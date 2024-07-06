@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { categories } from "../../../helpers/categories";
-import { ICategory } from "@/app/interfaces/ICategory";
+import { categories } from "../../helpers/categories";
+import { ICategory } from "@/interfaces/ICategory";
 import { IProduct } from "../../interfaces/IProduct";
 import { useState } from "react";
 
@@ -23,9 +23,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
   const handleCategoryChange = (id: number | null) => {
     if (id === null) {
-      router.push(`/products`);
+      router.push(`/categories`);
     } else {
-      router.push(`/products/${id}`);
+      router.push(`/categories/${id}`);
     }
   };
 
@@ -33,7 +33,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     if (!category) {
       return (
         <h1 className="text-2xl font-bold">
-          <Link href="/products">
+          <Link href="/categories">
             <p className="text-bold">Productos</p>
           </Link>
         </h1>
@@ -42,7 +42,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
     return (
       <h1 className="text-2xl">
-        <Link href="/products">Productos</Link>
+        <Link href="/categories">Productos</Link>
         {" / "}
         <span className="font-bold">{category.name}</span>
       </h1>
@@ -103,7 +103,11 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <div className="w-full lg:w-3/4 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {productsList.map((product) => (
-              <div key={product.id} className="border p-4 rounded-lg">
+              <div
+                key={product.id}
+                className="border p-4 rounded-lg"
+                onClick={() => router.push(`/products/${product.id}`)}
+              >
                 <img
                   src={product.imageUrl}
                   alt={product.name}
