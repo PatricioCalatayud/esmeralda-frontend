@@ -5,7 +5,8 @@ import Link from "next/link";
 import { categories, getCategoryById } from "../../helpers/categories";
 import { ICategory } from "@/interfaces/ICategory";
 import { IProduct } from "../../interfaces/IProduct";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 
 interface ProductsClientPageProps {
   selectedCategory: number | null;
@@ -20,6 +21,35 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 }) => {
   const router = useRouter();
   const [filterOption, setFilterOption] = useState<string>("");
+  const [filteredProducts, setFilteredProducts] =
+    useState<IProduct[]>(productsList);
+
+  useEffect(() => {
+    let sortedProducts = [...productsList];
+
+    switch (filterOption) {
+      case "price-asc":
+        sortedProducts.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        sortedProducts.sort((a, b) => b.price - a.price);
+        break;
+      case "name-asc":
+        sortedProducts.sort((a, b) =>
+          a.description.localeCompare(b.description)
+        );
+        break;
+      case "name-desc":
+        sortedProducts.sort((a, b) =>
+          b.description.localeCompare(a.description)
+        );
+        break;
+      default:
+        sortedProducts = [...productsList];
+    }
+
+    setFilteredProducts(sortedProducts);
+  }, [filterOption, productsList]);
 
   const handleCategoryChange = (id: number | null) => {
     if (id === null) {
@@ -61,6 +91,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
             onChange={(e) => setFilterOption(e.target.value)}
             className="bg-transparent border-none outline-none focus:outline-none p-2 text-white"
           >
+            <option value="" className="text-black">
+              Filtrar
+            </option>
             <option value="price-asc" className="text-black">
               Ordenar por precio: Menor a Mayor
             </option>
@@ -102,7 +135,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         {/* Contenido principal */}
         <div className="w-full lg:w-3/4 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {productsList.map((product) => {
+            {filteredProducts.map((product) => {
               const category = getCategoryById(product.categoryId); // Obtener categoría
               return (
                 <div
@@ -111,10 +144,11 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                   onClick={() => router.push(`/products/${product.article_id}`)}
                 >
                   <div className="relative pb-56 flex items-center justify-center">
-                    <img
+                    <Image
                       src={product.url_img}
                       alt={product.description}
-                      className="absolute inset-0 w-full h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
+                      layout="fill"
+                      className="absolute inset-0 object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
                     />
                   </div>
                   {category && (

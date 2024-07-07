@@ -121,30 +121,6 @@ export const products: IProduct[] = [
     isDeleted: false,
     categoryId: 2,
   },
-  {
-    article_id: 11,
-    description: "Café de Comercio Justo",
-    url_img: "https://via.placeholder.com/150",
-    price: 11.99,
-    stock: 100,
-    discount: 0,
-    averageRating: 4.5,
-    isAvailable: true,
-    isDeleted: false,
-    categoryId: 3,
-  },
-  {
-    article_id: 12,
-    description: "Máquina de Café Automática",
-    url_img: "https://via.placeholder.com/150",
-    price: 249.99,
-    stock: 20,
-    discount: 0,
-    averageRating: 5.0,
-    isAvailable: true,
-    isDeleted: false,
-    categoryId: 4,
-  },
 ];
 
 export const getProductsByCategory = (categoryId: number) => {
