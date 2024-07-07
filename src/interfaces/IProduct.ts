@@ -1,8 +1,12 @@
 export interface IProduct {
-  id: number;
-  name: string;
-  categoryId: number;
-  price: number;
+  article_id: number;
   description: string;
-  imageUrl: string;
+  url_img: string;
+  price: number;
+  stock: number;
+  discount?: number;
+  averageRating?: number;
+  isAvailable?: boolean;
+  isDeleted?: boolean;
+  categoryId: number;
 }

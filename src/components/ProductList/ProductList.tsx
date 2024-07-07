@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { categories } from "../../helpers/categories";
+import { categories, getCategoryById } from "../../helpers/categories";
 import { ICategory } from "@/interfaces/ICategory";
 import { IProduct } from "../../interfaces/IProduct";
 import { useState } from "react";
@@ -102,22 +102,46 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         {/* Contenido principal */}
         <div className="w-full lg:w-3/4 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {productsList.map((product) => (
-              <div
-                key={product.id}
-                className="border p-4 rounded-lg"
-                onClick={() => router.push(`/products/${product.id}`)}
-              >
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-48 object-cover mb-4 rounded"
-                />
-                <h2 className="text-xl font-semibold">{product.name}</h2>
-                <p className="text-gray-700">{product.description}</p>
-                <p className="text-lg font-bold mt-2">${product.price}</p>
-              </div>
-            ))}
+            {productsList.map((product) => {
+              const category = getCategoryById(product.categoryId); // Obtener categoría
+              return (
+                <div
+                  key={product.article_id}
+                  className="p-4 rounded-lg h-full"
+                  onClick={() => router.push(`/products/${product.article_id}`)}
+                >
+                  <div className="relative pb-56 flex items-center justify-center">
+                    <img
+                      src={product.url_img}
+                      alt={product.description}
+                      className="absolute inset-0 w-full h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
+                    />
+                  </div>
+                  {category && (
+                    <h3 className="text-gray-500">{category.name}</h3>
+                  )}
+                  <h2 className="text-xl font-semibold">
+                    {product.description}
+                  </h2>
+                  <p className="text-lg font-bold mt-2">${product.price}</p>
+                </div>
+              );
+            })}
+            <style jsx>{`
+              @keyframes fade-in-up {
+                0% {
+                  opacity: 0;
+                  transform: translateY(-20px);
+                }
+                100% {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              .animate-fade-in-up {
+                animation: fade-in-up 1s ease-out;
+              }
+            `}</style>
           </div>
         </div>
       </div>
