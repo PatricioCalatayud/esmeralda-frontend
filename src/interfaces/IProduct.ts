@@ -10,3 +10,5 @@ export interface IProduct {
   isDeleted?: boolean;
   categoryId: number;
 }
+
+
