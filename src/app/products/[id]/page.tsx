@@ -36,7 +36,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const renderBreadcrumb = () => {
     if (!category) {
       return (
-        <h1 className="text-lg font-bold">
+        <h1 className="text-lg font-bold animate-fade-in-up">
           <Link href="/categories">
             <p className="hover:font-bold">Productos</p>
           </Link>
@@ -45,7 +45,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     }
 
     return (
-      <h1 className="text-lg text-gray-500">
+      <h1 className="text-lg text-gray-500 animate-fade-in-up">
         <Link href="/categories" className="hover:font-bold hover:text-black">
           Productos
         </Link>
@@ -115,16 +115,36 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           .animate-fade-in-right {
             animation: fade-in-right 1s ease-out;
           }
+
+          @keyframes fade-in-up {
+            0% {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out;
+          }
         `}</style>
-        <div className="md:w-1/2 md:pl-8 mt-4 md:mt-0">
+        <div className="md:w-1/2 md:pl-8 mt-4 md:mt-0 animate-fade-in-up">
           {renderBreadcrumb()}
-          {category && <h3 className="text-gray-500 mt-4">{category.name}</h3>}
-          <h1 className="text-3xl font-bold mb-2">{product.description}</h1>
-          <p className="text-2xl font-semibold text-green-700 mb-4">
+          {category && (
+            <h3 className="text-gray-500 mt-4 animate-fade-in-up">
+              {category.name}
+            </h3>
+          )}
+          <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
+            {product.description}
+          </h1>
+          <p className="text-2xl font-semibold text-green-700 mb-4 animate-fade-in-up">
             ${product.price}
           </p>
           {sizeOptions.length > 0 && (
-            <div className="mb-4 flex space-x-4">
+            <div className="mb-4 flex space-x-4 animate-fade-in-up">
               {sizeOptions.map((size) => (
                 <button
                   key={size}
@@ -140,7 +160,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
               ))}
             </div>
           )}
-          <button className="bg-green-800 text-white py-2 px-4 rounded-full hover:bg-green-700 transition-colors duration-300">
+          <button className="bg-green-800 text-white py-2 px-4 rounded-full hover:bg-green-700 transition-colors duration-300 animate-fade-in-up">
             Añadir al carrito
           </button>
         </div>
