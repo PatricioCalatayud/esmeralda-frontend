@@ -93,27 +93,44 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="md:w-1/2">
+        <div className="relative md:w-1/2">
+          <img
+            src="/Logo.png"
+            alt="Logo"
+            className="absolute inset-0 w-full h-full object-contain opacity-0 animate-fade-in-logo"
+          />
           <img
             src={product.url_img}
             alt={product.description}
-            className="w-full h-96 object-contain rounded-lg animate-fade-in-right"
+            className="relative w-full h-96 object-contain rounded-lg opacity-0 animate-fade-in-product"
           />
         </div>
 
         <style jsx>{`
-          @keyframes fade-in-right {
+          @keyframes fade-in-logo {
             0% {
               opacity: 0;
-              transform: translateX(20px);
+            }
+            100% {
+              opacity: 0.3;
+            }
+          }
+          .animate-fade-in-logo {
+            animation: fade-in-logo 0.5s ease-out forwards;
+            animation-delay: 0.5s;
+          }
+
+          @keyframes fade-in-product {
+            0% {
+              opacity: 0;
             }
             100% {
               opacity: 1;
-              transform: translateX(0);
             }
           }
-          .animate-fade-in-right {
-            animation: fade-in-right 1s ease-out;
+          .animate-fade-in-product {
+            animation: fade-in-product 1.5s ease-out forwards;
+            animation-delay: 1.5s;
           }
 
           @keyframes fade-in-up {

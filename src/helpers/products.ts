@@ -9,8 +9,6 @@ export const products: IProduct[] = [
     stock: 100,
     discount: 0,
     averageRating: 4.5,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 1,
   },
   {
@@ -21,8 +19,6 @@ export const products: IProduct[] = [
     stock: 150,
     discount: 0,
     averageRating: 4.0,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 1,
   },
   {
@@ -33,8 +29,6 @@ export const products: IProduct[] = [
     stock: 80,
     discount: 0,
     averageRating: 4.7,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 2,
   },
   {
@@ -45,8 +39,6 @@ export const products: IProduct[] = [
     stock: 70,
     discount: 0,
     averageRating: 4.8,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 2,
   },
   {
@@ -57,8 +49,6 @@ export const products: IProduct[] = [
     stock: 200,
     discount: 0,
     averageRating: 4.3,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 3,
   },
   {
@@ -69,8 +59,6 @@ export const products: IProduct[] = [
     stock: 120,
     discount: 0,
     averageRating: 4.1,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 3,
   },
   {
@@ -81,8 +69,6 @@ export const products: IProduct[] = [
     stock: 30,
     discount: 0,
     averageRating: 4.9,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 4,
   },
   {
@@ -93,8 +79,6 @@ export const products: IProduct[] = [
     stock: 50,
     discount: 0,
     averageRating: 4.2,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 4,
   },
   {
@@ -105,8 +89,6 @@ export const products: IProduct[] = [
     stock: 90,
     discount: 0,
     averageRating: 4.6,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 1,
   },
   {
@@ -117,8 +99,6 @@ export const products: IProduct[] = [
     stock: 110,
     discount: 0,
     averageRating: 4.0,
-    isAvailable: true,
-    isDeleted: false,
     categoryId: 2,
   },
 ];
