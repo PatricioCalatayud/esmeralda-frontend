@@ -1,7 +1,42 @@
-
-
+"use client";
+import { ILoginErrorProps, ILoginProps } from "@/types/login";
+import { validateLoginForm } from "@/utils/loginFormValidation copy";
+import { useEffect, useState } from "react";
 
 const Login = () => {
+  const [dataUser, setDataUser] = useState<ILoginProps>({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<ILoginErrorProps>({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const { name, value } = e.target;
+
+    setDataUser((prevDataUser) => ({
+      ...prevDataUser,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors = validateLoginForm(dataUser);
+    setError(errors);
+  };
+
+  useEffect(() => {
+    const errors = validateLoginForm(dataUser);
+    setError(errors);
+  }, [dataUser]);
+
+  const isDisabled = Object.values(error).some((x) => x !== "");
+
   return (
     <div
       className="flex justify-center items-center font-sans h-full min-h-screen p-4"
@@ -13,7 +48,7 @@ const Login = () => {
     >
       <div className="font-sans max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 items-center gap-8 h-full">
-          <form className="max-w-lg w-full p-6 bg-opacity-70 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
+          <form className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
             <div className="mb-12">
               <h3 className="text-gray-800 text-4xl font-extrabold animate-fade-down animate-once">
                 Iniciar sesión
@@ -32,8 +67,11 @@ const Login = () => {
                 <input
                   name="email"
                   type="text"
+                  id="email"
+                  value={dataUser.email}
+                  onChange={handleChange}
                   required
-                  className="w-full text-sm text-gray-800 bg-gray-100 focus:bg-transparent px-4 py-3.5 rounded-md outline-green-700"
+                  className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                   placeholder="Ingrese correo"
                 />
                 <svg
@@ -66,6 +104,7 @@ const Login = () => {
                   </g>
                 </svg>
               </div>
+              {error.email && <p className="text-red-500">{error.email}</p>}
             </div>
 
             <div className="mt-4">
@@ -76,8 +115,10 @@ const Login = () => {
                 <input
                   name="password"
                   type="password"
+                  value={dataUser.password}
+                  onChange={handleChange}
                   required
-                  className="w-full text-sm text-gray-800 bg-gray-100 focus:bg-transparent px-4 py-3.5 rounded-md outline-green-700"
+                  className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                   placeholder="Ingrese contraseña"
                 />
                 <svg
@@ -93,6 +134,9 @@ const Login = () => {
                   ></path>
                 </svg>
               </div>
+              {error.password && (
+                <p className="text-red-500">{error.password}</p>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
@@ -121,12 +165,17 @@ const Login = () => {
             </div>
 
             <div className="mt-8">
-              <button
-                type="button"
-                className="w-full shadow-xl py-3 px-6 text-sm tracking-wide font-semibold rounded-md text-white bg-green-800 hover:bg-green-900 focus:outline-none animate-bounce animate-thrice"
-              >
-                Iniciar sesión
-              </button>
+            <button
+                          type="submit"
+                          disabled={isDisabled}
+                          className={`w-full shadow-xl py-3 px-6 text-sm tracking-wide font-semibold rounded-md text-white focus:outline-none animate-bounce animate-thrice ${
+                            isDisabled
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-800"
+                          }`}
+                        >
+                          Registrar
+                        </button>
             </div>
             <p className="text-sm mt-8 text-center font-semibold text-gray-800">
               ¿No tienes cuenta?{" "}
@@ -141,7 +190,7 @@ const Login = () => {
 
           <div className="h-full md:py-6 flex items-center relative max-md:before:hidden before:absolute before:bg-gradient-to-r before:h-full before:w-3/4 before:right-0 before:z-0">
             <img
-              src="/coffe.png"
+              src="/LogoCafe.png"
               alt="Imagen de café"
               className="rounded-xl lg:w-4/5 md:w-11/12 z-50 relative"
             />
