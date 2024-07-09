@@ -176,47 +176,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           />
         </div>
 
-        <style jsx>{`
-          @keyframes fade-in-logo {
-            0% {
-              opacity: 0;
-            }
-            100% {
-              opacity: 0.3;
-            }
-          }
-          .animate-fade-in-logo {
-            animation: fade-in-logo 0.5s ease-out forwards;
-            animation-delay: 0.5s;
-          }
-
-          @keyframes fade-in-product {
-            0% {
-              opacity: 0;
-            }
-            100% {
-              opacity: 1;
-            }
-          }
-          .animate-fade-in-product {
-            animation: fade-in-product 1.5s ease-out forwards;
-            animation-delay: 1.5s;
-          }
-
-          @keyframes fade-in-up {
-            0% {
-              opacity: 0;
-              transform: translateY(-20px);
-            }
-            100% {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-fade-in-up {
-            animation: fade-in-up 1s ease-out;
-          }
-        `}</style>
         <div className="md:w-1/2 md:pl-8 mt-4 md:mt-0 animate-fade-in-up">
           {renderBreadcrumb()}
           {category && (
@@ -260,6 +219,63 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in-logo {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 0.3;
+          }
+        }
+        .animate-fade-in-logo {
+          animation: fade-in-logo 0.5s ease-out forwards;
+          animation-delay: 0.5s;
+        }
+
+        @keyframes fade-in-product {
+          0% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+        .animate-fade-in-product {
+          animation: fade-in-product 1.5s ease-out forwards;
+          animation-delay: 1.5s;
+        }
+
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 1s ease-out;
+        }
+
+        @keyframes fade-in-text {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-text {
+          animation: fade-in-text 1s ease-out forwards;
+          animation-delay: 2s;
+        }
+      `}</style>
     </div>
   );
 };
