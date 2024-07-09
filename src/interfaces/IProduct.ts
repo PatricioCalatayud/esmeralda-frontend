@@ -9,6 +9,6 @@ export interface IProduct {
   isAvailable?: boolean;
   isDeleted?: boolean;
   categoryId: number;
+  size?: string;
+  quantity?: number;
 }
-
-
