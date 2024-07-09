@@ -46,7 +46,8 @@ const DashboardAdmin = () => {
 //     return null; // Puedes mostrar un loader o similar mientras se verifica el token
 //   }
   return (
-    <div className="flex flex-row min-h-screen dark:bg-gray-700">
+
+<div className="flex flex-row min-h-screen dark:bg-gray-700">
       {/* Barra lateral */}
       <div className="bg-black text-green-800 w-36 md:w-52">
         <div className="p-1 md:p-4">
@@ -108,6 +109,7 @@ const DashboardAdmin = () => {
       {/* Contenido principal */}
       <div className="flex-1 overflow-y-auto">
         {/* Barra de navegación */}
+        
         <div className="bg-gray-200 p-1 md:p-4 dark:bg-gray-500">
           <h2 className="text-lg font-semibold mb-2 dark:text-white">
             Bienvenido usuario Administrador
@@ -173,6 +175,7 @@ const DashboardAdmin = () => {
         </div>
       </div>
     </div>
+    
   )
 }
 
