@@ -6,7 +6,6 @@ import { categories, getCategoryById } from "../../helpers/categories";
 import { ICategory } from "@/interfaces/ICategory";
 import { IProduct } from "../../interfaces/IProduct";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 interface ProductsClientPageProps {
   selectedCategory: number | null;
@@ -144,11 +143,10 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                   onClick={() => router.push(`/products/${product.article_id}`)}
                 >
                   <div className="relative pb-56 flex items-center justify-center">
-                    <Image
+                    <img
                       src={product.url_img}
                       alt={product.description}
-                      layout="fill"
-                      className="absolute inset-0 object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
+                      className="absolute inset-0 w-full h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
                     />
                   </div>
                   {category && (
@@ -161,24 +159,24 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 </div>
               );
             })}
-            <style jsx>{`
-              @keyframes fade-in-up {
-                0% {
-                  opacity: 0;
-                  transform: translateY(-20px);
-                }
-                100% {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-              .animate-fade-in-up {
-                animation: fade-in-up 1s ease-out;
-              }
-            `}</style>
           </div>
         </div>
       </div>
+      <style jsx>{`
+        @keyframes fade-in-up {
+          0% {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 1s ease-out forwards;
+        }
+      `}</style>
     </>
   );
 };
