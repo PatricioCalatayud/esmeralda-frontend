@@ -1,14 +1,18 @@
 "use client";
 import { IUserErrorProps, IUserProps } from "@/types/user";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const RegisterUser = () => {
+  const Router = useRouter();
+
   const [dataUser, setDataUser] = useState<IUserProps>({
     names: "",
     email: "",
     password: "",
-    address: "",
+    //address: "",
     phone: "",
   });
 
@@ -16,7 +20,7 @@ const RegisterUser = () => {
     names: "",
     email: "",
     password: "",
-    address: "",
+    //address: "",
     phone: "",
   });
 
@@ -30,10 +34,33 @@ const RegisterUser = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors = validateRegisterUserForm(dataUser);
     setError(errors);
+    console.log(dataUser);
+    try {
+      const res = await axios.post(
+        "http://localhost:3001/users/signup",
+        dataUser,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.status !== 200) {
+        throw new Error(
+          `Error registrando usuario: ${res.status} - ${res.data.message}`
+        );
+      }
+
+      const User = res.data;
+      console.log(User);
+
+      return User;
+    } catch (error: any) {}
   };
 
   useEffect(() => {
@@ -112,7 +139,7 @@ const RegisterUser = () => {
                       )}
                     </div>
 
-                    <div className="md:col-span-5 font-semibold">
+                    {/* <div className="md:col-span-5 font-semibold">
                       <label htmlFor="address">Dirección</label>
                       <input
                         type="text"
@@ -125,7 +152,7 @@ const RegisterUser = () => {
                       {error.address && (
                         <p className="text-red-500">{error.address}</p>
                       )}
-                    </div>
+                    </div> */}
 
                     <div className="md:col-span-3 font-semibold">
                       <label htmlFor="phone">Teléfono</label>

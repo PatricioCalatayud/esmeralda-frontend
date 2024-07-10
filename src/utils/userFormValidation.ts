@@ -5,7 +5,7 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     names: "",
     email: "",
     password: "",
-    address: "",
+    //address: "",
     phone: "",
   };
 
@@ -19,9 +19,9 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     errors.email = "El email es inválido";
   }
 
-  if (!values.address.trim()) {
-    errors.address = "El campo dirección es requerido";
-  }
+  // if (!values.address.trim()) {
+  //   errors.address = "El campo dirección es requerido";
+  // }
 
   if (!values.phone) {
     errors.phone = "El campo teléfono es requerido";

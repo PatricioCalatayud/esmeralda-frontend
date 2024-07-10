@@ -1,9 +1,15 @@
 "use client";
 import { ILoginErrorProps, ILoginProps } from "@/types/login";
 import { validateLoginForm } from "@/utils/loginFormValidation copy";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { LoginUser } from "@/helpers/Autenticacion.helper";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
+  const Router = useRouter();
+
   const [dataUser, setDataUser] = useState<ILoginProps>({
     email: "",
     password: "",
@@ -14,7 +20,7 @@ const Login = () => {
     password: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: any) => {
     e.preventDefault();
     const { name, value } = e.target;
 
@@ -24,8 +30,34 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      const user = await LoginUser(dataUser);
+      const userWithToken = user as unknown as { token: string };
+      localStorage.setItem("userSession", JSON.stringify({ userData: user }));
+
+      const decodedToken = jwtDecode(userWithToken.token) as {
+        isAdmin: boolean;
+        isSuperAdmin: boolean;
+      };
+
+      // Swal.fire({
+      //   icon: "success",
+      //   title: "¡Bienvenido a FastBurgers!",
+      //   showConfirmButton: false,
+      //   timer: 1500,
+      // });
+
+      if (decodedToken.isAdmin || decodedToken.isSuperAdmin) {
+        Router.push("/dashboardAdmin");
+      } else {
+        Router.push("/home");
+      }
+      
+    } catch (error) {
+      
+    }
     const errors = validateLoginForm(dataUser);
     setError(errors);
   };
@@ -48,7 +80,7 @@ const Login = () => {
     >
       <div className="font-sans max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 items-center gap-8 h-full">
-          <form className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
+          <form onSubmit={handleChange} className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
             <div className="mb-12">
               <h3 className="text-gray-800 text-4xl font-extrabold animate-fade-down animate-once">
                 Iniciar sesión

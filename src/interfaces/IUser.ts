@@ -3,5 +3,5 @@ export interface IUser {
   email: string;
   password: string;
   address: string;
-  phone: number;
+  phone: string;
 }
