@@ -53,8 +53,8 @@ const MercadoPagoButton: React.FC<PaymentComponentProps> = ({
 
   useEffect(() => {
     if (brickContainerRef.current && preferenceId) {
-      const bricksBuilder = new window.MercadoPagoBricks();
       const renderBrick = async () => {
+        const bricksBuilder = new (window as any).MercadoPagoBricks();
         await bricksBuilder.create("payment", "paymentbrick_container", {
           initialization: {
             amount: cartItems.reduce(
@@ -119,7 +119,7 @@ const MercadoPagoButton: React.FC<PaymentComponentProps> = ({
 
       renderBrick();
     }
-  }, [preferenceId]);
+  }, [preferenceId, cartItems, user]);
 
   return <div id="paymentbrick_container" ref={brickContainerRef}></div>;
 };

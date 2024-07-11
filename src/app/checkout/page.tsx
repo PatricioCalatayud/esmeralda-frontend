@@ -38,35 +38,6 @@ const Checkout = () => {
     setAllFieldsCompleted(allFieldsFilled);
   }, [user, address]);
 
-  useEffect(() => {
-    const createPreference = async () => {
-      const response = await fetch("/api/create_preference", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: cart.map((item) => ({
-            title: item.description,
-            unit_price: item.price,
-            quantity: item.quantity,
-          })),
-          payer: {
-            name: user.name,
-            email: user.email,
-          },
-        }),
-      });
-
-      const preference = await response.json();
-      setPreferenceId(preference.id);
-    };
-
-    if (allFieldsCompleted) {
-      createPreference();
-    }
-  }, [allFieldsCompleted, cart, user]);
-
   const calculateDiscountAmount = (price: number, discount: number) => {
     const validPrice = price || 0;
     const validDiscount = discount || 0;
