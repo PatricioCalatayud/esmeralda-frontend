@@ -1,5 +1,5 @@
 export interface IUserProps {
-  names: string;
+  name: string;
   email: string;
   password: string;
   //address: string;
@@ -7,7 +7,7 @@ export interface IUserProps {
 }
 
 export interface IUserErrorProps {
-  names: string;
+  name: string;
   email: string;
   password: string;
   //address: string;
