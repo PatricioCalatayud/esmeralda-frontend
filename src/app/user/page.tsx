@@ -140,21 +140,7 @@ const RegisterUser = () => {
                       )}
                     </div>
 
-                    {/* <div className="md:col-span-5 font-semibold">
-                      <label htmlFor="address">Dirección</label>
-                      <input
-                        type="text"
-                        name="address"
-                        id="address"
-                        value={dataUser.address}
-                        onChange={handleChange}
-                        className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
-                      />
-                      {error.address && (
-                        <p className="text-red-500">{error.address}</p>
-                      )}
-                    </div> */}
-
+                
                     <div className="md:col-span-3 font-semibold">
                       <label htmlFor="phone">Teléfono</label>
                       <input
