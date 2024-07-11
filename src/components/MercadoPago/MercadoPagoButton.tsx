@@ -46,7 +46,7 @@ const MercadoPagoButton: React.FC<PaymentComponentProps> = ({
       setPreferenceId(preference.id);
     };
 
-    if (cartItems.length > 0 && user.name && user.email) {
+    if (cartItems.length > 0) {
       createPreference();
     }
   }, [cartItems, user]);

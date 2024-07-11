@@ -142,11 +142,11 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                   className="p-4 rounded-lg h-full"
                   onClick={() => router.push(`/products/${product.article_id}`)}
                 >
-                  <div className="relative pb-56 flex items-center justify-center">
+                  <div className="relative pb-56 flex justify-items-start ">
                     <img
                       src={product.url_img}
                       alt={product.description}
-                      className="absolute inset-0 w-full h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
+                      className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
                     />
                   </div>
                   {category && (

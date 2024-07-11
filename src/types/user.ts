@@ -1,15 +1,15 @@
 export interface IUserProps {
-  names: string;
+  name: string;
   email: string;
   password: string;
-  //address: string;
+  
   phone: string;
 }
 
 export interface IUserErrorProps {
-  names: string;
+  name: string;
   email: string;
   password: string;
-  //address: string;
+ 
   phone: string;
 }

@@ -9,7 +9,7 @@ const RegisterUser = () => {
   const Router = useRouter();
 
   const [dataUser, setDataUser] = useState<IUserProps>({
-    names: "",
+    name: "",
     email: "",
     password: "",
     //address: "",
@@ -17,7 +17,7 @@ const RegisterUser = () => {
   });
 
   const [error, setError] = useState<IUserErrorProps>({
-    names: "",
+    name: "",
     email: "",
     password: "",
     //address: "",
@@ -93,17 +93,18 @@ const RegisterUser = () => {
                 <div className="lg:col-span-2">
                   <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
                     <div className="md:col-span-5 font-semibold">
-                      <label htmlFor="names">Nombres y Apellidos:</label>
+                      <label htmlFor="names">Apellidos y Nombres:</label>
                       <input
                         type="text"
-                        name="names"
-                        id="names"
-                        value={dataUser.names}
+                        name="name"
+                        id="name"
+                        value={dataUser.name}
                         onChange={handleChange}
+                        placeholder="Apellidos y Nombres"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                       />
-                      {error.names && (
-                        <p className="text-red-500">{error.names}</p>
+                      {error.name && (
+                        <p className="text-red-500">{error.name}</p>
                       )}
                     </div>
 
@@ -139,21 +140,7 @@ const RegisterUser = () => {
                       )}
                     </div>
 
-                    {/* <div className="md:col-span-5 font-semibold">
-                      <label htmlFor="address">Dirección</label>
-                      <input
-                        type="text"
-                        name="address"
-                        id="address"
-                        value={dataUser.address}
-                        onChange={handleChange}
-                        className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
-                      />
-                      {error.address && (
-                        <p className="text-red-500">{error.address}</p>
-                      )}
-                    </div> */}
-
+                
                     <div className="md:col-span-3 font-semibold">
                       <label htmlFor="phone">Teléfono</label>
                       <input

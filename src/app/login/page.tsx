@@ -1,15 +1,9 @@
 "use client";
 import { ILoginErrorProps, ILoginProps } from "@/types/login";
 import { validateLoginForm } from "@/utils/loginFormValidation copy";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { LoginUser } from "@/helpers/Autenticacion.helper";
-import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
-  const Router = useRouter();
-
   const [dataUser, setDataUser] = useState<ILoginProps>({
     email: "",
     password: "",
@@ -20,7 +14,7 @@ const Login = () => {
     password: "",
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
 
@@ -30,34 +24,8 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const user = await LoginUser(dataUser);
-      const userWithToken = user as unknown as { token: string };
-      localStorage.setItem("userSession", JSON.stringify({ userData: user }));
-
-      const decodedToken = jwtDecode(userWithToken.token) as {
-        isAdmin: boolean;
-        isSuperAdmin: boolean;
-      };
-
-      // Swal.fire({
-      //   icon: "success",
-      //   title: "¡Bienvenido a FastBurgers!",
-      //   showConfirmButton: false,
-      //   timer: 1500,
-      // });
-
-      if (decodedToken.isAdmin || decodedToken.isSuperAdmin) {
-        Router.push("/dashboardAdmin");
-      } else {
-        Router.push("/home");
-      }
-      
-    } catch (error) {
-      
-    }
     const errors = validateLoginForm(dataUser);
     setError(errors);
   };
@@ -70,17 +38,19 @@ const Login = () => {
   const isDisabled = Object.values(error).some((x) => x !== "");
 
   return (
-    <div
-      className="flex justify-center items-center font-sans h-full min-h-screen p-4"
-      style={{
-        backgroundImage: `url("/hermoso-jardin-fresas-amanecer-doi-ang-khang-chiang-mai-tailandia.jpg")`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-      }}
-    >
-      <div className="font-sans max-w-7xl mx-auto">
+    <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
+     <video
+  autoPlay
+  loop
+  muted
+  className="absolute top-0 left-0 w-full h-full object-cover"
+>
+  <source src="/roaster.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+      <div className="relative z-10 font-sans max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 items-center gap-8 h-full">
-          <form onSubmit={handleChange} className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
+          <form className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
             <div className="mb-12">
               <h3 className="text-gray-800 text-4xl font-extrabold animate-fade-down animate-once">
                 Iniciar sesión
@@ -213,7 +183,7 @@ const Login = () => {
               ¿No tienes cuenta?{" "}
               <a
                 href="/user"
-                className="text-green-600 font-bold tracking-wide hover:underline ml-1"
+                className="text-green-900 font-bold tracking-wide hover:underline ml-1"
               >
                 Regístrate Aquí
               </a>

@@ -11,4 +11,7 @@ export interface IProduct {
   categoryId: number;
   size?: string;
   quantity?: number;
+  id?: number;
+  name?: string;
+  imgUrl?: string;
 }

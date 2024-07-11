@@ -110,7 +110,7 @@ const DashboardAdmin = () => {
       <div className="flex-1 overflow-y-auto">
         {/* Barra de navegación */}
         
-        <div className="bg-gray-200 p-1 md:p-4 dark:bg-gray-500">
+        <div className="bg-gray-200 p-1 md:p-4 dark:bg-gray-600">
           <h2 className="text-lg font-semibold mb-2 dark:text-white">
             Bienvenido usuario Administrador
           </h2>

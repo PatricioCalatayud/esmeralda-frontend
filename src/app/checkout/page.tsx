@@ -158,15 +158,17 @@ const Checkout = () => {
                             </span>
                           </li>
 
-                          {calculateDiscountAmount(item.price, item.discount) >
-                            0 && (
+                          {calculateDiscountAmount(
+                            item.price,
+                            item.discount || 0
+                          ) > 0 && (
                             <li className="flex flex-wrap gap-4">
                               Descuento{" "}
                               <span className="ml-auto">
                                 -$
                                 {calculateDiscountAmount(
                                   item.price,
-                                  item.discount
+                                  item.discount || 0
                                 ).toFixed(2)}
                               </span>
                             </li>

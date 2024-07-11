@@ -2,15 +2,15 @@ import { IUserErrorProps, IUserProps } from "@/types/user";
 
 export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
   let errors: IUserProps = {
-    names: "",
+    name: "",
     email: "",
     password: "",
     //address: "",
     phone: "",
   };
 
-  if (!values.names.trim()) {
-    errors.names = "El campo nombre y apellido es requerido";
+  if (!values.name.trim()) {
+    errors.name = "El campo nombre y apellido es requerido";
   }
 
   if (!values.email.trim()) {
@@ -19,9 +19,6 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     errors.email = "El email es inválido";
   }
 
-  // if (!values.address.trim()) {
-  //   errors.address = "El campo dirección es requerido";
-  // }
 
   if (!values.phone) {
     errors.phone = "El campo teléfono es requerido";
