@@ -9,7 +9,7 @@ import { IProduct } from "@/interfaces/IProduct";
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<IProduct[]>([]);
-  const [userSession, setUserSession] = useState<boolean>(false); // Aquí deberías manejar el estado de la sesión del usuario según corresponda
+  const [userSession, setUserSession] = useState<boolean>(true); // Aquí deberías manejar el estado de la sesión del usuario según corresponda
 
   useEffect(() => {
     const fetchCart = () => {
@@ -218,7 +218,7 @@ const Cart = () => {
                 type="button"
                 className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
                   userSession && cart.length > 0
-                    ? "bg-gray-900 hover:bg-gray-700 text-green-600"
+                    ? "bg-gray-200 hover:bg-gray-700 text-green-600"
                     : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
                 disabled={!userSession || cart.length === 0}
