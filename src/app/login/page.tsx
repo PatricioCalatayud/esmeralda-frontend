@@ -1,19 +1,37 @@
 "use client";
+import { LoginUser } from "@/helpers/Autenticacion.helper";
 import { ILoginErrorProps, ILoginProps } from "@/types/login";
-import { validateLoginForm } from "@/utils/loginFormValidation copy";
-import { useEffect, useState } from "react";
+import { validateLoginForm } from "@/utils/loginFormValidation";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import Swal from "sweetalert2";
 
 const Login = () => {
-  const [dataUser, setDataUser] = useState<ILoginProps>({
+  const Router = useRouter();
+
+  const initialUserData: ILoginProps = {
     email: "",
     password: "",
-  });
-
-  const [error, setError] = useState<ILoginErrorProps>({
+  };
+  const initialErrorState: ILoginErrorProps = {
     email: "",
     password: "",
+  };
+
+  const [dataUser, setDataUser] = useState<ILoginProps>(initialUserData);
+  const [error, setError] = useState<ILoginErrorProps>(initialErrorState);
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [touched, setTouched] = useState<
+    Record<keyof ILoginErrorProps, boolean>
+  >({
+    email: false,
+    password: false,
   });
 
+  //! Funcion para iniciar sesion
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -22,35 +40,132 @@ const Login = () => {
       ...prevDataUser,
       [name]: value,
     }));
+
+    if (!touched[name as keyof ILoginErrorProps]) {
+      setTouched((prevTouched) => ({
+        ...prevTouched,
+        [name]: true,
+      }));
+    }
+
+    const fieldErrors = validateLoginForm({
+      ...dataUser,
+      [name]: value,
+    });
+
+    setError((prevError) => ({
+      ...prevError,
+      [name]: fieldErrors[name as keyof ILoginErrorProps] || "", // Asegurar que siempre se asigna un string
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  //! Funcion para iniciar sesion
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar el formulario
     const errors = validateLoginForm(dataUser);
     setError(errors);
+
+    // Marcar todos los campos como tocados
+    setTouched({
+      email: true,
+      password: true,
+    });
+
+    // Si hay errores, no proceder con el envío
+    if (Object.values(errors).some((x) => x !== "")) {
+      return;
+    }
+
+    // Limpiar errores de envío previos
+    setSubmitError(null);
+
+    // Iniciar carga
+    setLoading(true);
+
+    console.log(dataUser); // Captura los datos del usuario (email y password
+
+    try {
+      // Intentar iniciar sesión usando fetch
+      const response = await fetch("http://localhost:3001/users/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataUser),
+      });
+
+      console.log(response); // Captura la respuesta del servidor
+      if (!response.ok) {
+        // Si la respuesta no es exitosa, lanzar un error
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      // Verificar si se recibió un usuario en la respuesta
+      const { user } = json;
+      if (user) {
+        // Guardar datos de usuario en localStorage
+        localStorage.setItem("userSession", JSON.stringify({ userData: user }));
+
+        // Mostrar mensaje de éxito usando Swal
+        Swal.fire({
+          icon: "success",
+          title: "¡Bienvenido a SmartMarket!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        // Limpiar campos del formulario después del éxito
+        setDataUser(initialUserData);
+        setTouched({
+          email: false,
+          password: false,
+        });
+
+        // Redirigir a la página principal después de un tiempo
+        setTimeout(() => {
+          Router.push("/");
+        }, 1500);
+      } else {
+        // Mostrar mensaje de error si no se encontró el usuario
+        Swal.fire({
+          icon: "error",
+          title: "Usuario o contraseña incorrecta",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error: any) {
+      // Capturar errores durante el inicio de sesión
+      setSubmitError(`Error al iniciar sesión: ${error.message}`);
+      toast.error(`Error al iniciar sesión: ${error.message}`);
+    } finally {
+      // Detener la carga después de finalizar
+      setLoading(false);
+    }
   };
-
-  useEffect(() => {
-    const errors = validateLoginForm(dataUser);
-    setError(errors);
-  }, [dataUser]);
-
   const isDisabled = Object.values(error).some((x) => x !== "");
 
   return (
     <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
-     <video
-  autoPlay
-  loop
-  muted
-  className="absolute top-0 left-0 w-full h-full object-cover"
->
-  <source src="/roaster.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
+      <video
+        autoPlay
+        loop
+        muted
+        className="absolute top-0 left-0 w-full h-full object-cover"
+      >
+        <source src="/roaster.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       <div className="relative z-10 font-sans max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 items-center gap-8 h-full">
-          <form className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center">
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-lg w-full p-6 bg-opacity-50 bg-white rounded-2xl shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)] flex flex-col justify-center"
+          >
             <div className="mb-12">
               <h3 className="text-gray-800 text-4xl font-extrabold animate-fade-down animate-once">
                 Iniciar sesión
@@ -62,7 +177,10 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="text-gray-800 font-semibold text-[15px] mb-2 block">
+              <label
+                htmlFor="email"
+                className="text-gray-800 font-semibold text-[15px] mb-2 block"
+              >
                 Correo
               </label>
               <div className="relative flex items-center">
@@ -72,7 +190,6 @@ const Login = () => {
                   id="email"
                   value={dataUser.email}
                   onChange={handleChange}
-                  required
                   className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                   placeholder="Ingrese correo"
                 />
@@ -108,18 +225,20 @@ const Login = () => {
               </div>
               {error.email && <p className="text-red-500">{error.email}</p>}
             </div>
-
-            <div className="mt-4">
-              <label className="text-gray-800 font-semibold text-[15px]  mb-2 block">
+            <div className="mt-6">
+              <label
+                htmlFor="password"
+                className="text-gray-800 font-semibold text-[15px] mb-2 block"
+              >
                 Contraseña
               </label>
               <div className="relative flex items-center">
                 <input
                   name="password"
                   type="password"
+                  id="password"
                   value={dataUser.password}
                   onChange={handleChange}
-                  required
                   className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                   placeholder="Ingrese contraseña"
                 />
@@ -158,7 +277,7 @@ const Login = () => {
               </div>
               <div className="text-sm">
                 <a
-                  href="jajvascript:void(0);"
+                  href="#"
                   className="text-green-00 font-semibold hover:underline"
                 >
                   ¿Olvidaste tu contraseña?
@@ -167,17 +286,15 @@ const Login = () => {
             </div>
 
             <div className="mt-8">
-            <button
-                          type="submit"
-                          disabled={isDisabled}
-                          className={`w-full shadow-xl py-3 px-6 text-sm tracking-wide font-semibold rounded-md text-white focus:outline-none animate-bounce animate-thrice ${
-                            isDisabled
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-green-800"
-                          }`}
-                        >
-                          Registrar
-                        </button>
+              <button
+                type="submit"
+                disabled={isDisabled}
+                className={`w-full shadow-xl py-3 px-6 text-sm tracking-wide font-semibold rounded-md text-white focus:outline-none animate-bounce animate-thrice ${
+                  isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-800"
+                }`}
+              >
+                Iniciar sesión
+              </button>
             </div>
             <p className="text-sm mt-8 text-center font-semibold text-gray-800">
               ¿No tienes cuenta?{" "}
@@ -188,6 +305,7 @@ const Login = () => {
                 Regístrate Aquí
               </a>
             </p>
+            {submitError && <p className="text-red-500 mt-4">{submitError}</p>}
           </form>
 
           <div className="h-full md:py-6 flex items-center relative max-md:before:hidden before:absolute before:bg-gradient-to-r before:h-full before:w-3/4 before:right-0 before:z-0">
@@ -199,6 +317,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

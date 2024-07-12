@@ -1,27 +1,39 @@
-"use client";
+'use client';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { NewUser } from "@/helpers/Autenticacion.helper";
 import { IUserErrorProps, IUserProps } from "@/types/user";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
-import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const RegisterUser = () => {
   const Router = useRouter();
 
-  const [dataUser, setDataUser] = useState<IUserProps>({
+  const initialUserData: IUserProps = {
     name: "",
     email: "",
     password: "",
-    //address: "",
     phone: "",
-  });
+  };
 
-  const [error, setError] = useState<IUserErrorProps>({
+  const initialErrorState: IUserErrorProps = {
     name: "",
     email: "",
     password: "",
-    //address: "",
     phone: "",
+  };
+
+  const [dataUser, setDataUser] = useState<IUserProps>(initialUserData);
+  const [error, setError] = useState<IUserErrorProps>(initialErrorState);
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Record<keyof IUserErrorProps, boolean>>({
+    name: false,
+    email: false,
+    password: false,
+    phone: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,41 +44,89 @@ const RegisterUser = () => {
       ...prevDataUser,
       [name]: value,
     }));
+
+    if (!touched[name as keyof IUserErrorProps]) {
+      setTouched((prevTouched) => ({
+        ...prevTouched,
+        [name]: true,
+      }));
+    }
+
+    // Validar el campo específico que se ha cambiado
+    const fieldErrors = validateRegisterUserForm({
+      ...dataUser,
+      [name]: value,
+    });
+
+    setError((prevError) => ({
+      ...prevError,
+      [name]: fieldErrors[name as keyof IUserErrorProps] || "", // Asegurar que siempre se asigna un string
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const errors = validateRegisterUserForm(dataUser);
     setError(errors);
-    console.log(dataUser);
+
+    // Marcar todos los campos como tocados para mostrar errores
+    setTouched({
+      name: true,
+      email: true,
+      password: true,
+      phone: true,
+    });
+
+    // Si hay errores, no proceder con el envío
+    if (Object.values(errors).some((x) => x !== "")) {
+      return;
+    }
+
+    setLoading(true);
+    setSubmitError(null);
+
     try {
-      const res = await axios.post(
-        "http://localhost:3001/users/signup",
-        dataUser,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await NewUser(dataUser);
+      toast.success("Usuario registrado correctamente", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
 
-      if (res.status !== 200) {
-        throw new Error(
-          `Error registrando usuario: ${res.status} - ${res.data.message}`
+      setDataUser(initialUserData); // Limpiar campos del formulario
+      setTouched({
+        name: false,
+        email: false,
+        password: false,
+        phone: false,
+      });
+
+      setTimeout(() => {
+        Router.push("/login");
+      }, 3000);
+    } catch (error: any) {
+      if (error.response) {
+        setSubmitError(
+          `Error al registrar el usuario: ${error.response.data.message}`
         );
+      } else if (error.request) {
+        setSubmitError(
+          "Error al registrar el usuario: No se recibió respuesta del servidor."
+        );
+      } else {
+        setSubmitError(`Error al registrar el usuario: ${error.message}`);
       }
-
-      const User = res.data;
-      console.log(User);
-
-      return User;
-    } catch (error: any) {}
+      toast.error("Error al registrar el usuario");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  useEffect(() => {
-    const errors = validateRegisterUserForm(dataUser);
-    setError(errors);
-  }, [dataUser]);
 
   const isDisabled = Object.values(error).some((x) => x !== "");
 
@@ -103,7 +163,7 @@ const RegisterUser = () => {
                         placeholder="Apellidos y Nombres"
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                       />
-                      {error.name && (
+                      {touched.name && error.name && (
                         <p className="text-red-500">{error.name}</p>
                       )}
                     </div>
@@ -119,7 +179,7 @@ const RegisterUser = () => {
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                         placeholder="email@domain.com"
                       />
-                      {error.email && (
+                      {touched.email && error.email && (
                         <p className="text-red-500">{error.email}</p>
                       )}
                     </div>
@@ -135,12 +195,11 @@ const RegisterUser = () => {
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                         placeholder="*********"
                       />
-                      {error.password && (
+                      {touched.password && error.password && (
                         <p className="text-red-500">{error.password}</p>
                       )}
                     </div>
 
-                
                     <div className="md:col-span-3 font-semibold">
                       <label htmlFor="phone">Teléfono</label>
                       <input
@@ -151,7 +210,7 @@ const RegisterUser = () => {
                         onChange={handleChange}
                         className="h-10 border mt-1 rounded px-4 w-full bg-gray-50 outline-green-700"
                       />
-                      {error.phone && (
+                      {touched.phone && error.phone && (
                         <p className="text-red-500">{error.phone}</p>
                       )}
                     </div>
@@ -160,24 +219,28 @@ const RegisterUser = () => {
                       <div className="font-sans max-w-7xl mx-auto pt-5">
                         <button
                           type="submit"
-                          disabled={isDisabled}
+                          disabled={isDisabled || loading}
                           className={`w-full shadow-xl py-3 px-6 text-sm tracking-wide font-semibold rounded-md text-white focus:outline-none animate-bounce animate-thrice ${
-                            isDisabled
+                            isDisabled || loading
                               ? "bg-gray-400 cursor-not-allowed"
                               : "bg-green-800"
                           }`}
                         >
-                          Registrar
+                          {loading ? "Registrando..." : "Registrar"}
                         </button>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+              {submitError && (
+                <p className="text-red-500 mt-4">{submitError}</p>
+              )}
             </form>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
