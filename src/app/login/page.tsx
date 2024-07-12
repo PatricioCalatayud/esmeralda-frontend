@@ -87,33 +87,20 @@ const Login = () => {
     console.log(dataUser); // Captura los datos del usuario (email y password
 
     try {
-      // Intentar iniciar sesión usando fetch
-      const response = await fetch("http://localhost:3001/users/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(dataUser),
-      });
+      const response = await LoginUser(dataUser);
 
       console.log(response); // Captura la respuesta del servidor
-      if (!response.ok) {
-        // Si la respuesta no es exitosa, lanzar un error
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const json = await response.json();
 
       // Verificar si se recibió un usuario en la respuesta
-      const { user } = json;
-      if (user) {
+
+      if (response) {
         // Guardar datos de usuario en localStorage
-        localStorage.setItem("userSession", JSON.stringify({ userData: user }));
+        //localStorage.setItem("userSession", JSON.stringify({ userData: response }));
 
         // Mostrar mensaje de éxito usando Swal
         Swal.fire({
           icon: "success",
-          title: "¡Bienvenido a SmartMarket!",
+          title: "¡La Esmeralda Café!",
           showConfirmButton: false,
           timer: 1500,
         });
