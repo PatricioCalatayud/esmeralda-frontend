@@ -9,7 +9,7 @@ import FooterList from "./FooterList";
 
 const Footer = () => {
   const pathname = usePathname();
-  const hideFooter = pathname === "/login";
+  const hideFooter = pathname === "/login" || pathname === "/register"; // Ocultar footer en login y register
   const [footerHeight, setFooterHeight] = useState("500px");
 
   useEffect(() => {

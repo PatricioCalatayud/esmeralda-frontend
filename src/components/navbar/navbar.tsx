@@ -14,7 +14,7 @@ import Image from "next/image";
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const hideNavbar = pathname === "/login";
+  const hideNavbar = pathname === "/login" || pathname === "/register"; // Ocultar navbar en login y register
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [allProducts, setAllProducts] = useState([]);
