@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { IProduct } from "@/interfaces/IProduct";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
+
+initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
+  locale: "es-AR",
+});
 
 const Checkout = () => {
   const router = useRouter();
@@ -21,6 +27,28 @@ const Checkout = () => {
       localStorage.getItem("cart") || "[]"
     ) as IProduct[];
     setCart(cartData);
+
+    const totalConDescuento = calcularTotalConDescuento(cartData);
+    const shippingCost = 0; // Costo de envío
+    const totalAmount = totalConDescuento + shippingCost;
+
+    const createPreference = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/market-pay/url-proccess",
+          {
+            unit_price: totalAmount,
+          }
+        );
+
+        const { id } = response.data;
+        setPreferenceId(id);
+      } catch (error) {
+        console.error("Error creating payment preference:", error);
+      }
+    };
+
+    createPreference();
   }, []);
 
   useEffect(() => {
@@ -34,7 +62,7 @@ const Checkout = () => {
     return validPrice * validDiscount;
   };
 
-  const calcularTotalConDescuento = () => {
+  const calcularTotalConDescuento = (cart: IProduct[]) => {
     return cart.reduce((acc, item) => {
       const validPrice = item.price || 0;
       const validDiscount = item.discount || 0;
@@ -46,7 +74,7 @@ const Checkout = () => {
     }, 0);
   };
 
-  const totalConDescuento = calcularTotalConDescuento();
+  const totalConDescuento = calcularTotalConDescuento(cart);
   const shippingCost = 0; // Costo de envío
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +86,12 @@ const Checkout = () => {
     const totalAmount = (totalConDescuento + shippingCost).toFixed(2);
     localStorage.setItem("totalAmount", totalAmount);
   }, [totalConDescuento]);
+
+  useEffect(() => {
+    if (allFieldsCompleted) {
+      // Lógica adicional cuando todos los campos están completos
+    }
+  }, [allFieldsCompleted]);
 
   return (
     <div className="font-sans bg-white h-full mb-20">
@@ -88,16 +122,6 @@ const Checkout = () => {
                     value={user.email}
                     required
                   />
-                </div>
-              </div>
-
-              <div className="mt-12 pb-6">
-                <h2 className="text-2xl font-extrabold text-gray-800 my-5">
-                  Método de Pago
-                </h2>
-
-                <div>
-                  <MercadoPagoButton preferenceId={preferenceId} />
                 </div>
               </div>
             </form>
@@ -146,7 +170,7 @@ const Checkout = () => {
                           item.discount || 0
                         ) > 0 && (
                           <li className="flex flex-wrap gap-4">
-                            Descuento{" "}
+                            Descuento
                             <span className="ml-auto">
                               -$
                               {calculateDiscountAmount(
@@ -174,6 +198,7 @@ const Checkout = () => {
             </div>
           </div>
         </div>
+        {preferenceId && <MercadoPagoButton preferenceId={preferenceId} />}
       </div>
     </div>
   );
