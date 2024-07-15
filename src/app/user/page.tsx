@@ -6,7 +6,7 @@ import { IUserErrorProps, IUserProps } from "@/types/user";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -246,3 +246,5 @@ const RegisterUser = () => {
 };
 
 export default RegisterUser;
+
+
