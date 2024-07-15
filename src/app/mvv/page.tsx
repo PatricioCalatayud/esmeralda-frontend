@@ -15,15 +15,15 @@ const MVV: React.FC = () => {
           </p>
           <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">Nuestros Valores</h1>
           <p className="mb-8 leading-relaxed">
-            - **Calidad**: Compromiso con la excelencia en cada taza de café.
+            -<span className=' font-bold'>Calidad</span>: Compromiso con la excelencia en cada taza de café.
             <br />
-            - **Sostenibilidad**: Apoyo a prácticas agrícolas y de negocio responsables.
+            -<span className=' font-bold'>Sostenibilidad</span>: Apoyo a prácticas agrícolas y de negocio responsables.
             <br />
-            - **Innovación**: Búsqueda continua de mejoras en técnicas de tostado y preparación.
+            -<span className=' font-bold'>Innovacion</span>: Búsqueda continua de mejoras en técnicas de tostado y preparación.
             <br />
-            - **Pasión**: Amor por el café y dedicación a compartirlo con el mundo.
+            -<span className=' font-bold'>Pasion</span>: Amor por el café y dedicación a compartirlo con el mundo.
             <br />
-            - **Integridad**: Conducta ética y transparencia en todas nuestras operaciones.
+            -<span className=' font-bold'>Integridad</span>: Conducta ética y transparencia en todas nuestras operaciones.
           </p>
         
         </div>

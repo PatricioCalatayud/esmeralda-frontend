@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Image from "next/image"; // Importación del componente Image
 
 const theme = createTheme();
 
@@ -324,6 +325,9 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
+      <div className="absolute  bottom-1 right-1">
+          <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
+        </div>
     </ThemeProvider>
   );
 };

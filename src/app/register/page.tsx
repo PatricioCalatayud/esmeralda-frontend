@@ -236,7 +236,7 @@ const Register = (): JSX.Element => {
           </Container>
         </div>
         <div className="absolute top-1 left-1">
-          <Image src="/logo.png" alt="Logo" width={400} height={400} /> {/* Ajusta el tamaño según sea necesario */}
+          <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
         </div>
       </div>
     </ThemeProvider>

@@ -14,7 +14,7 @@ const ReturnsAndExchanges: React.FC = () => {
           <div className="flex-grow sm:text-left text-center mt-6 sm:mt-0">
             <h2 className="text-gray-900 text-lg title-font font-medium mb-2">Política de Devolución</h2>
             <p className="leading-relaxed text-base">
-              Si no estás satisfecho con tu pedido, puedes devolverlo en el local dentro de los 30 minutos posteriores a la compra. Asegúrate de que los productos no hayan sido consumidos y estén en su estado original.
+              Si no estás satisfecho con tu pedido, puedes devolverlo en el local dentro de las 24hs posteriores a la compra. Asegúrate de que los productos no hayan sido consumidos y estén en su estado original.
             </p>
           </div>
         </div>
@@ -22,7 +22,7 @@ const ReturnsAndExchanges: React.FC = () => {
           <div className="flex-grow sm:text-left text-center mt-6 sm:mt-0">
             <h2 className="text-gray-900 text-lg title-font font-medium mb-2">Política de Cambio</h2>
             <p className="leading-relaxed text-base">
-              Ofrecemos cambios por productos del mismo valor dentro de los 30 minutos posteriores a la compra. Los productos deben estar en su estado original y sin consumir. Para iniciar un cambio, visita nuestro local con tu recibo y el producto en cuestión.
+              Ofrecemos cambios por productos del mismo valor dentro de las 24hs posteriores a la compra. Los productos deben estar en su estado original y sin consumir. Para iniciar un cambio, visita nuestro local con tu recibo y el producto en cuestión.
             </p>
           </div>
           <div className="sm:w-32 sm:order-none order-first sm:h-32 h-20 w-20 sm:ml-10 inline-flex items-center justify-center rounded-full bg-teal-100 text-teal-500 flex-shrink-0">
