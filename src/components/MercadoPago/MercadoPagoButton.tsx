@@ -1,30 +1,15 @@
-"use client";
+import React, { useEffect } from "react";
+import { Wallet } from "@mercadopago/sdk-react";
 
-import React, { useEffect, useRef } from "react";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
-
-interface CheckoutProps {
+interface MercadoPagoButtonProps {
   preferenceId: string;
 }
 
-const MercadoPagoButton: React.FC<CheckoutProps> = ({ preferenceId }) => {
-  const mp = useRef<any>(null);
-
+const MercadoPagoButton: React.FC<MercadoPagoButtonProps> = ({
+  preferenceId,
+}) => {
   useEffect(() => {
-    if (mp.current) {
-      mp.current.destroy();
-    }
-
-    mp.current = initMercadoPago(
-      process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!,
-      { locale: "es-AR" }
-    );
-
-    return () => {
-      if (mp.current) {
-        mp.current.destroy();
-      }
-    };
+    // Initialization is now handled in the Checkout component
   }, [preferenceId]);
 
   return (
