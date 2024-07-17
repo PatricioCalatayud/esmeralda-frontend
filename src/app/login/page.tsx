@@ -99,7 +99,7 @@ const Login = () => {
     try {
       const response = await LoginUser(dataUser);
 
-      console.log(response); // Captura la respuesta del servidor
+      console.log(response); 
 
       // Verificar si se recibió un usuario en la respuesta
 
@@ -107,10 +107,9 @@ const Login = () => {
         // Guardar datos de usuario en localStorage
         //localStorage.setItem("userSession", JSON.stringify({ userData: response }));
 
-        // Mostrar mensaje de éxito usando Swal
         Swal.fire({
           icon: "success",
-          title: "¡Bienvenido a La Esmeralda Café!",
+          title: "¡Bienvenido a La Esmeralda!",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -127,7 +126,6 @@ const Login = () => {
           Router.push("/");
         }, 1500);
       } else {
-        // Mostrar mensaje de error si no se encontró el usuario
         Swal.fire({
           icon: "error",
           title: "Usuario o contraseña incorrecta",
@@ -136,7 +134,6 @@ const Login = () => {
         });
       }
     } catch (error: any) {
-      // Capturar errores durante el inicio de sesión
       setSubmitError(`Error al iniciar sesión: ${error.message}`);
       toast.error(`Error al iniciar sesión: ${error.message}`);
     } finally {
