@@ -325,9 +325,15 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
-      <div className="absolute  bottom-1 right-1">
-          <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
-        </div>
+      <div className="absolute bottom-1 right-1 hidden md:block">
+  <Image
+    src="/logoblanco.png"
+    alt="Logo"
+    width={300}
+    height={300}
+    className="w-[300px] h-[300px]"
+  />
+</div>
     </ThemeProvider>
   );
 };

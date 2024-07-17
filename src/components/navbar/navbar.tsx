@@ -37,42 +37,98 @@ const Navbar = () => {
 
   return (
     <header className="relative text-gray-600 body-font">
-      <div className="relative z-10 container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-        <div className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
-          <AiOutlineMenu
-            onClick={() => setNav(!nav)}
-            size={30}
-            className="mr-2 cursor-pointer"
-          />
-          <Link href="/home" className="flex items-center text-gray-900">
-            <div className="w-20 h-25 text-white p-2">
-              <img
-                src="/esmeraldaLogosolo.png"
-                alt="Logo"
-                className="w-full h-full object-cover"
+      <div className="relative z-10 container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between">
+        <div className="flex items-center text-gray-900 mb-4 md:mb-0 w-full md:w-auto justify-between md:justify-start">
+          <div className="flex items-center">
+            <AiOutlineMenu
+              onClick={() => setNav(!nav)}
+              size={30}
+              className="mr-2 cursor-pointer"
+            />
+            <Link href="/home" className="flex items-center text-gray-900">
+              <div className="w-20 h-25 text-white p-2 md:w-16 md:h-20">
+                <img
+                  src="/esmeraldaLogosolo.png"
+                  alt="Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </Link>
+          </div>
+          <div className="flex items-center w-full md:w-auto justify-between space-x-2 md:hidden">
+            <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
+              <input
+                className="bg-gray-200 rounded-full pl-8 pr-4 py-1 focus:outline-none w-full md:w-64"
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
+              <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
             </div>
-          </Link>
+            <button
+              onClick={() => router.push("/cart")}
+              className="text-teal-700 flex items-center p-2 rounded-full relative"
+            >
+              <FaCartPlus size={30} />
+              {cartItemCount > 0 && (
+                <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+            {!userSesion && (
+              <Link href="/login">
+                <button className="text-gray-900 font-bold">Iniciar Sesion</button>
+              </Link>
+            )}
+            {userSesion && (
+              <Dropdown
+                arrowIcon={false}
+                inline
+                label={
+                  <Image
+                    src={"/perfil.png"}
+                    alt="imagen"
+                    width={30}
+                    height={30}
+                    className="rounded-full"
+                  />
+                }
+              >
+                <Dropdown.Header>
+                  <span className="block text-sm">
+                    User
+                  </span>
+                  <span className="block truncate text-sm font-medium">
+                    User@hotmail.com
+                  </span>
+                </Dropdown.Header>
+                <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
+                <Dropdown.Item>Salir</Dropdown.Item>
+              </Dropdown>
+            )}
+          </div>
         </div>
-        <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-          <Link href="/sobre-la-esmeralda" className="mr-5 hover:text-gray-900">Sobre la Esmeralda</Link>
-          <Link href="/mision" className="mr-5 hover:text-gray-900">Misión</Link>
-          <Link href="/historia" className="mr-5 hover:text-gray-900">Historia</Link>
-          <Link href="/locales" className="mr-5 hover:text-gray-900">Locales</Link>
-          <Link href="/tienda-online" className="mr-5 hover:text-gray-900">Tienda Online</Link>
-          <Link href="/nosotros" className="mr-5 hover:text-gray-900">Nosotros</Link>
+        <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
+        <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
+          <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">Sobre la Esmeralda</Link>
+        <Link href="/politica" className="mr-5 hover:text-gray-900">Politica</Link>
+          <Link href="/contact" className="mr-5 hover:text-gray-900">Contacto</Link>
+          <Link href="/mvv" className="mr-5 hover:text-gray-900">MVV</Link>
+          <Link href="/nosotros" className="mr-5 hover:text-gray-900">F&Q</Link>
         </nav>
-        <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
-          <input
-            className="bg-gray-200 rounded-full pl-8 pr-4 py-1 focus:outline-none"
-            type="text"
-            placeholder="Buscar productos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
-        </div>
-        <div className="flex items-center space-x-2">
+        <div className="hidden md:flex items-center space-x-2">
+          <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
+            <input
+              className="bg-gray-200 rounded-full pl-8 pr-4 py-1 focus:outline-none w-full md:w-64"
+              type="text"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
+          </div>
           <button
             onClick={() => router.push("/cart")}
             className="text-teal-700 flex items-center p-2 rounded-full relative"

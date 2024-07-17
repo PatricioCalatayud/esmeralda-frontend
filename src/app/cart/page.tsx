@@ -218,7 +218,7 @@ const Cart = () => {
                 type="button"
                 className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
                   userSession && cart.length > 0
-                    ? "bg-gray-200 hover:bg-gray-700 text-green-600"
+                    ? "bg-gray-200 hover:bg-gray-700 text-teal-600"
                     : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
                 disabled={!userSession || cart.length === 0}
@@ -237,7 +237,7 @@ const Cart = () => {
               <button
                 type="button"
                 onClick={() => router.push("/home")}
-                className="text-sm px-4 py-2.5 w-full font-semibold tracking-wide bg-green-600 text-white  hover:bg-green-800  rounded-md"
+                className="text-sm px-4 py-2.5 w-full font-semibold tracking-wide bg-teal-600 text-white  hover:bg-green-800  rounded-md"
               >
                 Continuar comprando
               </button>

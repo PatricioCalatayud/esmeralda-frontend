@@ -8,7 +8,7 @@ function HeadlineCards() {
 
   return (
     <div className='max-w-[1640px] mx-auto p-4 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
-      <div className='rounded-xl relative'>
+      <div className='rounded-xl  relative'>
         <div className='absolute w-full h-full bg-black/50 rounded-xl text-white flex flex-col justify-center items-center p-4'>
           <p className='font-bold text-xl sm:text-2xl px-2'>Tienda Online</p>
           <p className='px-2 text-center'>¡Comienza tu pedido ahora!</p>
