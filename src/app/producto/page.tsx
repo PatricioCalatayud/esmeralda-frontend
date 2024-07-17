@@ -294,6 +294,6 @@ const ProductList = () => {
   );
 };
 
-export default ProductList_soloPrueba;
+export default ProductList;
 
 
