@@ -108,7 +108,7 @@ const InsertProduct = () => {
       formData.append("file", imageFile);
     }
 
-    // Mostrar alerta de carga mientras se procesa la solicitud
+    //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
       title: "Agregando producto...",
       text: "Por favor espera.",
