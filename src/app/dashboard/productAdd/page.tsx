@@ -169,7 +169,7 @@ const InsertProduct = () => {
       <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
         <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Agregar nuevo producto
+            Agregar un nuevo producto
           </h3>
         </div>
 
@@ -227,6 +227,89 @@ const InsertProduct = () => {
                   htmlFor="price"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
+                  Presentación
+                </label>
+                <input
+                  type="select"
+                  name="presentacion"
+                  id="presentacion"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="0.00"
+                  value={dataProduct.presentacion}
+                  onChange={handleChange}
+                />
+                {errors.presentacion && (
+                  <span className="text-red-500">{errors.presentacion}</span>
+                )}
+              </div>
+              <div>
+                <label
+                  htmlFor="discount"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Tipo de grano
+                </label>
+                <input
+                  type="number"
+                  name="tipoGrano"
+                  id="tipoGrano"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="0"
+                  value={dataProduct.tipoGrano}
+                  onChange={handleChange}
+                />
+                {errors.discount && (
+                  <span className="text-red-500">{errors.tipoGrano}</span>
+                )}
+              </div>
+              <div>
+                <label
+                  htmlFor="stock"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Unidad de medida
+                </label>
+                <input
+                  type="number"
+                  name="medida"
+                  id="medida"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="0"
+                  value={dataProduct.medida}
+                  onChange={handleChange}
+                />
+                {errors.medida && (
+                  <span className="text-red-500">{errors.medida}</span>
+                )}
+              </div>
+              <div>
+                <label
+                  htmlFor="stock"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Stock
+                </label>
+                <input
+                  type="number"
+                  name="stock"
+                  id="stock"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="0"
+                  value={dataProduct.stock}
+                  onChange={handleChange}
+                />
+                {errors.stock && (
+                  <span className="text-red-500">{errors.stock}</span>
+                )}
+              </div>
+
+            </div>
+            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-4">
+              <div>
+                <label
+                  htmlFor="price"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
                   Precio
                 </label>
                 <input
@@ -262,49 +345,13 @@ const InsertProduct = () => {
                   <span className="text-red-500">{errors.discount}</span>
                 )}
               </div>
-              <div>
-                <label
-                  htmlFor="stock"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  name="stock"
-                  id="stock"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0"
-                  value={dataProduct.stock}
-                  onChange={handleChange}
-                />
-                {errors.stock && (
-                  <span className="text-red-500">{errors.stock}</span>
-                )}
-              </div>
+              
             </div>
 
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="description"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Descripción
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows={4}
-                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Escriba la descripción del producto aquí..."
-                value={dataProduct.description}
-                onChange={handleChange}
-              ></textarea>
-              {errors.description && (
-                <span className="text-red-500">{errors.description}</span>
-              )}
-            </div>
+
+            
           </div>
+          
 
           <div className="mb-4">
             <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
