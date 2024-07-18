@@ -11,7 +11,7 @@ export interface IProductList {
     averageRating: string;
     isAvailable:   boolean;
     isDeleted:     boolean;
-    presentacion?: string;
+    presentacion?: string; 
     tipoGrano?:    string;
     medida?:       string;
     category:      Category;
@@ -20,4 +20,30 @@ export interface IProductList {
 export interface Category {
     id:   string;
     name: string;
+}
+
+export interface IProductResponse {
+   
+    description:   string;
+    imgUrl:        string;
+    price:         string;
+    stock:         number;
+    discount:      string;
+    presentacion?: string; 
+    tipoGrano?:    string;
+    medida?:       string;
+    category:      Category;
+}
+
+export interface IProductErrorResponse {
+   
+    description:   string;
+    imgUrl:        string;
+    price:         string;
+    stock:         number;
+    discount:      string;
+    presentacion?: string; 
+    tipoGrano?:    string;
+    medida?:       string;
+    category:      Category;
 }
