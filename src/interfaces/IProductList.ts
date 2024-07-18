@@ -32,7 +32,7 @@ export interface IProductResponse {
     presentacion?: string; 
     tipoGrano?:    string;
     medida?:       string;
-    category:      Category;
+    categoryId:      string;
 }
 
 export interface IProductErrorResponse {
@@ -45,5 +45,5 @@ export interface IProductErrorResponse {
     presentacion?: string; 
     tipoGrano?:    string;
     medida?:       string;
-    category:      Category;
+    categoryId:      string;
 }

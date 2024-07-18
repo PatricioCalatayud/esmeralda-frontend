@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
@@ -7,10 +6,10 @@ import axios from "axios";
 import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
-
 import Swal from "sweetalert2";
-
-import { IProductList, IProductResponse } from "@/interfaces/IProductList";
+import { IProductResponse } from "@/interfaces/IProductList";
+import { ICategory } from "@/interfaces/ICategory";
+import { productAddValidation } from "@/utils/productAddValidation";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,7 +17,7 @@ const InsertProduct = () => {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductResponse>({
@@ -27,10 +26,7 @@ const InsertProduct = () => {
     price: "",
     stock: 0,
     discount: "",
-    category: {
-        id: "",
-        name: "",
-        },
+    categoryId: "",
     imgUrl: "",
     presentacion: "",
     tipoGrano: "",
@@ -43,10 +39,7 @@ const InsertProduct = () => {
     price: "",
     stock: 0,
     discount: "",
-    category: {
-        id: "",
-        name: "",
-        },
+    categoryId: "",
     imgUrl: "",
     presentacion: "",
     tipoGrano: "",
@@ -68,12 +61,14 @@ const InsertProduct = () => {
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-    //   const categories = await getCategories();
-    //   setCategories(categories);
+      const response = await axios.get('http://localhost:3001/category');
+      const categories = response.data;
+      setCategories(categories);
     };
-
+  
     fetchCategories();
   }, []);
+  
 
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
@@ -100,7 +95,7 @@ const InsertProduct = () => {
     }
   };
 
-  console.log("dataProduct", dataProduct);
+ 
 
   //! Función para enviar los datos del producto al backend
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -160,7 +155,7 @@ const InsertProduct = () => {
 
   //!Validar formulario
   useEffect(() => {
-    //const errors = validateProductForm(dataProduct);
+    const errors = productAddValidation(dataProduct);
     setErrors(errors);
   }, [dataProduct]);
 
@@ -177,15 +172,15 @@ const InsertProduct = () => {
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
               <label
-                htmlFor="name"
+                htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Producto
               </label>
               <input
                 type="text"
-                name="name"
-                id="name"
+                name="description"
+                id="description"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Nombre del producto"
                 value={dataProduct.description}
@@ -204,24 +199,24 @@ const InsertProduct = () => {
               </label>
               <select
                 id="category"
-                name="categoryID"
+                name="categoryId"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                //value={dataProduct.categoryID}
+                value={dataProduct.categoryId}
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
-                {categories.map((category: any) => (
+                {categories.map((category: ICategory) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
                 ))}
               </select>
-              {/* {errors.categoryID && (
-                <span className="text-red-500">{errors.categoryID}</span>
-              )} */}
+              {errors.categoryId && (
+                <span className="text-red-500">{errors.categoryId}</span>
+              )}
             </div>
 
-            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-4">
+            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
               <div>
                 <label
                   htmlFor="price"
@@ -229,15 +224,18 @@ const InsertProduct = () => {
                 >
                   Presentación
                 </label>
-                <input
-                  type="select"
-                  name="presentacion"
-                  id="presentacion"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0.00"
-                  value={dataProduct.presentacion}
-                  onChange={handleChange}
-                />
+               <select
+                id="presentacion"
+                name="presentacion"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                value={dataProduct.presentacion}
+                onChange={handleChange}
+                >
+                <option value="">--Seleccione--</option>
+                <option value="MOLIDO">Molido</option>
+                <option value="GRANO">Grano</option>
+                <option value="CAPSULAS">Cápsulas</option>
+                </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
                 )}
@@ -249,15 +247,23 @@ const InsertProduct = () => {
                 >
                   Tipo de grano
                 </label>
-                <input
-                  type="number"
-                  name="tipoGrano"
+                <select
                   id="tipoGrano"
+                  name="tipoGrano"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0"
                   value={dataProduct.tipoGrano}
                   onChange={handleChange}
-                />
+                >
+                    <option value="">--Seleccione--</option>
+                    <option value="SANTOS">Santos</option>
+                    <option value="COLOMBIANO">Colombiano</option>
+                    <option value="TORRADO">Torrado</option>
+                    <option value="RIO_DE_ORO">Rio de Oro</option>
+                    <option value="DESCAFEINADO">Descafeinado</option>
+                    <option value="BLEND">Blend</option>
+                    <option value="MEZCLA">Mezcla</option>
+
+                </select>
                 {errors.discount && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
                 )}
@@ -269,42 +275,26 @@ const InsertProduct = () => {
                 >
                   Unidad de medida
                 </label>
-                <input
-                  type="number"
-                  name="medida"
-                  id="medida"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0"
-                  value={dataProduct.medida}
-                  onChange={handleChange}
-                />
+               <select
+                id="medida"
+                name="medida"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                value={dataProduct.medida}
+                onChange={handleChange}
+                >
+                <option value="">--Seleccione--</option>
+                <option value="KILO">Kilo</option>
+                <option value="UNIDADES">Unidades</option>
+                <option value="SOBRE">Sobres</option>
+                <option value="CAJA">Caja</option>
+                </select>
                 {errors.medida && (
                   <span className="text-red-500">{errors.medida}</span>
                 )}
               </div>
-              <div>
-                <label
-                  htmlFor="stock"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  name="stock"
-                  id="stock"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0"
-                  value={dataProduct.stock}
-                  onChange={handleChange}
-                />
-                {errors.stock && (
-                  <span className="text-red-500">{errors.stock}</span>
-                )}
-              </div>
 
             </div>
-            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-4">
+            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
               <div>
                 <label
                   htmlFor="price"
@@ -313,7 +303,7 @@ const InsertProduct = () => {
                   Precio
                 </label>
                 <input
-                  type="number"
+                  type="string"
                   name="price"
                   id="price"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -343,6 +333,26 @@ const InsertProduct = () => {
                 />
                 {errors.discount && (
                   <span className="text-red-500">{errors.discount}</span>
+                )}
+              </div>
+              <div>
+                <label
+                  htmlFor="stock"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Stock
+                </label>
+                <input
+                  type="number"
+                  name="stock"
+                  id="stock"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="0"
+                  value={dataProduct.stock}
+                  onChange={handleChange}
+                />
+                {errors.stock && (
+                  <span className="text-red-500">{errors.stock}</span>
                 )}
               </div>
               
