@@ -21,7 +21,6 @@ const InsertProduct = () => {
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductResponse>({
-
     description: "",
     price: "",
     stock: 0,
@@ -61,14 +60,13 @@ const InsertProduct = () => {
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await axios.get('http://localhost:3001/category');
+      const response = await axios.get("http://localhost:3001/category");
       const categories = response.data;
       setCategories(categories);
     };
-  
+
     fetchCategories();
   }, []);
-  
 
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
@@ -94,8 +92,6 @@ const InsertProduct = () => {
       }));
     }
   };
-
- 
 
   //! Función para enviar los datos del producto al backend
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -224,17 +220,17 @@ const InsertProduct = () => {
                 >
                   Presentación
                 </label>
-               <select
-                id="presentacion"
-                name="presentacion"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                value={dataProduct.presentacion}
-                onChange={handleChange}
+                <select
+                  id="presentacion"
+                  name="presentacion"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  value={dataProduct.presentacion}
+                  onChange={handleChange}
                 >
-                <option value="">--Seleccione--</option>
-                <option value="MOLIDO">Molido</option>
-                <option value="GRANO">Grano</option>
-                <option value="CAPSULAS">Cápsulas</option>
+                  <option value="">--Seleccione--</option>
+                  <option value="MOLIDO">Molido</option>
+                  <option value="GRANO">Grano</option>
+                  <option value="CAPSULAS">Cápsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
@@ -254,15 +250,14 @@ const InsertProduct = () => {
                   value={dataProduct.tipoGrano}
                   onChange={handleChange}
                 >
-                    <option value="">--Seleccione--</option>
-                    <option value="SANTOS">Santos</option>
-                    <option value="COLOMBIANO">Colombiano</option>
-                    <option value="TORRADO">Torrado</option>
-                    <option value="RIO_DE_ORO">Rio de Oro</option>
-                    <option value="DESCAFEINADO">Descafeinado</option>
-                    <option value="BLEND">Blend</option>
-                    <option value="MEZCLA">Mezcla</option>
-
+                  <option value="">--Seleccione--</option>
+                  <option value="SANTOS">Santos</option>
+                  <option value="COLOMBIANO">Colombiano</option>
+                  <option value="TORRADO">Torrado</option>
+                  <option value="RIO_DE_ORO">Rio de Oro</option>
+                  <option value="DESCAFEINADO">Descafeinado</option>
+                  <option value="BLEND">Blend</option>
+                  <option value="MEZCLA">Mezcla</option>
                 </select>
                 {errors.discount && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
@@ -275,24 +270,23 @@ const InsertProduct = () => {
                 >
                   Unidad de medida
                 </label>
-               <select
-                id="medida"
-                name="medida"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                value={dataProduct.medida}
-                onChange={handleChange}
+                <select
+                  id="medida"
+                  name="medida"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  value={dataProduct.medida}
+                  onChange={handleChange}
                 >
-                <option value="">--Seleccione--</option>
-                <option value="KILO">Kilo</option>
-                <option value="UNIDADES">Unidades</option>
-                <option value="SOBRE">Sobres</option>
-                <option value="CAJA">Caja</option>
+                  <option value="">--Seleccione--</option>
+                  <option value="KILO">Kilo</option>
+                  <option value="UNIDADES">Unidades</option>
+                  <option value="SOBRE">Sobres</option>
+                  <option value="CAJA">Caja</option>
                 </select>
                 {errors.medida && (
                   <span className="text-red-500">{errors.medida}</span>
                 )}
               </div>
-
             </div>
             <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
               <div>
@@ -355,13 +349,8 @@ const InsertProduct = () => {
                   <span className="text-red-500">{errors.stock}</span>
                 )}
               </div>
-              
             </div>
-
-
-            
           </div>
-          
 
           <div className="mb-4">
             <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -409,7 +398,7 @@ const InsertProduct = () => {
             <button
               disabled={Object.values(errors).some((error) => error)}
               type="submit"
-              className="w-full sm:w-auto justify-center text-orange-400 inline-flex bg-gray-900 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              className="w-full sm:w-auto justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
               Agregar producto
             </button>
@@ -417,7 +406,7 @@ const InsertProduct = () => {
             <Link
               data-modal-toggle="createProductModal"
               type="button"
-              className="w-full justify-center sm:w-auto text-orange-500 inline-flex items-center hover:bg-orange-500 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+              className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
               href="/dashboardAdmin"
             >
               <FaArrowLeft />
