@@ -1,17 +1,26 @@
-import { IProductResponse, IProductErrorResponse}from "@/interfaces/IProductList";
+import {
+  IProductResponse,
+  IProductErrorResponse,
+} from "@/interfaces/IProductList";
 
-export function productAddValidation(product: IProductResponse): IProductErrorResponse {
+export function productAddValidation(
+  product: IProductResponse
+): IProductErrorResponse {
   const errors: IProductErrorResponse = {
+    article_id: "",
     description: "",
     imgUrl: "",
     price: "",
-    stock: 0,
+    stock: "",
     discount: "",
     presentacion: "",
     tipoGrano: "",
     medida: "",
-    categoryId  : "",
+    categoryID: "",
   };
+  if (!product.article_id) {
+    errors.article_id = "El código de artículo es obligatorio";
+  }
 
   if (!product.description) {
     errors.description = "La descripción es obligatoria";
@@ -25,28 +34,28 @@ export function productAddValidation(product: IProductResponse): IProductErrorRe
     errors.price = "El precio es obligatorio";
   }
 
-  if (product.stock === 0) {
-    errors.stock = 0;
+  if (!product.stock) {
+    errors.stock = "El stock es obligatorio";
   }
 
   if (!product.discount) {
     errors.discount = "El descuento es obligatorio";
   }
 
-    if (!product.presentacion) {
-        errors.presentacion = "La presentación es obligatoria";
-    }
+  if (!product.presentacion) {
+    errors.presentacion = "La presentación es obligatoria";
+  }
 
-    if (!product.tipoGrano) {
-        errors.tipoGrano = "El tipo de grano es obligatorio";
-    }
+  if (!product.tipoGrano) {
+    errors.tipoGrano = "El tipo de grano es obligatorio";
+  }
 
-    if (!product.medida) {
-        errors.medida = "La medida es obligatoria";
-    }
+  if (!product.medida) {
+    errors.medida = "La medida es obligatoria";
+  }
 
-  if (!product.categoryId) {
-    errors.categoryId = "La categoría es obligatoria";
+  if (!product.categoryID) {
+    errors.categoryID = "La categoría es obligatoria";
   }
 
   return errors;

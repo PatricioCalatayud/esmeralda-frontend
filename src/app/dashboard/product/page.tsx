@@ -316,9 +316,9 @@ const ProductList = () => {
                         <img
                           src={product.imgUrl}
                           alt={product.description}
-                          className="h-8 w-auto mr-3"
+                          className="h-12 w-auto mr-3"
                         />
-                        {product.description}
+                        {product.description}    
                       </div>
                     </th>
                     {/* <td className="px-4 py-3">
@@ -345,7 +345,7 @@ const ProductList = () => {
                             data-drawer-target="drawer-update-product"
                             data-drawer-show="drawer-update-product"
                             aria-controls="drawer-update-product"
-                            className="py-2 px-3 flex items-center text-sm font-medium text-center text-orange-400 bg-gray-900 rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                            className="py-2 px-3 flex items-center text-sm font-medium text-center text-teal-600 bg-gray-900 rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                             href={`/productList/${product.id}`}
                           >
                             <MdEdit size={20} />
@@ -355,7 +355,7 @@ const ProductList = () => {
                           <button
                             type="button"
                             onClick={() => handleDeleteProduct(product.id)}
-                            className="flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                            className="flex items-center text-red-400 hover:text-white border border-teal-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                           >
                             <RiDeleteBin6Fill size={20} />
                           </button>

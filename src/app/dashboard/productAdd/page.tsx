@@ -11,21 +11,22 @@ import { IProductResponse } from "@/interfaces/IProductList";
 import { ICategory } from "@/interfaces/ICategory";
 import { productAddValidation } from "@/utils/productAddValidation";
 
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+const apiURL = process.env.NEXTAUTH_URL_DASHBOARD;
 
 const InsertProduct = () => {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
+  //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<ICategory[]>([]);
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductResponse>({
+    article_id: "",
     description: "",
     price: "",
-    stock: 0,
+    stock: "",
     discount: "",
-    categoryId: "",
+    categoryID: "",
     imgUrl: "",
     presentacion: "",
     tipoGrano: "",
@@ -33,10 +34,11 @@ const InsertProduct = () => {
   });
 
   //! Estado para almacenar los errores
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<any>({
+    article_id: "",
     description: "",
     price: "",
-    stock: 0,
+    stock: "",
     discount: "",
     categoryId: "",
     imgUrl: "",
@@ -45,17 +47,16 @@ const InsertProduct = () => {
     medida: "",
   });
 
-  //! Obtener el token del usuario
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        console.log("userToken", parsedSession.userData.token);
-        setToken(parsedSession.userData.token);
-      }
-    }
-  }, [router]);
+  // //! Obtener el token del usuario
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && window.localStorage) {
+  //     const userSession = localStorage.getItem("userSession");
+  //     if (userSession) {
+  //       const parsedSession = JSON.parse(userSession);
+  //       setToken(parsedSession.userData.accessToken);
+  //     }
+  //   }
+  // }, [router]);
 
   //! Obtener las categorías
   useEffect(() => {
@@ -94,65 +95,73 @@ const InsertProduct = () => {
   };
 
   //! Función para enviar los datos del producto al backend
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", dataProduct.description);
-    formData.append("description", dataProduct.description);
-    formData.append("price", dataProduct.price.toString());
-    formData.append("stock", dataProduct.stock.toString());
-    formData.append("discount", dataProduct.discount.toString());
-    // formData.append("categoryID", dataProduct.categoryID);
-    if (imageFile) {
-      formData.append("file", imageFile);
-    }
+  const formData = new FormData();
+  formData.append("article_id", Number(dataProduct.article_id).toString());
+  formData.append("description", dataProduct.description);
+  formData.append("presentacion", dataProduct.presentacion || "");
+  formData.append("tipoGrano", dataProduct.tipoGrano || "");
+  formData.append("medida", dataProduct.medida || "");
+  formData.append("price", dataProduct.price);
+  formData.append("stock", Number(dataProduct.stock).toString());
+  formData.append("discount", dataProduct.discount);
+  formData.append("categoryID", dataProduct.categoryID);
+  if (imageFile) {
+    formData.append("file", imageFile);
+  }
 
-    //! Mostrar alerta de carga mientras se procesa la solicitud
-    Swal.fire({
-      title: "Agregando producto...",
-      text: "Por favor espera.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
+  // Log the FormData content
+  formData.forEach((value, key) => {
+    console.log(key, value);
+  });
+
+  //! Mostrar alerta de carga mientras se procesa la solicitud
+  Swal.fire({
+    title: "Agregando producto...",
+    text: "Por favor espera.",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    const response = await axios.post('http://localhost:3001/products', formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
       },
     });
 
-    try {
-      const response = await axios.post(`${apiURL}/products`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    console.log("Response:", response);
+    console.log("Product added successfully");
 
-      console.log("Response:", response);
-      console.log("Product added successfully");
+    // Mostrar alerta de éxito
+    Swal.fire({
+      icon: "success",
+      title: "¡Agregado!",
+      text: "El producto ha sido agregado con éxito.",
+    }).then(() => {
+      router.push("../../dashboard/product");
+    });
+  } catch (error) {
+    console.error("Error adding product:", error);
 
-      // Mostrar alerta de éxito
-      Swal.fire({
-        icon: "success",
-        title: "¡Agregado!",
-        text: "El producto ha sido agregado con éxito.",
-      }).then(() => {
-        router.push("/dashboardAdmin");
-      });
-    } catch (error) {
-      console.error("Error adding product:", error);
-
-      // Mostrar alerta de error
-      Swal.fire({
-        icon: "error",
-        title: "¡Error!",
-        text: "Ha ocurrido un error al agregar el producto.",
-      });
-    }
-  };
+    // Mostrar alerta de error
+    Swal.fire({
+      icon: "error",
+      title: "¡Error!",
+      text: "Ha ocurrido un error al agregar el producto.",
+    });
+  }
+};
+ 
 
   //!Validar formulario
   useEffect(() => {
-    const errors = productAddValidation(dataProduct);
-    setErrors(errors);
+    const validationErrors = productAddValidation(dataProduct);
+    setErrors(validationErrors);
   }, [dataProduct]);
 
   return (
@@ -165,8 +174,27 @@ const InsertProduct = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
+        <div>
+              <label
+                htmlFor="article_id"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Código de Producto
+              </label>
+              <input
+                type="number"
+                name="article_id"
+                id="article_id"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
+                value={dataProduct.article_id}
+                onChange={handleChange}
+              />
+              {errors.article_id && (
+                <span className="text-red-500">{errors.article_id}</span>
+              )}
+            </div>
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
-            <div>
+             <div>
               <label
                 htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -186,6 +214,7 @@ const InsertProduct = () => {
                 <span className="text-red-500">{errors.description}</span>
               )}
             </div>
+            
             <div>
               <label
                 htmlFor="category"
@@ -195,9 +224,9 @@ const InsertProduct = () => {
               </label>
               <select
                 id="category"
-                name="categoryId"
+                name="categoryID"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                value={dataProduct.categoryId}
+                value={dataProduct.categoryID}
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
@@ -207,8 +236,8 @@ const InsertProduct = () => {
                   </option>
                 ))}
               </select>
-              {errors.categoryId && (
-                <span className="text-red-500">{errors.categoryId}</span>
+              {errors.categoryID && (
+                <span className="text-red-500">{errors.categoryID}</span>
               )}
             </div>
 
@@ -228,9 +257,9 @@ const InsertProduct = () => {
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="MOLIDO">Molido</option>
-                  <option value="GRANO">Grano</option>
-                  <option value="CAPSULAS">Cápsulas</option>
+                  <option value="molido">Molido</option>
+                  <option value="grano">Grano</option>
+                  <option value="capsulas">Cápsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
@@ -251,13 +280,13 @@ const InsertProduct = () => {
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="SANTOS">Santos</option>
-                  <option value="COLOMBIANO">Colombiano</option>
-                  <option value="TORRADO">Torrado</option>
-                  <option value="RIO_DE_ORO">Rio de Oro</option>
-                  <option value="DESCAFEINADO">Descafeinado</option>
-                  <option value="BLEND">Blend</option>
-                  <option value="MEZCLA">Mezcla</option>
+                  <option value="santos">Santos</option>
+                  <option value="colombiano">Colombiano</option>
+                  <option value="torrado">Torrado</option>
+                  <option value="rio de oro">Rio de Oro</option>
+                  <option value="descafeino">Descafeinado</option>
+                  <option value="blend-premium">Blend</option>
+                  <option value="mezcla-baja calidad">Mezcla</option>
                 </select>
                 {errors.discount && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
@@ -278,10 +307,10 @@ const InsertProduct = () => {
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="KILO">Kilo</option>
-                  <option value="UNIDADES">Unidades</option>
-                  <option value="SOBRE">Sobres</option>
-                  <option value="CAJA">Caja</option>
+                  <option value="kilo">Kilo</option>
+                  <option value="unidades">Unidades</option>
+                  <option value="sobre">Sobres</option>
+                  <option value="caja">Caja</option>
                 </select>
                 {errors.medida && (
                   <span className="text-red-500">{errors.medida}</span>
@@ -297,7 +326,7 @@ const InsertProduct = () => {
                   Precio
                 </label>
                 <input
-                  type="string"
+                  type="number"
                   name="price"
                   id="price"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -321,7 +350,7 @@ const InsertProduct = () => {
                   name="discount"
                   id="discount"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="0"
+                  placeholder="0.00"
                   value={dataProduct.discount}
                   onChange={handleChange}
                 />
@@ -345,7 +374,7 @@ const InsertProduct = () => {
                   value={dataProduct.stock}
                   onChange={handleChange}
                 />
-                {errors.stock && (
+               {errors.stock && (
                   <span className="text-red-500">{errors.stock}</span>
                 )}
               </div>
@@ -407,7 +436,7 @@ const InsertProduct = () => {
               data-modal-toggle="createProductModal"
               type="button"
               className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-              href="/dashboardAdmin"
+              href="../../dashboard/product"
             >
               <FaArrowLeft />
               &nbsp; Volver
