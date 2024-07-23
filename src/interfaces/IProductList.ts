@@ -14,10 +14,11 @@ export interface IProductList {
   presentacion?: string;
   tipoGrano?: string;
   medida?: string;
-  category: Category;
+  quantity?: number;
+  category: ICategory;
 }
 
-export interface Category {
+export interface ICategory {
   id: string;
   name: string;
 }

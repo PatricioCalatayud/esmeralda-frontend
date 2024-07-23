@@ -4,46 +4,45 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@material-tailwind/react";
 import Link from "next/link";
-import { IProduct } from "@/interfaces/IProduct";
-import { products } from "@/helpers/products";
-import { getCategoryById } from "@/helpers/categories";
-import { ICategory } from "@/interfaces/ICategory";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
+import { ICategory, IProductList } from "@/interfaces/IProductList";
+import { getProductById } from "@/helpers/products.helper";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
-  const [product, setProduct] = useState<IProduct | null>(null);
+  const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<ICategory | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const router = useRouter();
-  const productId = Number(params.id);
+  const productId = params.id;
 
   useEffect(() => {
-    const fetchedProduct = products.find(
-      (product) => product.article_id === productId
-    );
-    if (fetchedProduct) {
-      setProduct(fetchedProduct);
-      const fetchedCategory = getCategoryById(fetchedProduct.categoryId);
-      setCategory(fetchedCategory || null);
+    const loadProductData = async () => {
+      const fetchedProduct = await getProductById(productId);
+      if (fetchedProduct) {
+        setProduct(fetchedProduct);
+        setCategory(fetchedProduct.category);
 
-      if (fetchedCategory?.name === "Café en Cápsulas") {
-        setSelectedSize("10 cápsulas");
-      } else {
-        setSelectedSize("250g");
-      }
+        if (fetchedProduct.category?.name === "coffee") {
+          setSelectedSize("250g");
+        } else {
+          setSelectedSize("10 cápsulas");
+        }
 
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const cartItem = cart.find(
-        (item: IProduct) => item.article_id === productId
-      );
-      if (cartItem) {
-        setQuantity(cartItem.quantity);
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const cartItem = cart.find(
+          (item: IProductList) => item.article_id === productId
+        );
+        if (cartItem) {
+          setQuantity(cartItem.quantity);
+        }
       }
-    }
-    setIsLoaded(true);
+      setIsLoaded(true);
+    };
+
+    loadProductData();
   }, [productId]);
 
   const renderBreadcrumb = () => {
@@ -82,7 +81,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const cartItemIndex = cart.findIndex(
-      (item: IProduct) => item.article_id === productId
+      (item: IProductList) => item.article_id === productId
     );
 
     if (cartItemIndex !== -1) {
@@ -170,7 +169,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             className="absolute inset-0 w-full h-full object-contain opacity-0 animate-fade-in-logo"
           />
           <img
-            src={product.url_img}
+            src={product.imgUrl}
             alt={product.description}
             className="relative w-full h-96 object-contain rounded-lg opacity-0 animate-fade-in-product"
           />
@@ -207,7 +206,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </div>
           )}
           <IncrementProduct
-            productId={product.article_id}
+            productId={product.id}
             initialQuantity={quantity}
             onQuantityChange={handleQuantityChange}
           />
@@ -229,10 +228,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             opacity: 0.3;
           }
         }
-        .animate-fade-in-logo {
-          animation: fade-in-logo 0.5s ease-out forwards;
-          animation-delay: 0.5s;
-        }
 
         @keyframes fade-in-product {
           0% {
@@ -242,38 +237,28 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             opacity: 1;
           }
         }
-        .animate-fade-in-product {
-          animation: fade-in-product 1.5s ease-out forwards;
-          animation-delay: 1.5s;
-        }
 
         @keyframes fade-in-up {
           0% {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(10px);
           }
           100% {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out;
         }
 
-        @keyframes fade-in-text {
-          0% {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .animate-fade-in-logo {
+          animation: fade-in-logo 1s forwards;
         }
-        .animate-fade-in-text {
-          animation: fade-in-text 1s ease-out forwards;
-          animation-delay: 2s;
+
+        .animate-fade-in-product {
+          animation: fade-in-product 1s forwards;
+        }
+
+        .animate-fade-in-up {
+          animation: fade-in-up 1s forwards;
         }
       `}</style>
     </div>

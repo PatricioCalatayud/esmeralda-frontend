@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IProduct } from "@/interfaces/IProduct";
+import { IProductList } from "@/interfaces/IProductList";
 
 const Cart = () => {
   const router = useRouter();
-  const [cart, setCart] = useState<IProduct[]>([]);
+  const [cart, setCart] = useState<IProductList[]>([]);
   const [userSession, setUserSession] = useState<boolean>(true); // Aquí deberías manejar el estado de la sesión del usuario según corresponda
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const Cart = () => {
     fetchCart();
   }, []);
 
-  const handleIncrease = (article_id: number) => {
+  const handleIncrease = (article_id: string) => {
     const newCart = cart.map((item) => {
       if (item.article_id === article_id) {
         return { ...item, quantity: (item.quantity || 1) + 1 };
@@ -31,7 +31,7 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
-  const handleDecrease = (article_id: number) => {
+  const handleDecrease = (article_id: string) => {
     const newCart = cart.map((item) => {
       if (item.article_id === article_id) {
         return { ...item, quantity: Math.max((item.quantity || 1) - 1, 1) };
@@ -67,13 +67,16 @@ const Cart = () => {
 
   const calcularSubtotal = () => {
     return cart.reduce((acc, item) => {
-      return acc + (item.quantity || 1) * item.price;
+      return acc + (item.quantity || 1) * Number(item.price);
     }, 0);
   };
 
   const calcularDescuento = () => {
     return cart.reduce((acc, item) => {
-      return acc + (item.quantity || 1) * (item.price * (item.discount || 0));
+      return (
+        acc +
+        (item.quantity || 1) * (Number(item.price) * Number(item.discount || 0))
+      );
     }, 0);
   };
 
@@ -133,7 +136,7 @@ const Cart = () => {
                 <div className="sm:col-span-2 flex items-center gap-4">
                   <div className="w-24 h-24 shrink-0 bg-white p-1 rounded-md">
                     <img
-                      src={item.url_img}
+                      src={item.imgUrl}
                       className="w-full h-full object-contain"
                       alt={item.description}
                     />
@@ -166,23 +169,24 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="ml-auto">
-                  {item.discount && item.discount > 0 ? (
+                  {item.discount && Number(item.discount) > 0 ? (
                     <div>
                       <h4 className="text-lg font-bold text-gray-800">
                         $
                         {(
-                          item.price *
+                          Number(item.price) *
                           (item.quantity || 1) *
-                          (1 - item.discount)
+                          (1 - Number(item.discount))
                         ).toFixed(2)}
                       </h4>
                       <h4 className="text-gray-500 line-through">
-                        ${(item.price * (item.quantity || 1)).toFixed(2)}
+                        $
+                        {(Number(item.price) * (item.quantity || 1)).toFixed(2)}
                       </h4>
                     </div>
                   ) : (
                     <h4 className="text-lg font-bold text-gray-800">
-                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+                      ${(Number(item.price) * (item.quantity || 1)).toFixed(2)}
                     </h4>
                   )}
                 </div>

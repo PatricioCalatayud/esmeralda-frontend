@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { IProduct } from "@/interfaces/IProduct";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
+import { IProductList } from "@/interfaces/IProductList";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
   locale: "es-AR",
@@ -13,7 +13,7 @@ initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
 
 const Checkout = () => {
   const router = useRouter();
-  const [cart, setCart] = useState<IProduct[]>([]);
+  const [cart, setCart] = useState<IProductList[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
     email: "",
@@ -25,7 +25,7 @@ const Checkout = () => {
   useEffect(() => {
     const cartData = JSON.parse(
       localStorage.getItem("cart") || "[]"
-    ) as IProduct[];
+    ) as IProductList[];
     setCart(cartData);
 
     const totalConDescuento = calcularTotalConDescuento(cartData);
@@ -62,11 +62,11 @@ const Checkout = () => {
     return validPrice * validDiscount;
   };
 
-  const calcularTotalConDescuento = (cart: IProduct[]) => {
+  const calcularTotalConDescuento = (cart: IProductList[]) => {
     return cart.reduce((acc, item) => {
-      const validPrice = item.price || 0;
-      const validDiscount = item.discount || 0;
-      const validQuantity = item.quantity || 1;
+      const validPrice = Number(item.price) || 0;
+      const validDiscount = Number(item.discount) || 0;
+      const validQuantity = Number(item.quantity) || 1;
 
       const discountedPrice = validPrice - validPrice * validDiscount;
       const itemTotal = discountedPrice * validQuantity;
@@ -141,7 +141,7 @@ const Checkout = () => {
                   >
                     <div className="max-w-[190px] shrink-0 rounded-md">
                       <img
-                        src={item.url_img}
+                        src={item.imgUrl}
                         className="w-40 h-full rounded-xl"
                         alt={item.description}
                       />
@@ -161,21 +161,21 @@ const Checkout = () => {
                         <li className="flex flex-wrap gap-4">
                           Producto{" "}
                           <span className="ml-auto">
-                            ${item.price.toFixed(2)}
+                            ${Number(item.price).toFixed(2)}
                           </span>
                         </li>
 
                         {calculateDiscountAmount(
-                          item.price,
-                          item.discount || 0
+                          Number(item.price),
+                          Number(item.discount) || 0
                         ) > 0 && (
                           <li className="flex flex-wrap gap-4">
                             Descuento
                             <span className="ml-auto">
                               -$
                               {calculateDiscountAmount(
-                                item.price,
-                                item.discount || 0
+                                Number(item.price),
+                                Number(item.discount) || 0
                               ).toFixed(2)}
                             </span>
                           </li>

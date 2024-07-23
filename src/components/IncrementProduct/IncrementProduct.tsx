@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 const IncrementProduct: React.FC<{
-  productId: number;
+  productId: string;
   initialQuantity: number;
   onQuantityChange: (quantity: number) => void;
 }> = ({ productId, initialQuantity, onQuantityChange }) => {
