@@ -41,7 +41,7 @@ const Login = () => {
     password: false,
   });
 
-  //! Funcion para iniciar sesion
+  //! Funcion para manejar los cambios en los campos del formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -99,13 +99,16 @@ const Login = () => {
     try {
       const response = await LoginUser(dataUser);
 
-      console.log(response); 
+      console.log(response);
 
       // Verificar si se recibió un usuario en la respuesta
 
       if (response) {
         // Guardar datos de usuario en localStorage
-        //localStorage.setItem("userSession", JSON.stringify({ userData: response }));
+        localStorage.setItem(
+          "userSession",
+          JSON.stringify({ userData: response })
+        );
 
         Swal.fire({
           icon: "success",
@@ -193,7 +196,7 @@ const Login = () => {
                   onChange={handleChange}
                   error={!!error.email}
                   helperText={error.email}
-                  InputLabelProps={{ style: { color: 'teal' } }} // Color teal
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
                 />
                 <TextField
                   margin="normal"
@@ -208,7 +211,7 @@ const Login = () => {
                   onChange={handleChange}
                   error={!!error.password}
                   helperText={error.password}
-                  InputLabelProps={{ style: { color: 'teal' } }} // Color teal
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
                 />
                 <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
                   <div className="flex items-center">
@@ -258,7 +261,9 @@ const Login = () => {
                     Regístrate Aquí
                   </a>
                 </p>
-                {submitError && <p className="text-red-500 mt-4">{submitError}</p>}
+                {submitError && (
+                  <p className="text-red-500 mt-4">{submitError}</p>
+                )}
                 <div>
                   <hr className="border-gray-600 border-2 my-3" />
                 </div>
@@ -322,9 +327,15 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
-      <div className="absolute  bottom-1 right-1">
-          <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
-        </div>
+      <div className="absolute bottom-1 right-1 hidden md:block">
+        <Image
+          src="/logoblanco.png"
+          alt="Logo"
+          width={300}
+          height={300}
+          className="w-[300px] h-[300px]"
+        />
+      </div>
     </ThemeProvider>
   );
 };

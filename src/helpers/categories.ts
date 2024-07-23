@@ -1,3 +1,7 @@
+import axios from "axios";
+
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
+
 export const categories = [
   {
     id: 1,
@@ -24,3 +28,14 @@ export const categories = [
 export const getCategoryById = (id: number) => {
   return categories.find((category) => category.id === id);
 };
+
+//! Get all categories
+export async function getCategories() {
+  try {
+    const res = await axios.get(`${apiURL}/category`);
+    return res.data;
+    console.log(res.data);
+  } catch (error: any) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+}
