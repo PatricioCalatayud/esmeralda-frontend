@@ -1,10 +1,13 @@
 import ProductList from "@/components/ProductList/ProductList";
-import { categories, getCategoryById } from "../../../helpers/categories";
-import { getProductsByCategory } from "../../../helpers/products";
+import {
+  getCategories,
+  getProductsByCategory,
+} from "@/helpers/categories.helper";
 
 export async function generateStaticParams() {
-  return categories.map((category) => ({
-    categories: category.id.toString(),
+  const categories = await getCategories();
+  return categories.map((category: any) => ({
+    categories: category.id,
   }));
 }
 
@@ -13,9 +16,11 @@ export default async function ProductsPage({
 }: {
   params: { products: string };
 }) {
-  const selectedCategory = parseInt(params.products);
-  const category = getCategoryById(selectedCategory) || null;
-  const productsList = getProductsByCategory(selectedCategory);
+  const selectedCategory = params.products;
+  const categories = await getCategories();
+  const category =
+    categories.find((cat) => cat.id === selectedCategory) || null;
+  const productsList = await getProductsByCategory(category?.name || "");
 
   return (
     <ProductList

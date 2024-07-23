@@ -2,15 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { categories, getCategoryById } from "../../helpers/categories";
-import { ICategory } from "@/interfaces/ICategory";
-import { IProduct } from "../../interfaces/IProduct";
 import { useState, useEffect } from "react";
+import { ICategory, IProductList } from "@/interfaces/IProductList";
+import { getCategories } from "@/helpers/categories.helper";
 
 interface ProductsClientPageProps {
-  selectedCategory: number | null;
+  selectedCategory: string | null;
   category: ICategory | null;
-  productsList: IProduct[];
+  productsList: IProductList[];
 }
 
 const ProductList: React.FC<ProductsClientPageProps> = ({
@@ -21,17 +20,26 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const router = useRouter();
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] =
-    useState<IProduct[]>(productsList);
+    useState<IProductList[]>(productsList);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
 
   useEffect(() => {
     let sortedProducts = [...productsList];
 
     switch (filterOption) {
       case "price-asc":
-        sortedProducts.sort((a, b) => a.price - b.price);
+        sortedProducts.sort(
+          (a, b) => parseFloat(a.price) - parseFloat(b.price)
+        );
         break;
       case "price-desc":
-        sortedProducts.sort((a, b) => b.price - a.price);
+        sortedProducts.sort(
+          (a, b) => parseFloat(b.price) - parseFloat(a.price)
+        );
         break;
       case "name-asc":
         sortedProducts.sort((a, b) =>
@@ -50,7 +58,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     setFilteredProducts(sortedProducts);
   }, [filterOption, productsList]);
 
-  const handleCategoryChange = (id: number | null) => {
+  const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
     } else {
@@ -135,22 +143,24 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <div className="w-full lg:w-3/4 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map((product) => {
-              const category = getCategoryById(product.categoryId); // Obtener categoría
+              const productCategory = categories.find(
+                (cat) => cat.id === product.category.id
+              );
               return (
                 <div
                   key={product.article_id}
                   className="p-4 rounded-lg h-full"
-                  onClick={() => router.push(`/products/${product.article_id}`)}
+                  onClick={() => router.push(`/products/${product.id}`)}
                 >
-                  <div className="relative pb-56 flex justify-items-start ">
+                  <div className="relative pb-56 flex justify-items-start">
                     <img
-                      src={product.url_img}
+                      src={product.imgUrl}
                       alt={product.description}
-                      className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer "
+                      className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer"
                     />
                   </div>
-                  {category && (
-                    <h3 className="text-gray-500">{category.name}</h3>
+                  {productCategory && (
+                    <h3 className="text-gray-500">{productCategory.name}</h3>
                   )}
                   <h2 className="text-xl font-semibold">
                     {product.description}
