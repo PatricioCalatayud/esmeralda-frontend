@@ -6,7 +6,7 @@ import { GiSettingsKnobs } from "react-icons/gi";
 
 
 const links = [
-  { name: "Producto", href: "product" },
+  { name: "Producto", href: "../../dashboard/product" },
   { name: "Salir", href: "salir" },
 ];
 

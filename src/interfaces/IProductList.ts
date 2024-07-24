@@ -48,3 +48,29 @@ export interface IProductErrorResponse {
   medida?: string;
   categoryID: string;
 }
+
+export interface IProductUpdate {
+  article_id:    string;
+  description:   string;
+  imgUrl:        string;
+  price:         string;
+  stock:         string;
+  discount:      string;
+  presentacion:  string;
+  tipoGrano:     string;
+  medida:        string;
+  category:      Category;
+}
+
+export interface IProductErrorUpdate {
+  article_id:    string;
+  description:   string;
+  imgUrl:        string;
+  price:         string;
+  stock:         string;
+  discount:      string;
+  presentacion:  string;
+  tipoGrano:     string;
+  medida:        string;
+  category:      Category;
+}

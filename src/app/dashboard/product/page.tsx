@@ -1,4 +1,3 @@
-
 "use client";
 import { MdEdit } from "react-icons/md";
 import { IoSearchSharp } from "react-icons/io5";
@@ -6,15 +5,12 @@ import { RiDeleteBin6Fill, RiAddLargeFill } from "react-icons/ri";
 import { Pagination, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import React from "react";
-
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-//import Spinner from "../Spinner";
 import { IProductList } from "@/interfaces/IProductList";
 
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+const apiURL = process.env.NEXT_PUBLIC_NEXTAUTH_PUBLIC_URL;
 
 const ProductList = () => {
   const router = useRouter();
@@ -27,22 +23,22 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
 
   //! Obtener token de usuario
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        console.log("userToken", parsedSession.userData.token);
-        setToken(parsedSession.userData.token);
-      }
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && window.localStorage) {
+  //     const userSession = localStorage.getItem("userSession");
+  //     if (userSession) {
+  //       const parsedSession = JSON.parse(userSession);
+  //       console.log("userToken", parsedSession.userData.token);
+  //       setToken(parsedSession.userData.token);
+  //     }
+  //   }
+  // }, [router]);
 
   //! Obtener los productos
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await axios.get('http://localhost:3001/products');
+        const response = await axios.get(`${apiURL}/products`);
         const products = response.data;
         setProducts(products);
         setTotalPages(Math.ceil(products.length / PRODUCTS_PER_PAGE));
@@ -148,14 +144,18 @@ const ProductList = () => {
   //! Función para habilitar un producto
   const handleEnableProduct = async (id: string) => {
     if (!token) {
-      Swal.fire("¡Error!", "Token no encontrado. Por favor, inicia sesión.", "error");
+      Swal.fire(
+        "¡Error!",
+        "Token no encontrado. Por favor, inicia sesión.",
+        "error"
+      );
       return;
     }
-    
+
     try {
       const response = await axios.put(
-        `${apiURL}/products/${id}`, 
-        { condition: true }, 
+        `${apiURL}/products/${id}`,
+        { condition: true },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -177,18 +177,22 @@ const ProductList = () => {
       );
     }
   };
-  
+
   //! Función para manejar la deshabilitación de un producto
   const handleDisableProduct = async (id: string) => {
     if (!token) {
-      Swal.fire("¡Error!", "Token no encontrado. Por favor, inicia sesión.", "error");
+      Swal.fire(
+        "¡Error!",
+        "Token no encontrado. Por favor, inicia sesión.",
+        "error"
+      );
       return;
     }
-  
+
     try {
       const response = await axios.put(
-        `${apiURL}/products/${id}`, 
-        { condition: false }, 
+        `${apiURL}/products/${id}`,
+        { condition: false },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -212,12 +216,12 @@ const ProductList = () => {
   };
 
   //! Spinner de carga
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setLoading(false);
+  //   }, 3000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   // if (products.length === 0) {
   //   return (
@@ -318,7 +322,7 @@ const ProductList = () => {
                           alt={product.description}
                           className="h-12 w-auto mr-3"
                         />
-                        {product.description}    
+                        {product.description}
                       </div>
                     </th>
                     {/* <td className="px-4 py-3">
@@ -346,7 +350,7 @@ const ProductList = () => {
                             data-drawer-show="drawer-update-product"
                             aria-controls="drawer-update-product"
                             className="py-2 px-3 flex items-center text-sm font-medium text-center text-teal-600 bg-gray-900 rounded-lg hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            href={`/productList/${product.id}`}
+                            href={`../../dashboard/product/${product.id}`}
                           >
                             <MdEdit size={20} />
                           </Link>
@@ -364,7 +368,7 @@ const ProductList = () => {
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex items-center justify-center space-x-4">
-                      <input
+                        <input
                           type="checkbox"
                           checked={product.isAvailable}
                           onChange={() =>
