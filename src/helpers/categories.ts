@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiURL = process.env.NEXT_PUBLIC_NEXTAUTH_PUBLIC_URL;
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 export const categories = [
   {
@@ -28,8 +28,6 @@ export const categories = [
 export const getCategoryById = (id: number) => {
   return categories.find((category) => category.id === id);
 };
-
-
 
 //! Get all categories
 export async function getCategories() {

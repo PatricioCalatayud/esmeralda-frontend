@@ -10,7 +10,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 
-const apiURL = process.env.NEXT_PUBLIC_NEXTAUTH_PUBLIC_URL;
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductList = () => {
   const router = useRouter();

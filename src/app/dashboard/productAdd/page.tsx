@@ -7,11 +7,11 @@ import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { IProductResponse } from "@/interfaces/IProductList";
-import { ICategory } from "@/interfaces/ICategory";
+import { ICategory, IProductResponse } from "@/interfaces/IProductList";
+
 import { productAddValidation } from "@/utils/productAddValidation";
 
-const apiURL = process.env.NEXTAUTH_URL_DASHBOARD;
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const InsertProduct = () => {
   const router = useRouter();

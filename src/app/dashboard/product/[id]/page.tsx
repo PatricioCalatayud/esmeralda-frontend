@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { getCategories } from "@/helpers/categories";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
-const apiURL = process.env.NEXT_PUBLIC_NEXTAUTH_PUBLIC_URL;
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
