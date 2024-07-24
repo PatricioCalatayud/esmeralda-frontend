@@ -319,8 +319,13 @@ console.log("formData",formData);
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="arabica">Arábica</option>
-                  <option value="robusta">Robusta</option>
+                  <option value="santos">Santos</option>
+                  <option value="colombiano">Colombiano</option>
+                  <option value="torrado">Torrado</option>
+                  <option value="rio de oro">Rio de Oro</option>
+                  <option value="descafeino">Descafeinado</option>
+                  <option value="blend-premium">Blend</option>
+                  <option value="mezcla-baja calidad">Mezcla</option>
                 </select>
                 {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
@@ -342,9 +347,10 @@ console.log("formData",formData);
                     onChange={handleChange}
                   >
                     <option value="">--Seleccione--</option>
-                    <option value="250g">250 gramos</option>
-                    <option value="500g">500 gramos</option>
-                    <option value="1kg">1 kilogramo</option>
+                    <option value="kilo">Kilo</option>
+                  <option value="unidades">Unidades</option>
+                  <option value="sobre">Sobres</option>
+                  <option value="caja">Caja</option>
                   </select>
                   {errors.medida && (
                     <span className="text-red-500">{errors.medida}</span>
