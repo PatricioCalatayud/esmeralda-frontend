@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
@@ -10,6 +10,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { MdHelp } from "react-icons/md";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
+import Swal from "sweetalert2";
 
 const Navbar = () => {
   const router = useRouter();
@@ -19,8 +20,9 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [allProducts, setAllProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [userSesion, setUserSesion] = useState();
+  const [userSession, setUserSession] = useState(null);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [showUser, setShowUser] = useState(false);
 
   const handleProductClick = () => {
     setSearchTerm("");
@@ -30,6 +32,69 @@ const Navbar = () => {
   const handleNavLinkClick = () => {
     setNav(false);
   };
+
+   //! Obtener token de usuario-Session
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const userSession = localStorage.getItem("userSession");
+      if (userSession) {
+        const parsedSession = JSON.parse(userSession);
+        console.log("userToken", parsedSession.userData.accessToken);
+        setUserSession(parsedSession.userData.accessToken);
+      }
+    }
+  }, [router]);
+
+//! Cerrar sesión
+const handleSignOut = () => {
+  localStorage.removeItem("userSession");
+  localStorage.removeItem("cart"); // Remove cart from local storage
+  setUserSession(null);
+  setShowUser(false);
+
+  Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
+  router.push("/categories");
+};
+
+//!Mostar User si hay sesión de usuario
+useEffect(() => {
+  if (typeof window !== "undefined" && window.localStorage) {
+    const userToken = localStorage.getItem("userSession");
+    if (userToken) {
+      setUserSession(JSON.parse(userToken));
+      setShowUser(true);
+    } else {
+      setUserSession(null);
+      setShowUser(false);
+    }
+  } else {
+    setShowUser(false);
+  }
+}, [pathname]);
+
+//! Función para obtener y actualizar la cantidad de elementos en el carrito
+const updateCartItemCount = () => {
+  const cartItems = localStorage.getItem("cart");
+
+  if (cartItems) {
+    const items = JSON.parse(cartItems);
+    setCartItemCount(items.length);
+  } else {
+    setCartItemCount(0);
+  }
+};
+
+//! Actualizar la cantidad de elementos en el carrito
+useEffect(() => {
+  const interval = setInterval(() => {
+    updateCartItemCount();
+  }, 1000);
+  return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
+}, [cartItemCount]);
+
+
+
+
 
   if (hideNavbar) {
     return null;
@@ -55,60 +120,7 @@ const Navbar = () => {
               </div>
             </Link>
           </div>
-          <div className="flex items-center w-full md:w-auto justify-between space-x-2 md:hidden">
-            <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
-              <input
-                className="bg-gray-200 rounded-full pl-8 pr-4 py-1 focus:outline-none w-full md:w-64"
-                type="text"
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
-            </div>
-            <button
-              onClick={() => router.push("/cart")}
-              className="text-teal-700 flex items-center p-2 rounded-full relative"
-            >
-              <FaCartPlus size={30} />
-              {cartItemCount > 0 && (
-                <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
-            {!userSesion && (
-              <Link href="/login">
-                <button className="text-gray-900 font-bold">Iniciar Sesion</button>
-              </Link>
-            )}
-            {userSesion && (
-              <Dropdown
-                arrowIcon={false}
-                inline
-                label={
-                  <Image
-                    src={"/perfil.png"}
-                    alt="imagen"
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
-                }
-              >
-                <Dropdown.Header>
-                  <span className="block text-sm">
-                    User
-                  </span>
-                  <span className="block truncate text-sm font-medium">
-                    User@hotmail.com
-                  </span>
-                </Dropdown.Header>
-                <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
-                <Dropdown.Item>Salir</Dropdown.Item>
-              </Dropdown>
-            )}
-          </div>
+        
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
         <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
@@ -135,17 +147,17 @@ const Navbar = () => {
           >
             <FaCartPlus size={30} />
             {cartItemCount > 0 && (
-              <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
+              <span className="bg-red-400 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
                 {cartItemCount}
               </span>
             )}
           </button>
-          {!userSesion && (
+          {!showUser && (
             <Link href="/login">
               <button className="text-gray-900 font-bold">Iniciar Sesion</button>
             </Link>
           )}
-          {userSesion && (
+          {showUser && (
             <Dropdown
               arrowIcon={false}
               inline
@@ -153,22 +165,20 @@ const Navbar = () => {
                 <Image
                   src={"/perfil.png"}
                   alt="imagen"
-                  width={30}
-                  height={30}
+                  width={40}
+                  height={40}
                   className="rounded-full"
                 />
               }
             >
               <Dropdown.Header>
-                <span className="block text-sm">
-                  User
-                </span>
+                <span className="block text-sm">User</span>
                 <span className="block truncate text-sm font-medium">
                   User@hotmail.com
                 </span>
               </Dropdown.Header>
               <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
-              <Dropdown.Item>Salir</Dropdown.Item>
+              <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
             </Dropdown>
           )}
         </div>
