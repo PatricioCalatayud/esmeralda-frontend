@@ -23,16 +23,16 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
 
   //! Obtener token de usuario
-  // useEffect(() => {
-  //   if (typeof window !== "undefined" && window.localStorage) {
-  //     const userSession = localStorage.getItem("userSession");
-  //     if (userSession) {
-  //       const parsedSession = JSON.parse(userSession);
-  //       console.log("userToken", parsedSession.userData.token);
-  //       setToken(parsedSession.userData.token);
-  //     }
-  //   }
-  // }, [router]);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const userSession = localStorage.getItem("userSession");
+      if (userSession) {
+        const parsedSession = JSON.parse(userSession);
+        console.log("userToken", parsedSession.userData.accessToken);
+        setToken(parsedSession.userData.accessToken);
+      }
+    }
+  }, [router]);
 
   //! Obtener los productos
   useEffect(() => {
@@ -90,7 +90,6 @@ const ProductList = () => {
 
     if (isConfirmed) {
       try {
-        console.log("Token:", token);
         if (!token) {
           Swal.fire(
             "¡Error!",
@@ -155,7 +154,7 @@ const ProductList = () => {
     try {
       const response = await axios.put(
         `${apiURL}/products/${id}`,
-        { condition: true },
+        { isAvailable: true },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,7 +164,7 @@ const ProductList = () => {
       console.log("Producto habilitado:", response.data);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === id ? { ...product, condition: true } : product
+          product.id === id ? { ...product, isAvailable: true } : product
         )
       );
     } catch (error) {
@@ -192,7 +191,7 @@ const ProductList = () => {
     try {
       const response = await axios.put(
         `${apiURL}/products/${id}`,
-        { condition: false },
+        { isAvailable: false },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -202,7 +201,7 @@ const ProductList = () => {
       console.log("Producto deshabilitado:", response.data);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === id ? { ...product, condition: false } : product
+          product.id === id ? { ...product, isAvailable: false } : product
         )
       );
     } catch (error) {
