@@ -1,8 +1,11 @@
 
 "use client";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GiSettingsKnobs } from "react-icons/gi";
+import { useRouter, usePathname } from "next/navigation";
+
 
 
 const links = [
@@ -16,6 +19,47 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [view, setView] = useState<string>("modifyProducts");
+  const [userSession, setUserSession] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userTelefono, setUserTelefono] = useState<string | null>(null);
+  const router = useRouter();
+
+  //! Obtener token de usuario-Session
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const userSession = localStorage.getItem("userSession");
+      if (userSession) {
+        const parsedSession = JSON.parse(userSession);
+        const token = parsedSession.userData.accessToken;
+        setUserSession(token);
+        
+      
+          const decodedToken: DecodedToken = jwtDecode(token);
+  
+          console.log(decodedToken);
+         
+         
+            if(decodedToken){
+              setUserEmail(decodedToken.email);
+              setUserName(decodedToken.name);
+              setUserRole(decodedToken.roles[0]);
+              setUserTelefono(decodedToken.phone);
+              
+              
+    
+          }
+            
+           
+         
+          
+      }
+    }
+  }, [router]);
+
+
+
   return (
     <>
       <div className="flex flex-row min-h-screen dark:bg-gray-700">
@@ -49,24 +93,19 @@ export default function DashboardLayout({
             </h2>
             <div className="bg-gray-50 p-4 rounded shadow dark:bg-gray-300">
               {/* Aquí irían los datos del usuario */}
-              {/* <p>
-              <b>Nombre:</b> {token?.userData.data.name}
+              <p>
+              <b>Nombre:</b> {userName}
             </p>
             <p>
-              <b>Email:</b> {token?.userData.data.email}
+              <b>Email:</b> {userEmail}
             </p>
             <p>
-              <b>Teléfono:</b> {token?.userData.data.phone}
-            </p>
+              <b>Telefono:</b> {userTelefono}
+              </p>
             <p>
-              <b>Dirección:</b> {token?.userData.data.address}
+              <b>Rol:</b> {userRole} 
             </p>
-            <p>
-              <b>País:</b> {token?.userData.data.country}
-            </p>
-            <p>
-              <b>Ciudad:</b> {token?.userData.data.city}
-            </p> */}
+           
             </div>
           </div>
           <div className="p-1 md:p-1 flex flex-col flex-1">
