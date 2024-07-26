@@ -6,12 +6,13 @@ import { Spinner } from "@material-tailwind/react";
 import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
-import { ICategory, IProductList } from "@/interfaces/IProductList";
+
 import { getProductById } from "@/helpers/products.helper";
+import { Category, IProductList } from "@/interfaces/IProductList";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
-  const [category, setCategory] = useState<ICategory | null>(null);
+  const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);

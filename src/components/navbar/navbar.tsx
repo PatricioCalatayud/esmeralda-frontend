@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
@@ -10,6 +10,8 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { MdHelp } from "react-icons/md";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 import { useProductContext } from '@/context/product.context';
 
 const Navbar = () => {
@@ -18,9 +20,19 @@ const Navbar = () => {
   const hideNavbar = pathname === "/login" || pathname === "/register"; // Ocultar navbar en login y register
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [allProducts, setAllProducts] = useState([]);
+  const [searchResultss, setSearchResults] = useState([]);
+  const [userSession, setUserSession] = useState(null);
   const { searchResults, searchProducts } = useProductContext();
   const [userSesion, setUserSesion] = useState();
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [showUser, setShowUser] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
+
+
+
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -35,6 +47,97 @@ const Navbar = () => {
   const handleNavLinkClick = () => {
     setNav(false);
   };
+
+  //! Obtener token de usuario-Session
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const userSession = localStorage.getItem("userSession");
+      if (userSession) {
+        const parsedSession = JSON.parse(userSession);
+        const token = parsedSession.userData.accessToken;
+        setUserSession(token);
+        
+      
+          const decodedToken: DecodedToken = jwtDecode(token);
+  
+          console.log(decodedToken);
+         
+         
+            if(decodedToken){
+              setUserEmail(decodedToken.email);
+              setUserName(decodedToken.name);
+              setUserRole(decodedToken.roles[0]);
+              
+    
+          }
+            
+           
+         
+          
+      }
+    }
+  }, [router]);
+
+
+ 
+
+ 
+  
+  
+  
+
+  //! Cerrar sesión
+  const handleSignOut = () => {
+    localStorage.removeItem("userSession");
+    localStorage.removeItem("cart"); // Remove cart from local storage
+    setUserSession(null);
+    setShowUser(false);
+    setUserEmail("");
+    setUserName("");
+    setUserRole("");
+    
+
+    Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
+    router.push("/categories");
+  };
+
+  //!Mostar User si hay sesión de usuario
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      const userToken = localStorage.getItem("userSession");
+      if (userToken) {
+        setUserSession(JSON.parse(userToken));
+        setShowUser(true);
+        
+      } else {
+        setUserSession(null);
+        setShowUser(false);
+      }
+    } else {
+      setShowUser(false);
+      
+    }
+  }, [pathname]);
+
+  //! Función para obtener y actualizar la cantidad de elementos en el carrito
+  const updateCartItemCount = () => {
+    const cartItems = localStorage.getItem("cart");
+
+    if (cartItems) {
+      const items = JSON.parse(cartItems);
+      setCartItemCount(items.length);
+    } else {
+      setCartItemCount(0);
+    }
+  };
+
+  //! Actualizar la cantidad de elementos en el carrito
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateCartItemCount();
+    }, 1000);
+    return () => clearInterval(interval); // Limpia el intervalo cuando el componente se desmonta
+  }, [cartItemCount]);
 
   if (hideNavbar) {
     return null;
@@ -116,6 +219,29 @@ const Navbar = () => {
           </div>
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
+          <Link href="/categories" className="mr-5 hover:text-gray-900">
+            Tienda Online
+          </Link>
+          {userRole === "admin" && (
+            <Link href="/dashboard/product" className="mr-5 hover:text-gray-900">
+              Admin Dashboard
+            </Link>
+          )}
+          <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">
+            Sobre la Esmeralda
+          </Link>
+          <Link href="/politica" className="mr-5 hover:text-gray-900">
+            Politica
+          </Link>
+          <Link href="/contact" className="mr-5 hover:text-gray-900">
+            Contacto
+          </Link>
+          <Link href="/mvv" className="mr-5 hover:text-gray-900">
+            MVV
+          </Link>
+          <Link href="/nosotros" className="mr-5 hover:text-gray-900">
+            F&Q
+          </Link>
           <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
           <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">Sobre la Esmeralda</Link>
           <Link href="/politica" className="mr-5 hover:text-gray-900">Politica</Link>
@@ -132,7 +258,10 @@ const Navbar = () => {
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
+            <AiOutlineSearch
+              size={20}
+              className="absolute left-2 text-gray-600"
+            />
           </div>
           <button
             onClick={() => router.push("/cart")}
@@ -140,17 +269,24 @@ const Navbar = () => {
           >
             <FaCartPlus size={30} />
             {cartItemCount > 0 && (
-              <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
+              <span className="bg-red-400 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
                 {cartItemCount}
               </span>
             )}
           </button>
-          {!userSesion && (
+          {!showUser && (
             <Link href="/login">
-              <button className="text-gray-900 font-bold">Iniciar Sesion</button>
+              <button className="text-gray-900 font-bold">
+                Iniciar Sesion
+              </button>
             </Link>
           )}
-          {userSesion && (
+          {showUser && (
+            <label className="text-gray-900 font-bold cursor-pointer">
+              Bienvenido: {userName}
+            </label>
+          )}
+          {showUser && (
             <Dropdown
               arrowIcon={false}
               inline
@@ -158,22 +294,20 @@ const Navbar = () => {
                 <Image
                   src={"/perfil.png"}
                   alt="imagen"
-                  width={30}
-                  height={30}
+                  width={40}
+                  height={40}
                   className="rounded-full"
                 />
               }
             >
               <Dropdown.Header>
-                <span className="block text-sm">
-                  User
-                </span>
+                <span className="block text-sm">User</span>
                 <span className="block truncate text-sm font-medium">
-                  User@hotmail.com
+                  {userEmail}
                 </span>
               </Dropdown.Header>
               <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
-              <Dropdown.Item>Salir</Dropdown.Item>
+              <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
             </Dropdown>
           )}
         </div>

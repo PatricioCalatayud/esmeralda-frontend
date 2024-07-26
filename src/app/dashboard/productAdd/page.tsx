@@ -7,7 +7,7 @@ import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { ICategory, IProductResponse } from "@/interfaces/IProductList";
+import { Category, IProductResponse } from "@/interfaces/IProductList";
 
 import { productAddValidation } from "@/utils/productAddValidation";
 
@@ -15,9 +15,8 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const InsertProduct = () => {
   const router = useRouter();
-  //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductResponse>({
@@ -47,21 +46,10 @@ const InsertProduct = () => {
     medida: "",
   });
 
-  // //! Obtener el token del usuario
-  // useEffect(() => {
-  //   if (typeof window !== "undefined" && window.localStorage) {
-  //     const userSession = localStorage.getItem("userSession");
-  //     if (userSession) {
-  //       const parsedSession = JSON.parse(userSession);
-  //       setToken(parsedSession.userData.accessToken);
-  //     }
-  //   }
-  // }, [router]);
-
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await axios.get("http://localhost:3001/category");
+      const response = await axios.get(`${apiURL}/category`);
       const categories = response.data;
       setCategories(categories);
     };
@@ -95,68 +83,67 @@ const InsertProduct = () => {
   };
 
   //! Función para enviar los datos del producto al backend
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const formData = new FormData();
-  formData.append("article_id", Number(dataProduct.article_id).toString());
-  formData.append("description", dataProduct.description);
-  formData.append("presentacion", dataProduct.presentacion || "");
-  formData.append("tipoGrano", dataProduct.tipoGrano || "");
-  formData.append("medida", dataProduct.medida || "");
-  formData.append("price", dataProduct.price);
-  formData.append("stock", Number(dataProduct.stock).toString());
-  formData.append("discount", dataProduct.discount);
-  formData.append("categoryID", dataProduct.categoryID);
-  if (imageFile) {
-    formData.append("file", imageFile);
-  }
+    const formData = new FormData();
+    formData.append("article_id", Number(dataProduct.article_id).toString());
+    formData.append("description", dataProduct.description);
+    formData.append("presentacion", dataProduct.presentacion || "");
+    formData.append("tipoGrano", dataProduct.tipoGrano || "");
+    formData.append("medida", dataProduct.medida || "");
+    formData.append("price", dataProduct.price);
+    formData.append("stock", Number(dataProduct.stock).toString());
+    formData.append("discount", dataProduct.discount);
+    formData.append("categoryID", dataProduct.categoryID);
+    if (imageFile) {
+      formData.append("file", imageFile);
+    }
 
-  // Log the FormData content
-  formData.forEach((value, key) => {
-    console.log(key, value);
-  });
+    // Log the FormData content
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
 
-  //! Mostrar alerta de carga mientras se procesa la solicitud
-  Swal.fire({
-    title: "Agregando producto...",
-    text: "Por favor espera.",
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
-
-  try {
-    const response = await axios.post('http://localhost:3001/products', formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    //! Mostrar alerta de carga mientras se procesa la solicitud
+    Swal.fire({
+      title: "Agregando producto...",
+      text: "Por favor espera.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
       },
     });
 
-    console.log("Response:", response);
-    console.log("Product added successfully");
+    try {
+      const response = await axios.post(`${apiURL}/products`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    // Mostrar alerta de éxito
-    Swal.fire({
-      icon: "success",
-      title: "¡Agregado!",
-      text: "El producto ha sido agregado con éxito.",
-    }).then(() => {
-      router.push("../../dashboard/product");
-    });
-  } catch (error) {
-    console.error("Error adding product:", error);
+      console.log("Response:", response);
+      console.log("Product added successfully");
 
-    // Mostrar alerta de error
-    Swal.fire({
-      icon: "error",
-      title: "¡Error!",
-      text: "Ha ocurrido un error al agregar el producto.",
-    });
-  }
-};
- 
+      // Mostrar alerta de éxito
+      Swal.fire({
+        icon: "success",
+        title: "¡Agregado!",
+        text: "El producto ha sido agregado con éxito.",
+      }).then(() => {
+        router.push("../../dashboard/product");
+      });
+    } catch (error) {
+      console.error("Error adding product:", error);
+
+      // Mostrar alerta de error
+      Swal.fire({
+        icon: "error",
+        title: "¡Error!",
+        text: "Ha ocurrido un error al agregar el producto.",
+      });
+    }
+  };
 
   //!Validar formulario
   useEffect(() => {
@@ -174,27 +161,27 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-        <div>
-              <label
-                htmlFor="article_id"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Código de Producto
-              </label>
-              <input
-                type="number"
-                name="article_id"
-                id="article_id"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-                value={dataProduct.article_id}
-                onChange={handleChange}
-              />
-              {errors.article_id && (
-                <span className="text-red-500">{errors.article_id}</span>
-              )}
-            </div>
+          <div>
+            <label
+              htmlFor="article_id"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Código de Producto
+            </label>
+            <input
+              type="number"
+              name="article_id"
+              id="article_id"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
+              value={dataProduct.article_id}
+              onChange={handleChange}
+            />
+            {errors.article_id && (
+              <span className="text-red-500">{errors.article_id}</span>
+            )}
+          </div>
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
-             <div>
+            <div>
               <label
                 htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -214,7 +201,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 <span className="text-red-500">{errors.description}</span>
               )}
             </div>
-            
+
             <div>
               <label
                 htmlFor="category"
@@ -230,7 +217,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
-                {categories.map((category: ICategory) => (
+                {categories.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -374,7 +361,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                   value={dataProduct.stock}
                   onChange={handleChange}
                 />
-               {errors.stock && (
+                {errors.stock && (
                   <span className="text-red-500">{errors.stock}</span>
                 )}
               </div>

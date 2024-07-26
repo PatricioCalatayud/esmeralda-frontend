@@ -11,14 +11,13 @@ export interface IProductList {
   averageRating: string;
   isAvailable: boolean;
   isDeleted: boolean;
+  category: Category;
   presentacion?: string;
   tipoGrano?: string;
   medida?: string;
-  quantity?: number;
-  category: ICategory;
 }
 
-export interface ICategory {
+export interface Category {
   id: string;
   name: string;
 }
@@ -50,27 +49,27 @@ export interface IProductErrorResponse {
 }
 
 export interface IProductUpdate {
-  article_id:    string;
-  description:   string;
-  imgUrl:        string;
-  price:         string;
-  stock:         string;
-  discount:      string;
-  presentacion:  string;
-  tipoGrano:     string;
-  medida:        string;
-  category:      Category;
+  article_id: string;
+  description: string;
+  imgUrl: string;
+  price: string;
+  stock: string;
+  discount: string;
+  presentacion: string;
+  tipoGrano: string;
+  medida: string;
+  category: Category;
 }
 
 export interface IProductErrorUpdate {
-  article_id:    string;
-  description:   string;
-  imgUrl:        string;
-  price:         string;
-  stock:         string;
-  discount:      string;
-  presentacion:  string;
-  tipoGrano:     string;
-  medida:        string;
-  category:      Category;
+  article_id: string;
+  description: string;
+  imgUrl: string;
+  price: string;
+  stock: string;
+  discount: string;
+  presentacion: string;
+  tipoGrano: string;
+  medida: string;
+  category: Category;
 }

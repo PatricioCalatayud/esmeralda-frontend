@@ -65,7 +65,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         presentacion,
         imgUrl,
         discount,
-        category,
+        category = {
+          id: "",
+          name: "",
+        },
       } = productData;
       // Establecer solo los campos especificados en dataProduct
       setDataProduct((prevState) => ({
@@ -93,7 +96,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     const fetchCategories = async () => {
       const categories = await getCategories();
       setCategories(categories);
-      console.log("Categories:", categories);
     };
     fetchCategories();
   }, []);
@@ -153,9 +155,9 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       if (imageFile) {
         formData.append("file", imageFile);
       }
-console.log("formData",formData);
+      console.log("formData", formData);
       const response = await fetch(
-        `${apiURL}/product/${params.id}`,
+        `${apiURL}/products/${params.id}`,
         {
           method: "PUT",
 
@@ -178,7 +180,7 @@ console.log("formData",formData);
         title: "¡Actualizado!",
         text: "El producto ha sido actualizado con éxito.",
       }).then(() => {
-        router.push("../../product");
+        router.push("../../dashboard/product");
       });
     } catch (error) {
       console.error("Error updating product:", error);
@@ -327,9 +329,9 @@ console.log("formData",formData);
                   <option value="blend-premium">Blend</option>
                   <option value="mezcla-baja calidad">Mezcla</option>
                 </select>
-                {errors.tipoGrano && (
+                {/* {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
-                )}
+                )} */}
                 </div>
 
                 <div>
@@ -352,9 +354,9 @@ console.log("formData",formData);
                   <option value="sobre">Sobres</option>
                   <option value="caja">Caja</option>
                   </select>
-                  {errors.medida && (
+                  {/* {errors.medida && (
                     <span className="text-red-500">{errors.medida}</span>
-                  )}
+                  )} */}
                   </div>
 
              
@@ -374,7 +376,7 @@ console.log("formData",formData);
                 name="price"
                 id="price"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="$2999"
+                placeholder="0.00"
                 value={dataProduct.price}
                 onChange={handleChange}
               />
@@ -395,7 +397,7 @@ console.log("formData",formData);
                 name="stock"
                 id="stock"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="12"
+                placeholder="0.00"
                 value={dataProduct.stock}
                 onChange={handleChange}
               />
@@ -415,7 +417,7 @@ console.log("formData",formData);
                 type="number"
                 name="discount"
                 id="discount"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full piscounark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="12"
                 value={dataProduct.discount}
                 onChange={handleChange}
@@ -449,9 +451,9 @@ console.log("formData",formData);
                 style={{ maxHeight: "150px", objectFit: "contain" }}
               />
             )}
-            {errors.imgUrl && (
+            {/* {errors.imgUrl && (
               <span className="text-red-500">{errors.imgUrl}</span>
-            )}
+            )} */}
           </div>
 
           <div className="flex items-center space-x-4 mt-4">
@@ -462,11 +464,11 @@ console.log("formData",formData);
               Actualizar producto
             </button>
             <Link
-              href="../../product"
+              href="../../dashboard/product"
               className="w-full text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 border border-gray-300 rounded-lg text-sm px-5 py-2.5 text-center"
             >
-              <FaArrowLeft className="mr-2" />
-              Cancelar
+              
+             Volver
             </Link>
           </div>
         </form>

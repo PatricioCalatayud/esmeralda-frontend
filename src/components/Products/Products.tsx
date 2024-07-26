@@ -3,9 +3,10 @@ import Link from "next/link";
 import { getProducts } from "@/helpers/products.helper";
 import { IProduct } from "@/interfaces/IProduct";
 import { Rating } from "@mui/material";
+import { IProductList } from "@/interfaces/IProductList";
 
 const Products = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+  const [products, setProducts] = useState<IProductList[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,17 +32,17 @@ const Products = () => {
       </div>
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 place-items-center gap-5">
-          {products.map((product: IProduct) => (
+          {products.map((product: IProductList) => (
             <Link href="/home" key={product.id}>
               <div>
                 <img
                   src={product.imgUrl}
-                  alt={product.name}
+                  alt={product.description}
                   className="h-[300px] w-[200px] object-cover rounded-md"
                 />
                 <div className="product-item text-center">
                   <Rating name="read-only" value={5} readOnly />
-                  <h3 className="font-bold">{product.name}</h3>
+                  <h3 className="font-bold">{product.description}</h3>
                   <p className="text-sm text-gray-600">${product.price}</p>
                   <div className="flex items-center gap-1"></div>
                 </div>
