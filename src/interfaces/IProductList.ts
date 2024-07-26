@@ -14,6 +14,7 @@ export interface IProductList {
   category: Category;
   presentacion?: string;
   tipoGrano?: string;
+  quantity?: number;
   medida?: string;
 }
 
