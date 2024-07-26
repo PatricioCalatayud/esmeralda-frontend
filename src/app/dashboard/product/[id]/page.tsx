@@ -467,8 +467,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               href="../../dashboard/product"
               className="w-full text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 border border-gray-300 rounded-lg text-sm px-5 py-2.5 text-center"
             >
-              <FaArrowLeft className="mr-2" />
-              Cancelar
+              
+             Volver
             </Link>
           </div>
         </form>

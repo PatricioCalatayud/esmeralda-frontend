@@ -10,7 +10,7 @@ import { useRouter, usePathname } from "next/navigation";
 
 const links = [
   { name: "Producto", href: "../../dashboard/product" },
-  { name: "Salir", href: "salir" },
+  { name: "Ordenes", href: "../../dashboard/order" },
 ];
 
 export default function DashboardLayout({
@@ -34,26 +34,13 @@ export default function DashboardLayout({
         const parsedSession = JSON.parse(userSession);
         const token = parsedSession.userData.accessToken;
         setUserSession(token);
-        
-      
           const decodedToken: DecodedToken = jwtDecode(token);
-  
-          console.log(decodedToken);
-         
-         
             if(decodedToken){
               setUserEmail(decodedToken.email);
               setUserName(decodedToken.name);
               setUserRole(decodedToken.roles[0]);
               setUserTelefono(decodedToken.phone);
-              
-              
-    
           }
-            
-           
-         
-          
       }
     }
   }, [router]);
@@ -79,6 +66,8 @@ export default function DashboardLayout({
                     <span className="ml-3">{link.name}</span>
                   </Link>
                 </li>
+                
+                
               ))}
             </ul>
           </div>
