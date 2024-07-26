@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";
@@ -10,8 +10,24 @@ const apiURL = "http://localhost:3001/testimony"; // Endpoint actualizado
 const Contacto: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [punctuation, setPunctuation] = useState<number>(0);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
+    if (userSession?.userData?.user?.id) {
+      setIsUserLoggedIn(true);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Debes estar Loggueado para poder hacer un comentario",
+        text: "Redirigiendo a la página de inicio de sesión...",
+      }).then(() => {
+        router.push("/login");
+      });
+    }
+  }, [router]);
 
   const handleCambioDeCalificacion = (calificacion: number) => {
     setPunctuation(calificacion);
@@ -132,6 +148,7 @@ const Contacto: React.FC = () => {
               <button
                 type="submit"
                 className="text-white bg-teal-500 border-0 py-2 px-6 focus:outline-none hover:bg-teal-800 rounded text-lg"
+                disabled={!isUserLoggedIn}
               >
                 Enviar Opinión
               </button>

@@ -7,7 +7,7 @@ import { MdFacebook } from "react-icons/md";
 import Container from "@/components/container/Container";
 import FooterList from "./FooterList";
 import { getCategories } from "@/helpers/categories.helper";
-import { ICategory } from "@/interfaces/IProductList";
+import { Category } from "@/interfaces/IProductList";
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
   const [footerHeight, setFooterHeight] = useState("600px");
   const [flexDirection, setFlexDirection] = useState<"row" | "column">("row");
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
-  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     function updateSize() {

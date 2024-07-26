@@ -242,12 +242,7 @@ const Navbar = () => {
           <Link href="/nosotros" className="mr-5 hover:text-gray-900">
             F&Q
           </Link>
-          <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
-          <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">Sobre la Esmeralda</Link>
-          <Link href="/politica" className="mr-5 hover:text-gray-900">Politica</Link>
-          <Link href="/contact" className="mr-5 hover:text-gray-900">Contacto</Link>
-          <Link href="/mvv" className="mr-5 hover:text-gray-900">MVV</Link>
-          <Link href="/nosotros" className="mr-5 hover:text-gray-900">F&Q</Link>
+          
         </nav>
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
