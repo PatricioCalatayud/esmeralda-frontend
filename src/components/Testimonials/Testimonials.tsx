@@ -3,14 +3,17 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { FaStar } from 'react-icons/fa';
-import { testimonials as testimonialsData } from '@/helpers/testimonialhelper';
+import axios from 'axios';
 
 interface Testimonial {
   id: string;
-  name: string;
-  email: string;
   description: string;
   punctuation: number;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 const getAvatarUrl = (id: string) => 
@@ -20,7 +23,16 @@ const Testimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    setTestimonials(testimonialsData);
+    const fetchTestimonials = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/testimony');
+        setTestimonials(response.data);
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+      }
+    };
+
+    fetchTestimonials();
   }, []);
 
   const settings = {
@@ -88,14 +100,14 @@ const Testimonials: React.FC = () => {
                 <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative shadow-lg">
                   <div className="mb-4 flex justify-center">
                     <img
-                      src={getAvatarUrl(data.id)}
-                      alt={`Avatar of ${data.name}`}
+                      src={getAvatarUrl(data.user.id)}
+                      alt={`Avatar of ${data.user.name}`}
                       className="rounded-full w-20 h-20 shadow-lg bg-gray-200"
                     />
                   </div>
                   <div className="flex flex-col items-center gap-4">
                     <div className="space-y-3 text-center">
-                      <p className="text-xl font-bold text-black/80 dark:text-white">{data.name}</p>
+                      <p className="text-xl font-bold text-black/80 dark:text-white">{data.user.name}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 font-bold">{data.description}</p>
                       <div className="flex justify-center">
                         {[...Array(5)].map((star, index) => (

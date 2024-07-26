@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -7,6 +6,8 @@ import { AiFillInstagram, AiFillTwitterCircle, AiFillYoutube } from "react-icons
 import { MdFacebook } from "react-icons/md";
 import Container from "@/components/container/Container";
 import FooterList from "./FooterList";
+import { getCategories } from "@/helpers/categories.helper";
+import { ICategory } from "@/interfaces/IProductList";
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
@@ -14,6 +15,7 @@ const Footer: React.FC = () => {
   const [footerHeight, setFooterHeight] = useState("600px");
   const [flexDirection, setFlexDirection] = useState<"row" | "column">("row");
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   useEffect(() => {
     function updateSize() {
@@ -41,6 +43,10 @@ const Footer: React.FC = () => {
     window.addEventListener("resize", updateSize);
 
     return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  useEffect(() => {
+    getCategories().then(setCategories);
   }, []);
 
   if (hideFooter) {
@@ -90,10 +96,11 @@ const Footer: React.FC = () => {
         >
           <FooterList>
             <h3 style={{ fontSize: "1rem", color: "#38b2ac", fontWeight: "bold", marginBottom: "0.75rem" }}>Menú</h3>
-            <div>Cafés en Grano</div>
-            <div>Accesorios</div>
-            <div>Ofertas</div>
-            <div>Novedades</div>
+            {categories.map((category) => (
+              <Link key={category.id} href={`/categories/${category.id}`}>
+                <div>{category.name}</div>
+              </Link>
+            ))}
           </FooterList>
           <FooterList>
             <h3 style={{ fontSize: "1rem", color: "#38b2ac", fontWeight: "bold", marginBottom: "0.5rem" }}>Servicio al Cliente</h3>

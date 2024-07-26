@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ICategory, IProductList } from "@/interfaces/IProductList";
 import { getCategories } from "@/helpers/categories.helper";
+import { useProductContext } from '@/context/product.context';
+import Link from "next/link";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -18,6 +19,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   productsList,
 }) => {
   const router = useRouter();
+  const { searchResults, allProducts } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] =
     useState<IProductList[]>(productsList);
@@ -28,7 +30,11 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   }, []);
 
   useEffect(() => {
-    let sortedProducts = [...productsList];
+    let sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+
+    if (selectedCategory) {
+      sortedProducts = sortedProducts.filter(product => product.category.id === selectedCategory);
+    }
 
     switch (filterOption) {
       case "price-asc":
@@ -52,11 +58,11 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         );
         break;
       default:
-        sortedProducts = [...productsList];
+        sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
     }
 
     setFilteredProducts(sortedProducts);
-  }, [filterOption, productsList]);
+  }, [filterOption, productsList, searchResults, selectedCategory]);
 
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
@@ -89,9 +95,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   return (
     <>
       {/* Título y filtro */}
-      <div className="flex flex-col md:flex-row justify-around items-center bg-green-800 py-6 text-white">
+      <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white">
         {renderBreadcrumb()}
-        <div className="flex items-center bg-green-700 py-2 px-8 rounded-full mt-4 md:mt-0">
+        <div className="flex items-center bg-teal-700 py-2 px-8 rounded-full mt-4 md:mt-0">
           <select
             id="filter"
             value={filterOption}
@@ -122,14 +128,26 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <div className="w-full lg:w-1/4 p-4 lg:ml-24">
           <h2 className="text-lg font-bold mb-4 text-gray-400">Categorías</h2>
           <ul>
+            <li className="mb-2">
+              <button
+                onClick={() => handleCategoryChange(null)}
+                className={`text-lg ${
+                  selectedCategory === null
+                    ? "font-bold text-teal-800"
+                    : "text-teal-600"
+                }`}
+              >
+                Todo
+              </button>
+            </li>
             {categories.map((cat) => (
               <li key={cat.id} className="mb-2">
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`text-lg ${
                     selectedCategory === cat.id
-                      ? "font-bold text-green-800"
-                      : "text-green-600"
+                      ? "font-bold text-teal-800"
+                      : "text-teal-600"
                   }`}
                 >
                   {cat.name}

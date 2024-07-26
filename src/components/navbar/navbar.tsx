@@ -10,6 +10,7 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { MdHelp } from "react-icons/md";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
+import { useProductContext } from '@/context/product.context';
 
 const Navbar = () => {
   const router = useRouter();
@@ -17,14 +18,18 @@ const Navbar = () => {
   const hideNavbar = pathname === "/login" || pathname === "/register"; // Ocultar navbar en login y register
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [allProducts, setAllProducts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const { searchResults, searchProducts } = useProductContext();
   const [userSesion, setUserSesion] = useState();
   const [cartItemCount, setCartItemCount] = useState(0);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    searchProducts(term);
+  };
+
   const handleProductClick = () => {
     setSearchTerm("");
-    setSearchResults(allProducts);
   };
 
   const handleNavLinkClick = () => {
@@ -62,7 +67,7 @@ const Navbar = () => {
                 type="text"
                 placeholder="Buscar productos..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
               />
               <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
             </div>
@@ -111,9 +116,9 @@ const Navbar = () => {
           </div>
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
-        <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
+          <Link href="/categories" className="mr-5 hover:text-gray-900">Tienda Online</Link>
           <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">Sobre la Esmeralda</Link>
-        <Link href="/politica" className="mr-5 hover:text-gray-900">Politica</Link>
+          <Link href="/politica" className="mr-5 hover:text-gray-900">Politica</Link>
           <Link href="/contact" className="mr-5 hover:text-gray-900">Contacto</Link>
           <Link href="/mvv" className="mr-5 hover:text-gray-900">MVV</Link>
           <Link href="/nosotros" className="mr-5 hover:text-gray-900">F&Q</Link>
@@ -125,7 +130,7 @@ const Navbar = () => {
               type="text"
               placeholder="Buscar productos..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
             <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
           </div>
@@ -175,19 +180,19 @@ const Navbar = () => {
       </div>
       {searchResults.length > 0 && searchTerm && (
         <div className="absolute top-16 left-0 right-0 z-50 bg-white shadow-md">
-          {searchResults.map((product: any) => (
+          {searchResults.map((product:any) => (
             <Link
-              href={`/product/${product.id}`}
+              href={`/products/${product.id}`}
               key={product.id}
               onClick={handleProductClick}
             >
               <div className="flex items-center p-2 border-b border-gray-200">
                 <img
                   src={product.imgUrl}
-                  alt={product.name}
+                  alt={product.description}
                   className="w-12 h-12 object-cover mr-2"
                 />
-                <p className="text-gray-800">{product.name}</p>
+                <p className="text-gray-800">{product.description}</p>
               </div>
             </Link>
           ))}
@@ -241,7 +246,7 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <AiFillProduct size={25} className="mr-4" />
               <Link
-                href="/product"
+                href="/categories"
                 className="hover:text-orange-400"
                 onClick={handleNavLinkClick}
               >
