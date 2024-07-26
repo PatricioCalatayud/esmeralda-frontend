@@ -8,9 +8,7 @@ interface MercadoPagoButtonProps {
 const MercadoPagoButton: React.FC<MercadoPagoButtonProps> = ({
   preferenceId,
 }) => {
-  useEffect(() => {
-    // Initialization is now handled in the Checkout component
-  }, [preferenceId]);
+  useEffect(() => {}, [preferenceId]);
 
   return (
     <div>

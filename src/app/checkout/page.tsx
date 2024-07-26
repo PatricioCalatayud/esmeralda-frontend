@@ -12,6 +12,7 @@ initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
 });
 
 const Checkout = () => {
+  const apiURL = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
@@ -28,18 +29,18 @@ const Checkout = () => {
     ) as IProductList[];
     setCart(cartData);
 
-    const totalConDescuento = calcularTotalConDescuento(cartData);
-    const shippingCost = 0; // Costo de envío
-    const totalAmount = totalConDescuento + shippingCost;
-
     const createPreference = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:3001/market-pay/url-proccess",
-          {
-            unit_price: totalAmount,
-          }
-        );
+        const items = cartData.map((item) => ({
+          title: item.description,
+          description: item.category.name,
+          quantity: item.quantity,
+          unit_price: Number(item.price),
+        }));
+
+        const response = await axios.post(`${apiURL}/market-pay/url-proccess`, {
+          items,
+        });
 
         const { id } = response.data;
         setPreferenceId(id);
@@ -98,33 +99,7 @@ const Checkout = () => {
       <div className="max-w-7xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 max-lg:order-1 p-6 max-w-4xl mx-auto w-full">
-            <form>
-              <div>
-                <h2 className="text-2xl font-extrabold text-[#333]">
-                  Datos de envío
-                </h2>
-                <div className="grid grid-cols-2 gap-6 mt-8">
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Nombre"
-                    className="px-2 py-3.5 bg-white text-[#333] w-full text-sm border-b-2 focus:border-[#333] outline-none"
-                    onChange={handleChange}
-                    value={user.name}
-                    required
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Correo"
-                    className="px-2 py-3.5 bg-white text-[#333] w-full text-sm border-b-2 focus:border-[#333] outline-none"
-                    onChange={handleChange}
-                    value={user.email}
-                    required
-                  />
-                </div>
-              </div>
-            </form>
+            {preferenceId && <MercadoPagoButton preferenceId={preferenceId} />}
           </div>
 
           {/* Mis pedidos */}
@@ -198,7 +173,6 @@ const Checkout = () => {
             </div>
           </div>
         </div>
-        {preferenceId && <MercadoPagoButton preferenceId={preferenceId} />}
       </div>
     </div>
   );
