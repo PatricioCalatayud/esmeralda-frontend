@@ -12,6 +12,7 @@ import { Dropdown } from "flowbite-react";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
+import { useProductContext } from '@/context/product.context';
 
 const Navbar = () => {
   const router = useRouter();
@@ -20,8 +21,10 @@ const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [allProducts, setAllProducts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResultss, setSearchResults] = useState([]);
   const [userSession, setUserSession] = useState(null);
+  const { searchResults, searchProducts } = useProductContext();
+  const [userSesion, setUserSesion] = useState();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [showUser, setShowUser] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -31,9 +34,14 @@ const Navbar = () => {
 
 
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    searchProducts(term);
+  };
+
   const handleProductClick = () => {
     setSearchTerm("");
-    setSearchResults(allProducts);
   };
 
   const handleNavLinkClick = () => {
@@ -155,6 +163,60 @@ const Navbar = () => {
               </div>
             </Link>
           </div>
+          <div className="flex items-center w-full md:w-auto justify-between space-x-2 md:hidden">
+            <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
+              <input
+                className="bg-gray-200 rounded-full pl-8 pr-4 py-1 focus:outline-none w-full md:w-64"
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              <AiOutlineSearch size={20} className="absolute left-2 text-gray-600" />
+            </div>
+            <button
+              onClick={() => router.push("/cart")}
+              className="text-teal-700 flex items-center p-2 rounded-full relative"
+            >
+              <FaCartPlus size={30} />
+              {cartItemCount > 0 && (
+                <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+            {!userSesion && (
+              <Link href="/login">
+                <button className="text-gray-900 font-bold">Iniciar Sesion</button>
+              </Link>
+            )}
+            {userSesion && (
+              <Dropdown
+                arrowIcon={false}
+                inline
+                label={
+                  <Image
+                    src={"/perfil.png"}
+                    alt="imagen"
+                    width={30}
+                    height={30}
+                    className="rounded-full"
+                  />
+                }
+              >
+                <Dropdown.Header>
+                  <span className="block text-sm">
+                    User
+                  </span>
+                  <span className="block truncate text-sm font-medium">
+                    User@hotmail.com
+                  </span>
+                </Dropdown.Header>
+                <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
+                <Dropdown.Item>Salir</Dropdown.Item>
+              </Dropdown>
+            )}
+          </div>
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
           <Link href="/categories" className="mr-5 hover:text-gray-900">
@@ -180,6 +242,7 @@ const Navbar = () => {
           <Link href="/nosotros" className="mr-5 hover:text-gray-900">
             F&Q
           </Link>
+          
         </nav>
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
@@ -188,7 +251,7 @@ const Navbar = () => {
               type="text"
               placeholder="Buscar productos..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
             <AiOutlineSearch
               size={20}
@@ -246,19 +309,19 @@ const Navbar = () => {
       </div>
       {searchResults.length > 0 && searchTerm && (
         <div className="absolute top-16 left-0 right-0 z-50 bg-white shadow-md">
-          {searchResults.map((product: any) => (
+          {searchResults.map((product:any) => (
             <Link
-              href={`/product/${product.id}`}
+              href={`/products/${product.id}`}
               key={product.id}
               onClick={handleProductClick}
             >
               <div className="flex items-center p-2 border-b border-gray-200">
                 <img
                   src={product.imgUrl}
-                  alt={product.name}
+                  alt={product.description}
                   className="w-12 h-12 object-cover mr-2"
                 />
-                <p className="text-gray-800">{product.name}</p>
+                <p className="text-gray-800">{product.description}</p>
               </div>
             </Link>
           ))}
@@ -312,7 +375,7 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <AiFillProduct size={25} className="mr-4" />
               <Link
-                href="/product"
+                href="/categories"
                 className="hover:text-orange-400"
                 onClick={handleNavLinkClick}
               >

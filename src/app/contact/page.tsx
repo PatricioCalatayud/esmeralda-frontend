@@ -1,18 +1,33 @@
 "use client";
-import React, { useState } from "react";
-import { TextInput, Textarea } from "flowbite-react";
+import React, { useState, useEffect } from "react";
+import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+const apiURL = "http://localhost:3001/testimony"; // Endpoint actualizado
 
 const Contacto: React.FC = () => {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [punctuation, setPunctuation] = useState<number>(0);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
+    if (userSession?.userData?.user?.id) {
+      setIsUserLoggedIn(true);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Debes estar Loggueado para poder hacer un comentario",
+        text: "Redirigiendo a la página de inicio de sesión...",
+      }).then(() => {
+        router.push("/login");
+      });
+    }
+  }, [router]);
 
   const handleCambioDeCalificacion = (calificacion: number) => {
     setPunctuation(calificacion);
@@ -20,15 +35,28 @@ const Contacto: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Obtener userId desde localStorage
+    const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
+    const userId = userSession?.userData?.user?.id;
+
+    if (!userId) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Usuario no autenticado",
+      });
+      return;
+    }
+
     const review = {
-      name,
-      email,
+      userId,
       description,
       punctuation,
     };
 
     try {
-      const res = await fetch(`${apiURL}/testimony/`, {
+      const res = await fetch(apiURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,15 +71,22 @@ const Contacto: React.FC = () => {
         );
       }
 
-      alert("Review creada correctamente");
-      setName("");
-      setEmail("");
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Review creada correctamente",
+      });
+
       setDescription("");
       setPunctuation(0);
       router.push("/");
     } catch (error: any) {
       console.error("Error creando review:", error);
-      alert("No se pudo crear la review");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo crear la review",
+      });
     }
   };
 
@@ -62,17 +97,17 @@ const Contacto: React.FC = () => {
           className="absolute inset-0 bg-gray-300"
           style={{ margin: "20px" }}
         >
-       <iframe
-    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3282.635490915495!2d-58.4381041!3d-34.6127627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca9288b43ef7%3A0x9c8e841db5753d45!2sC.%20Dr.%20Juan%20Felipe%20Aranguren%201528%2C%20C1406FWB%20CABA%2C%20Argentina!5e0!3m2!1ses!2sus!4v1626747469640!5m2!1ses!2sus"
-    width="100%"
-    height="100%"
-    frameBorder="0"
-    marginHeight={0}
-    marginWidth={0}
-    title="mapa"
-    scrolling="no"
-    style={{  opacity: 0.4 }}
-></iframe>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3282.635490915495!2d-58.4381041!3d-34.6127627!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca9288b43ef7%3A0x9c8e841db5753d45!2sC.%20Dr.%20Juan%20Felipe%20Aranguren%201528%2C%20C1406FWB%20CABA%2C%20Argentina!5e0!3m2!1ses!2sus!4v1626747469640!5m2!1ses!2sus"
+            width="100%"
+            height="600px"
+            frameBorder="0"
+            marginHeight={0}
+            marginWidth={0}
+            title="mapa"
+            scrolling="no"
+            style={{ opacity: 0.4 }}
+          ></iframe>
         </div>
         <div className="container px-5 py-24 mx-auto flex">
           <div className="lg:w-1/3 md:w-1/2 bg-white dark:bg-gray-700  rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0 relative z-10 shadow-md">
@@ -85,39 +120,6 @@ const Contacto: React.FC = () => {
               nuestros servicios.
             </p>
             <form onSubmit={handleSubmit}>
-              <div className="relative mb-4">
-                <label
-                  htmlFor="name"
-                  className="leading-7 text-sm text-gray-600 dark:text-teal-400"
-                >
-                  Tu Nombre
-                </label>
-                <TextInput
-                  id="name"
-                  name="name"
-                  placeholder="Ingresa tu nombre"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="relative mb-4">
-                <label
-                  htmlFor="email"
-                  className="leading-7 text-sm text-gray-600 dark:text-orange-400"
-                >
-                  Tu Correo Electrónico
-                </label>
-                <TextInput
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Ingresa tu correo electrónico"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
               <div className="relative mb-4">
                 <label
                   htmlFor="message"
@@ -146,6 +148,7 @@ const Contacto: React.FC = () => {
               <button
                 type="submit"
                 className="text-white bg-teal-500 border-0 py-2 px-6 focus:outline-none hover:bg-teal-800 rounded text-lg"
+                disabled={!isUserLoggedIn}
               >
                 Enviar Opinión
               </button>
