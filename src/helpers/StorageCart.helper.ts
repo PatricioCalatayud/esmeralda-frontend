@@ -14,7 +14,7 @@ interface StorageOrderPayload {
 
 export const createStorageOrder = async (payload: StorageOrderPayload) => {
   try {
-    const response = await axios.post(apiURL, payload);
+    const response = await axios.post(`${apiURL}/storage-order`, payload);
     return response.data;
   } catch (error) {
     console.error("Error creating storage order:", error);

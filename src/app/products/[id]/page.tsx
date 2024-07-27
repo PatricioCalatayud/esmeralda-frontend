@@ -9,6 +9,8 @@ import Swal from "sweetalert2";
 
 import { getProductById } from "@/helpers/products.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
+import { createStorageOrder } from "@/helpers/StorageCart.helper";
+import { jwtDecode } from "jwt-decode";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
@@ -122,9 +124,25 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             showCancelButton: true,
             confirmButtonText: "Ir al carrito",
             cancelButtonText: "Aceptar",
-          }).then((result: any) => {
+          }).then(async (result: any) => {
             if (result.isConfirmed) {
               router.push("/cart");
+            }
+
+            const userSession = localStorage.getItem("userSession");
+
+            if (userSession) {
+              const token = JSON.parse(userSession).userData.accessToken;
+              const decodedToken: DecodedToken = jwtDecode(token);
+              console.log("decodedToken", decodedToken);
+              const userId = decodedToken.userId;
+
+              try {
+                await createStorageOrder({ userId, products: cart });
+                console.log("Storage order created successfully");
+              } catch (error) {
+                console.error("Error creating storage order:", error);
+              }
             }
           });
         }
