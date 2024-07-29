@@ -9,6 +9,7 @@ import Link from "next/link";
 import axios from "axios";
 import { FcOk } from "react-icons/fc";
 import Spinner from "@/app/Spinner";
+import {jwtDecode} from "jwt-decode"; // Importar jwt-decode
 
 // Interfaces
 interface User {
@@ -69,25 +70,37 @@ interface userSession {
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const Dashboard = () => {
-  const [token, setToken] = useState<userSession>();
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [userName, setUserName] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [userPhone, setUserPhone] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      const userToken = localStorage.getItem("userSession");
-      setToken(JSON.parse(userToken!));
-      !userToken && redirect("/login");
+      const userSession = localStorage.getItem("userSession");
+      if (userSession) {
+        const parsedSession = JSON.parse(userSession);
+        const token = parsedSession.accessToken;
+        const decodedToken: any = jwtDecode(token);
+        setToken(token);
+        setUserName(decodedToken.name);
+        setUserEmail(decodedToken.email);
+        setUserPhone(decodedToken.phone);
+        setUserId(decodedToken.sub);
+      } else {
+        redirect("/login");
+      }
     }
   }, []);
-
-  const userId = token?.userData.user.id;
 
   const listOrders = async (userId: string): Promise<Order[]> => {
     try {
       const { data } = await axios.get(`${apiURL}/order/user/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token?.userData.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return data;
@@ -139,7 +152,7 @@ const Dashboard = () => {
             </li>
             <li className="mb-2">
               <Link
-                href="/"
+                href="/categories"
                 className="flex flex-row items-center py-2 md:px-4 rounded hover:bg-teal-700"
               >
                 <IoHome /> &nbsp; Ir a la tienda
@@ -170,13 +183,13 @@ const Dashboard = () => {
             <div className="p-4">
               <div className="bg-gray-50 dark:bg-gray-300 p-4 rounded shadow mb-4">
                 <p>
-                  <b>Nombre:</b> {token?.userData.user.name}
+                  <b>Nombre:</b> {userName}
                 </p>
                 <p>
-                  <b>Email:</b> {token?.userData.user.email}
+                  <b>Email:</b> {userEmail}
                 </p>
                 <p>
-                  <b>Teléfono:</b> {token?.userData.user.phone}
+                  <b>Teléfono:</b> {userPhone}
                 </p>
                 {/* Agrega más campos si es necesario */}
               </div>

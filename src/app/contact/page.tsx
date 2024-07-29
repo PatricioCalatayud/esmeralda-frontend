@@ -4,6 +4,7 @@ import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import {jwtDecode} from "jwt-decode"; // Asegúrate de importar jwt-decode
 
 const apiURL = "http://localhost:3001/testimony"; // Endpoint actualizado
 
@@ -11,17 +12,24 @@ const Contacto: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [punctuation, setPunctuation] = useState<number>(0);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
+  const [userName, setUserName] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
 
   const router = useRouter();
 
   useEffect(() => {
     const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
-    if (userSession?.userData?.user?.id) {
-      setIsUserLoggedIn(true);
+    if (userSession.accessToken) {
+      const decodedToken: any = jwtDecode(userSession.accessToken);
+      if (decodedToken) {
+        setUserName(decodedToken.name);
+        setUserId(decodedToken.sub);
+        setIsUserLoggedIn(true);
+      }
     } else {
       Swal.fire({
         icon: "error",
-        title: "Debes estar Loggueado para poder hacer un comentario",
+        title: "Debes estar logueado para poder hacer un comentario",
         text: "Redirigiendo a la página de inicio de sesión...",
       }).then(() => {
         router.push("/login");
@@ -36,11 +44,7 @@ const Contacto: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Obtener userId desde localStorage
-    const userSession = JSON.parse(localStorage.getItem("userSession") || "{}");
-    const userId = userSession?.userData?.user?.id;
-
-    if (!userId) {
+    if (!isUserLoggedIn || !userId) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -50,7 +54,8 @@ const Contacto: React.FC = () => {
     }
 
     const review = {
-      userId,
+      userId, // Enviar el UUID del usuario
+      userName, // También enviar el nombre del usuario
       description,
       punctuation,
     };

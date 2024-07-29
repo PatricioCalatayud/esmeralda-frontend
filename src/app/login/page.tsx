@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Image from "next/image"; // Importación del componente Image
+import Image from "next/image";
 
 const theme = createTheme();
 
@@ -41,7 +41,6 @@ const Login = () => {
     password: false,
   });
 
-  //! Funcion para manejar los cambios en los campos del formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     const { name, value } = e.target;
@@ -65,50 +64,35 @@ const Login = () => {
 
     setError((prevError) => ({
       ...prevError,
-      [name]: fieldErrors[name as keyof ILoginErrorProps] || "", // Asegurar que siempre se asigna un string
+      [name]: fieldErrors[name as keyof ILoginErrorProps] || "",
     }));
   };
 
-  //! Funcion para iniciar sesion
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar el formulario
     const errors = validateLoginForm(dataUser);
     setError(errors);
 
-    // Marcar todos los campos como tocados
     setTouched({
       email: true,
       password: true,
     });
 
-    // Si hay errores, no proceder con el envío
     if (Object.values(errors).some((x) => x !== "")) {
       return;
     }
 
-    // Limpiar errores de envío previos
     setSubmitError(null);
-
-    // Iniciar carga
     setLoading(true);
-
-    console.log(dataUser); // Captura los datos del usuario (email y password)
 
     try {
       const response = await LoginUser(dataUser);
 
       console.log(response);
 
-      // Verificar si se recibió un usuario en la respuesta
-
       if (response) {
-        // Guardar datos de usuario en localStorage
-        localStorage.setItem(
-          "userSession",
-          JSON.stringify({ userData: response })
-        );
+        localStorage.setItem("userSession", JSON.stringify(response));
 
         Swal.fire({
           icon: "success",
@@ -117,14 +101,12 @@ const Login = () => {
           timer: 1500,
         });
 
-        // Limpiar campos del formulario después del éxito
         setDataUser(initialUserData);
         setTouched({
           email: false,
           password: false,
         });
 
-        // Redirigir a la página principal después de un tiempo
         setTimeout(() => {
           Router.push("/");
         }, 1500);
@@ -140,10 +122,10 @@ const Login = () => {
       setSubmitError(`Error al iniciar sesión: ${error.message}`);
       toast.error(`Error al iniciar sesión: ${error.message}`);
     } finally {
-      // Detener la carga después de finalizar
       setLoading(false);
     }
   };
+
   const isDisabled = Object.values(error).some((x) => x !== "");
 
   return (
@@ -167,7 +149,7 @@ const Login = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.6)", // Más transparente
+                backgroundColor: "rgba(255, 255, 255, 0.6)",
                 padding: 4,
                 borderRadius: 2,
                 boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -196,7 +178,7 @@ const Login = () => {
                   onChange={handleChange}
                   error={!!error.email}
                   helperText={error.email}
-                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                  InputLabelProps={{ style: { color: "teal" } }}
                 />
                 <TextField
                   margin="normal"
@@ -211,7 +193,7 @@ const Login = () => {
                   onChange={handleChange}
                   error={!!error.password}
                   helperText={error.password}
-                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                  InputLabelProps={{ style: { color: "teal" } }}
                 />
                 <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
                   <div className="flex items-center">
@@ -246,7 +228,7 @@ const Login = () => {
                     mb: 2,
                     backgroundColor: "teal",
                     "&:hover": {
-                      backgroundColor: "darkslategray", // Color teal más oscuro en hover
+                      backgroundColor: "darkslategray",
                     },
                   }}
                 >
