@@ -11,6 +11,7 @@ import { getProductById } from "@/helpers/products.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import { createStorageOrder } from "@/helpers/StorageCart.helper";
 import { jwtDecode } from "jwt-decode";
+import Image from "next/image";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
@@ -181,16 +182,22 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         }`}
       >
         <div className="relative md:w-1/2">
-          <img
-            src="/Logo.png"
-            alt="Logo"
-            className="absolute inset-0 w-full h-full object-contain opacity-0 animate-fade-in-logo"
-          />
-          <img
-            src={product.imgUrl}
-            alt={product.description}
-            className="relative w-full h-96 object-contain rounded-lg opacity-0 animate-fade-in-product"
-          />
+        <Image
+    width={1000}
+    height={1000}
+    priority={true}
+    src="/Logo.png"
+    alt="Logo"
+    className="absolute inset-0 w-full h-full object-contain"
+  />
+  <Image
+    width={1000}
+    height={1000}
+    priority={true}
+    src={product.imgUrl}
+    alt={product.description}
+    className="relative w-full h-96 object-contain rounded-lg"
+  />
         </div>
 
         <div className="md:w-1/2 md:pl-8 mt-4 md:mt-0 animate-fade-in-up">

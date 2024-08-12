@@ -2,6 +2,7 @@ import React from "react";
 import { GrSecure } from "react-icons/gr";
 import { IoFastFood } from "react-icons/io5";
 import { GiCoffeeBeans, GiDeliveryDrone } from "react-icons/gi";
+import Image from "next/image";
 
 const Banner = () => {
   return (
@@ -10,8 +11,10 @@ const Banner = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
           {/* sección de imagen */}
           <div data-aos="zoom-in" className="flex justify-center">
-            <img
-              src="esmeralda1.png"
+            <Image
+              width={500}
+              height={500}
+              src="/esmeralda1.png"
               alt="Café en Grano"
               className="w-3/4 sm:w-3/4 lg:w-3/4 h-auto mx-auto mb-11 drop-shadow-[-10px_10px_12px_rgba(0,0,0,1)] object-cover"
             />

@@ -1,11 +1,12 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import { getCategories } from "@/helpers/categories.helper";
-import { useProductContext } from '@/context/product.context';
+import { useProductContext } from "@/context/product.context";
 import Link from "next/link";
+import { Dropdown } from "flowbite-react";
+import Image from "next/image";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -19,10 +20,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   productsList,
 }) => {
   const router = useRouter();
-  const { searchResults, allProducts } = useProductContext();
+  const { searchResults } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
-  const [filteredProducts, setFilteredProducts] =
-    useState<IProductList[] | undefined>(productsList);
+  const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
   const [categories, setCategories] = useState<Category[] | undefined>([]);
 
   useEffect(() => {
@@ -30,39 +30,33 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   }, []);
 
   useEffect(() => {
-    let sortedProducts =  productsList || [];
-    if(searchResults !== undefined && productsList !== undefined) {
-    let sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+    let sortedProducts = productsList || [];
+    if (searchResults !== undefined && productsList !== undefined) {
+      sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
     }
     if (selectedCategory) {
-    sortedProducts = sortedProducts.filter(product => product.category.id === selectedCategory);
+      sortedProducts = sortedProducts.filter(
+        (product) => product.category.id === selectedCategory
+      );
     }
 
     switch (filterOption) {
       case "price-asc":
-        sortedProducts.sort(
-          (a, b) => parseFloat(a.price) - parseFloat(b.price)
-        );
+        sortedProducts.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
         break;
       case "price-desc":
-        sortedProducts.sort(
-          (a, b) => parseFloat(b.price) - parseFloat(a.price)
-        );
+        sortedProducts.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
         break;
       case "name-asc":
-        sortedProducts.sort((a, b) =>
-          a.description.localeCompare(b.description)
-        );
+        sortedProducts.sort((a, b) => a.description.localeCompare(b.description));
         break;
       case "name-desc":
-        sortedProducts.sort((a, b) =>
-          b.description.localeCompare(a.description)
-        );
+        sortedProducts.sort((a, b) => b.description.localeCompare(a.description));
         break;
       default:
-        if(searchResults !== undefined && productsList !== undefined){ {
-        sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];}
-    }
+        if (searchResults !== undefined && productsList !== undefined) {
+          sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+        }
     }
 
     setFilteredProducts(sortedProducts);
@@ -101,30 +95,46 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       {/* Título y filtro */}
       <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white">
         {renderBreadcrumb()}
-        <div className="flex items-center bg-teal-700 py-2 px-8 rounded-full mt-4 md:mt-0">
-          <select
-            id="filter"
-            value={filterOption}
-            onChange={(e) => setFilterOption(e.target.value)}
-            className="bg-transparent border-none outline-none focus:outline-none p-2 text-white"
-          >
-            <option value="" className="text-black">
-              Filtrar
-            </option>
-            <option value="price-asc" className="text-black">
-              Ordenar por precio: Menor a Mayor
-            </option>
-            <option value="price-desc" className="text-black">
-              Ordenar por precio: Mayor a Menor
-            </option>
-            <option value="name-asc" className="text-black">
-              Nombre: A-Z
-            </option>
-            <option value="name-desc" className="text-black">
-              Nombre: Z-A
-            </option>
-          </select>
-        </div>
+
+        <Dropdown
+          arrowIcon={false}
+          label={
+            <div className="flex justify-between w-[200px] md:w-[400px]" id="custom-dropdown-button">
+              <span>Filtrar</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          }
+          dismissOnClick={true}
+          style={{
+            border: "1px solid white",
+            backgroundColor: "#00695c",
+            outline: 'none',
+          }}
+        >
+          <Dropdown.Item onClick={() => setFilterOption("price-asc")} className="md:w-[400px]">
+            Ordenar por precio: Menor a Mayor
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => setFilterOption("price-desc")} className="md:w-[400px]">
+            Ordenar por precio: Mayor a Menor
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => setFilterOption("name-asc")} className="md:w-[400px]">
+            Nombre: A-Z
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => setFilterOption("name-desc")} className="md:w-[400px]">
+            Nombre: Z-A
+          </Dropdown.Item>
+        </Dropdown>
       </div>
 
       <div className="flex flex-col lg:flex-row">
@@ -163,35 +173,41 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
         {/* Contenido principal */}
         <div className="w-full lg:w-3/4 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProducts?.map((product) => {
-              const productCategory = categories?.find(
-                (cat) => cat.id === product.category.id
-              );
-              return (
-                <div
-                  key={product.article_id}
-                  className="p-4 rounded-lg h-full"
-                  onClick={() => router.push(`/products/${product.id}`)}
-                >
-                  <div className="relative pb-56 flex justify-items-start">
-                    <img
-                      src={product.imgUrl}
-                      alt={product.description}
-                      className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer"
-                    />
+          {filteredProducts && filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredProducts.map((product) => {
+                const productCategory = categories?.find(
+                  (cat) => cat.id === product.category.id
+                );
+                return (
+                  <div
+                    key={product.article_id}
+                    className="p-4 rounded-lg h-full"
+                    onClick={() => router.push(`/products/${product.id}`)}
+                  >
+                    <div className="relative pb-56 flex justify-items-start">
+                      <Image
+                      width={500}
+                        height={500}
+                        src={product.imgUrl}
+                        alt={product.description}
+                        className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer"
+                      />
+                    </div>
+                    {productCategory && (
+                      <h3 className="text-gray-500">{productCategory.name}</h3>
+                    )}
+                    <h2 className="text-xl font-semibold">
+                      {product.description}
+                    </h2>
+                    <p className="text-lg font-bold mt-2">${product.price}</p>
                   </div>
-                  {productCategory && (
-                    <h3 className="text-gray-500">{productCategory.name}</h3>
-                  )}
-                  <h2 className="text-xl font-semibold">
-                    {product.description}
-                  </h2>
-                  <p className="text-lg font-bold mt-2">${product.price}</p>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500">No hay productos para mostrar en esta categoría.</h1></div>
+          )}
         </div>
       </div>
       <style jsx>{`

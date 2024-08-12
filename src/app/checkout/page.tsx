@@ -6,6 +6,7 @@ import axios from "axios";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
 import { IProductList } from "@/interfaces/IProductList";
+import Image from "next/image";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
   locale: "es-AR",
@@ -50,6 +51,7 @@ const Checkout = () => {
     };
 
     createPreference();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -115,7 +117,9 @@ const Checkout = () => {
                     className="grid sm:grid-cols-2 items-start gap-6"
                   >
                     <div className="max-w-[190px] shrink-0 rounded-md">
-                      <img
+                      <Image
+                        width={500}
+                        height={500}
                         src={item.imgUrl}
                         className="w-40 h-full rounded-xl"
                         alt={item.description}
@@ -174,6 +178,7 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      
     </div>
   );
 };
