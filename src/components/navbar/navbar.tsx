@@ -204,30 +204,32 @@ const Navbar = () => {
           </div>
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
-          <Link href="/categories" className="mr-5 hover:text-gray-900">
-            Tienda Online
-          </Link>
-          {userRole === "admin" && (
-            <Link href="/dashboard/product" className="mr-5 hover:text-gray-900">
-              Admin Dashboard
-            </Link>
-          )}
-          <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">
-            Sobre la Esmeralda
-          </Link>
-          <Link href="/politica" className="mr-5 hover:text-gray-900">
-            Politica
-          </Link>
-          <Link href="/contact" className="mr-5 hover:text-gray-900">
-            Contacto
-          </Link>
-          <Link href="/mvv" className="mr-5 hover:text-gray-900">
-            MVV
-          </Link>
-          <Link href="/nosotros" className="mr-5 hover:text-gray-900">
-            F&Q
-          </Link>
-        </nav>
+  <Link href="/categories" className="mr-5 hover:text-gray-900">
+    Tienda Online
+  </Link>
+  {userRole === "admin" && (
+    <Link href="/dashboard/product" className="mr-5 hover:text-gray-900">
+      Admin Dashboard
+    </Link>
+  )}
+  <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">
+    Sobre la Esmeralda
+  </Link>
+  <Link href="/politica" className="mr-5 hover:text-gray-900">
+    Politica
+  </Link>
+  {userSession && (
+    <Link href="/contact" className="mr-5 hover:text-gray-900">
+      Contacto
+    </Link>
+  )}
+  <Link href="/mvv" className="mr-5 hover:text-gray-900">
+    MVV
+  </Link>
+  <Link href="/nosotros" className="mr-5 hover:text-gray-900">
+    F&Q
+  </Link>
+</nav>
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
             <input
