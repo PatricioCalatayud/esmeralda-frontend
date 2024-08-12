@@ -4,14 +4,14 @@ import { getCategories } from '@/helpers/categories.helper';
 import { Category } from '@/interfaces/IProductList';
 
 function HeadlineCards() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[] | undefined>([]);
   const [accessoriesCategoryId, setAccessoriesCategoryId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCategories().then((fetchedCategories) => {
       setCategories(fetchedCategories);
-      const accessoriesCategory = fetchedCategories.find(category => category.name.toLowerCase() === 'accesorio');
+      const accessoriesCategory = fetchedCategories?.find(category => category.name.toLowerCase() === 'accesorio');
       if (accessoriesCategory) {
         setAccessoriesCategoryId(accessoriesCategory.id);
       }

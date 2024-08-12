@@ -36,6 +36,7 @@ export async function getCategories() {
     return res.data;
     console.log(res.data);
   } catch (error: any) {
-    throw new Error(`Error fetching categories: ${error.message}`);
+    /*throw new Error(`Error fetching categories: ${error.message}`);*/
+    console.log(`Error fetching categories: ${error.message}`);
   }
 }

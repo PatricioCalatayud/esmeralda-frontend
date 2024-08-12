@@ -6,13 +6,13 @@ import { Rating } from "@mui/material";
 import { IProductList } from "@/interfaces/IProductList";
 
 const Products = () => {
-  const [products, setProducts] = useState<IProductList[]>([]);
+  const [products, setProducts] = useState<IProductList[] | undefined>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const loadedProducts = await getProducts();
-        setProducts(loadedProducts.slice(0, 7));
+        setProducts(loadedProducts?.slice(0, 7));
       } catch (error) {
         console.error("Error al cargar los productos:", error);
       }
@@ -32,7 +32,7 @@ const Products = () => {
       </div>
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 place-items-center gap-5">
-          {products.map((product: IProductList) => (
+          {products?.map((product: IProductList) => (
             <Link href={`/categories/${product.id}`} key={product.id}>
             <div>
               <img

@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
   const [footerHeight, setFooterHeight] = useState("600px");
   const [flexDirection, setFlexDirection] = useState<"row" | "column">("row");
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[] | undefined>([]);
 
   useEffect(() => {
     function updateSize() {
@@ -97,7 +97,7 @@ const Footer: React.FC = () => {
         >
           <FooterList>
             <h3 style={{ fontSize: "1rem", color: "#38b2ac", fontWeight: "bold", marginBottom: "0.75rem" }}>Menú</h3>
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <Link key={category.id} href={`/categories/${category.id}`}>
                 <div>{category.name}</div>
               </Link>
