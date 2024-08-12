@@ -10,7 +10,7 @@ import Link from "next/link";
 interface ProductsClientPageProps {
   selectedCategory: string | null;
   category: Category | null;
-  productsList: IProductList[];
+  productsList: IProductList[] | undefined;
 }
 
 const ProductList: React.FC<ProductsClientPageProps> = ({
@@ -22,18 +22,20 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const { searchResults, allProducts } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] =
-    useState<IProductList[]>(productsList);
-  const [categories, setCategories] = useState<Category[]>([]);
+    useState<IProductList[] | undefined>(productsList);
+  const [categories, setCategories] = useState<Category[] | undefined>([]);
 
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
 
   useEffect(() => {
+    let sortedProducts =  productsList || [];
+    if(searchResults !== undefined && productsList !== undefined) {
     let sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
-
+    }
     if (selectedCategory) {
-      sortedProducts = sortedProducts.filter(product => product.category.id === selectedCategory);
+    sortedProducts = sortedProducts.filter(product => product.category.id === selectedCategory);
     }
 
     switch (filterOption) {
@@ -58,7 +60,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         );
         break;
       default:
-        sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+        if(searchResults !== undefined && productsList !== undefined){ {
+        sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];}
+    }
     }
 
     setFilteredProducts(sortedProducts);
@@ -140,7 +144,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 Todo
               </button>
             </li>
-            {categories.map((cat) => (
+            {categories?.map((cat) => (
               <li key={cat.id} className="mb-2">
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
@@ -160,8 +164,8 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         {/* Contenido principal */}
         <div className="w-full lg:w-3/4 p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredProducts.map((product) => {
-              const productCategory = categories.find(
+            {filteredProducts?.map((product) => {
+              const productCategory = categories?.find(
                 (cat) => cat.id === product.category.id
               );
               return (

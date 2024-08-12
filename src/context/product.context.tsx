@@ -4,8 +4,8 @@ import { IProductList } from '@/interfaces/IProductList';
 import { getProducts } from '@/helpers/products.helper';
 
 interface ProductContextType {
-  allProducts: IProductList[];
-  searchResults: IProductList[];
+  allProducts: IProductList[] | undefined;
+  searchResults: IProductList[] | undefined;
   searchProducts: (searchTerm: string) => void;
 }
 
@@ -20,8 +20,8 @@ export const useProductContext = () => {
 };
 
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [allProducts, setAllProducts] = useState<IProductList[]>([]);
-  const [searchResults, setSearchResults] = useState<IProductList[]>([]);
+  const [allProducts, setAllProducts] = useState<IProductList[] | undefined>([]);
+  const [searchResults, setSearchResults] = useState<IProductList[] | undefined>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,7 +37,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       setSearchResults([]);
       return;
     }
-    const results = allProducts.filter((product) =>
+    const results = allProducts?.filter((product) =>
       product.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(results);

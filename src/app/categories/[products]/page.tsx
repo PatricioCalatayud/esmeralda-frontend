@@ -6,7 +6,8 @@ import {
 
 export async function generateStaticParams() {
   const categories = await getCategories();
-  return categories.map((category: any) => ({
+  if (!categories) return [];
+  return categories?.map((category: any) => ({
     categories: category.id,
   }));
 }
@@ -19,7 +20,7 @@ export default async function ProductsPage({
   const selectedCategory = params.products;
   const categories = await getCategories();
   const category =
-    categories.find((cat) => cat.id === selectedCategory) || null;
+    categories?.find((cat) => cat.id === selectedCategory) || null;
   const productsList = await getProductsByCategory(category?.name || "");
   console.log(productsList);
 

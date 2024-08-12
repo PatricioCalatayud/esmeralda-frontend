@@ -203,7 +203,6 @@ const Navbar = () => {
             )}
           </div>
         </div>
-<<<<<<< HEAD
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center gap-5 mx-5">
           <Link href="/categories" className={` hover:text-gray-900 ${pathname === "/categories" && "text-gray-900 font-bold"}`}>
             Tienda Online
@@ -229,35 +228,6 @@ const Navbar = () => {
             F&Q
           </Link>
         </nav>
-=======
-        <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center">
-  <Link href="/categories" className="mr-5 hover:text-gray-900">
-    Tienda Online
-  </Link>
-  {userRole === "admin" && (
-    <Link href="/dashboard/product" className="mr-5 hover:text-gray-900">
-      Admin Dashboard
-    </Link>
-  )}
-  <Link href="/sobrenosotros" className="mr-5 hover:text-gray-900">
-    Sobre la Esmeralda
-  </Link>
-  <Link href="/politica" className="mr-5 hover:text-gray-900">
-    Politica
-  </Link>
-  {userSession && (
-    <Link href="/contact" className="mr-5 hover:text-gray-900">
-      Contacto
-    </Link>
-  )}
-  <Link href="/mvv" className="mr-5 hover:text-gray-900">
-    MVV
-  </Link>
-  <Link href="/nosotros" className="mr-5 hover:text-gray-900">
-    F&Q
-  </Link>
-</nav>
->>>>>>> 6fc5ad0fba5f3679487afde70f6ae5a0e0764deb
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
             <input
@@ -333,9 +303,9 @@ const Navbar = () => {
           }
         </div>
       </div>
-      {searchProductResults.length > 0 && searchTerm && (
+      {searchProductResults !== undefined && searchProductResults.length > 0 && searchTerm && (
         <div className="absolute top-16 left-0 right-0 z-50 bg-white shadow-md">
-          {searchProductResults.map((product: any) => (
+          {searchProductResults?.map((product: any) => (
             <Link
               href={`/products/${product.id}`}
               key={product.id}

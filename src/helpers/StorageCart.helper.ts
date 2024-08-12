@@ -18,7 +18,9 @@ export const createStorageOrder = async (payload: StorageOrderPayload) => {
     return response.data;
   } catch (error) {
     console.error("Error creating storage order:", error);
-    throw error;
+    /*throw error;*/
+
+    console.log(error);
   }
 };
 
@@ -28,7 +30,9 @@ export const getStorageOrder = async (userId: string) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching storage order:", error);
-    throw error;
+    /*throw error;*/
+
+    console.log(error);
   }
 };
 
@@ -38,6 +42,8 @@ export const clearStorageOrder = async (userId: string) => {
     return response.data;
   } catch (error) {
     console.error("Error clearing storage order:", error);
-    throw error;
+    /*throw error;*/
+
+    console.log(error);
   }
 };
