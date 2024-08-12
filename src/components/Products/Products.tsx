@@ -33,25 +33,25 @@ const Products = () => {
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 place-items-center gap-5">
           {products.map((product: IProductList) => (
-            <Link href="/home" key={product.id}>
-              <div>
-                <img
-                  src={product.imgUrl}
-                  alt={product.description}
-                  className="h-[300px] w-[200px] object-cover rounded-md"
-                />
-                <div className="product-item text-center">
-                  <Rating name="read-only" value={5} readOnly />
-                  <h3 className="font-bold">{product.description}</h3>
-                  <p className="text-sm text-gray-600">${product.price}</p>
-                  <div className="flex items-center gap-1"></div>
-                </div>
+            <Link href={`/categories/${product.id}`} key={product.id}>
+            <div>
+              <img
+                src={product.imgUrl}
+                alt={product.description}
+                className="h-[300px] w-[200px] object-cover rounded-md"
+              />
+              <div className="product-item text-center">
+                <Rating name="read-only" value={5} readOnly />
+                <h3 className="font-bold">{product.description}</h3>
+                <p className="text-sm text-gray-600">${product.price}</p>
+                <div className="flex items-center gap-1"></div>
               </div>
-            </Link>
+            </div>
+          </Link>
           ))}
         </div>
         
-        <Link href="/home">
+        <Link href="/categories">
           <div className="flex justify-center pb-10">
             <p className="text-center mt-10 cursor-pointer bg-teal-400 hover:bg-teal-700 text-white py-1 px-5 rounded-2xl focus:outline-none focus:ring-0">
               Ver Todos

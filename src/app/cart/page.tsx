@@ -108,7 +108,7 @@ const Cart = () => {
               comprar ahora!
             </p>
             <div className="flex justify-center">
-              <Link href="/home">
+              <Link href="/categories">
                 <button className="inline-flex text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded text-lg">
                   Empezar a comprar
                 </button>
@@ -237,7 +237,7 @@ const Cart = () => {
                 Ir a pagar
               </button>
             </Link>
-            <Link href="/home">
+            <Link href="/categories">
               <button
                 type="button"
                 onClick={() => router.push("/home")}

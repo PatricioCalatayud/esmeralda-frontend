@@ -25,11 +25,20 @@ const ProductList = () => {
   //! Obtener token de usuario
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        console.log("userToken", parsedSession.userData.accessToken);
-        setToken(parsedSession.userData.accessToken);
+      const userSessionString = localStorage.getItem("userSession");
+      if (userSessionString) {
+        const userSession = JSON.parse(userSessionString);
+        const accessToken = userSession.accessToken; // Access the accessToken correctly
+        console.log("userToken", accessToken);
+        setToken(accessToken);
+      } else {
+        Swal.fire(
+          "¡Error!",
+          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
+          "error"
+        ).then(() => {
+          router.push("/login");
+        });
       }
     }
   }, [router]);
@@ -73,6 +82,7 @@ const ProductList = () => {
     setSearchTerm(e.target.value); // Actualizar el estado del término de búsqueda
     setCurrentPage(1); // Reiniciar la página actual al cambiar el término de búsqueda
   };
+
   const onPageChange = (page: number) => setCurrentPage(page);
 
   //! Función para manejar la eliminación de un producto
@@ -140,6 +150,7 @@ const ProductList = () => {
       }
     }
   };
+
   //! Función para habilitar un producto
   const handleEnableProduct = async (id: string) => {
     if (!token) {
@@ -214,22 +225,6 @@ const ProductList = () => {
     }
   };
 
-  //! Spinner de carga
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setLoading(false);
-  //   }, 3000);
-  //   return () => clearTimeout(timer);
-  // }, []);
-
-  // if (products.length === 0) {
-  //   return (
-  //     <div className="h-screen items- justify-center">
-  //       {loading ? <Spinner /> : <p>Algo no esta bien.</p>}
-  //     </div>
-  //   );
-  // }
-
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
@@ -285,9 +280,6 @@ const ProductList = () => {
                   <th scope="col" className="p-4">
                     Producto
                   </th>
-                  {/* <th scope="col" className="p-4">
-                    Tamaño
-                  </th> */}
                   <th scope="col" className="p-4">
                     Stock
                   </th>
@@ -324,11 +316,6 @@ const ProductList = () => {
                         {product.description}
                       </div>
                     </th>
-                    {/* <td className="px-4 py-3">
-                      <span className="bg-gray-900 text-orange-400 text-xs font-medium px-2 py-0.5 rounded">
-                        {product.size}
-                      </span>
-                    </td> */}
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex justify-center items-center">
                         {product.stock}

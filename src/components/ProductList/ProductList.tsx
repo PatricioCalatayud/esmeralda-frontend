@@ -2,14 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ICategory, IProductList } from "@/interfaces/IProductList";
+import { Category, IProductList } from "@/interfaces/IProductList";
 import { getCategories } from "@/helpers/categories.helper";
 import { useProductContext } from '@/context/product.context';
 import Link from "next/link";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
-  category: ICategory | null;
+  category: Category | null;
   productsList: IProductList[];
 }
 
@@ -23,7 +23,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] =
     useState<IProductList[]>(productsList);
-  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     getCategories().then(setCategories);

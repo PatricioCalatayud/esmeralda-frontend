@@ -3,6 +3,7 @@ import { LoginUser } from "@/helpers/Autenticacion.helper";
 import { ILoginErrorProps, ILoginProps } from "@/types/login";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; 
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from "sweetalert2";
@@ -302,6 +303,25 @@ const Login = () => {
                       ></path>
                     </svg>
                   </button>
+                </div>
+                <div className="mt-4">
+                  <Link href="/" passHref>
+                    <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 3,
+                         mb: 2,
+                         backgroundColor: "teal",
+                         "&:hover": {
+                           backgroundColor: "darkslategray",
+                         },
+                       }}
+                    >
+                      Volver al Inicio
+                    </Button>
+                  </Link>
                 </div>
               </Box>
             </Box>

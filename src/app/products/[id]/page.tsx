@@ -132,7 +132,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             const userSession = localStorage.getItem("userSession");
 
             if (userSession) {
-              const token = JSON.parse(userSession).userData.accessToken;
+              const token = JSON.parse(userSession).accessToken; // Corrected access to the token
               const decodedToken: DecodedToken = jwtDecode(token);
               console.log("decodedToken", decodedToken);
               const userId = decodedToken.userId;
@@ -173,7 +173,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       : category?.name === "Máquinas"
       ? []
       : ["250g", "500g", "1kg"];
-
   return (
     <div className="container mx-auto p-4 my-32">
       <div
