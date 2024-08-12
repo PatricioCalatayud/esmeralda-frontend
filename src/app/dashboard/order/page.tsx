@@ -26,47 +26,62 @@ const OrderList = () => {
   //! Obtener token de usuario
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        console.log("userToken", parsedSession.userData.accessToken);
-        setToken(parsedSession.userData.accessToken);
+      const userSessionString = localStorage.getItem("userSession");
+      if (userSessionString) {
+        const userSession = JSON.parse(userSessionString);
+        const accessToken = userSession.accessToken; // Access the accessToken correctly
+        console.log("userToken", accessToken);
+        setToken(accessToken);
+      } else {
+        Swal.fire(
+          "¡Error!",
+          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
+          "error"
+        ).then(() => {
+          router.push("/login");
+        });
       }
     }
   }, [router]);
 
-  //! Obtener los Ordenes
+  //! Obtener las Ordenes
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await axios.get(`${apiURL}/order`);
+        const response = await axios.get(`${apiURL}/order`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const orders = response.data;
         console.log("orders", orders);
         setOrders(orders);
         setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
       } catch (error) {
         console.error("Error fetching orders:", error);
+        Swal.fire("¡Error!", "No se pudieron obtener las órdenes", "error");
       }
     }
-    fetchOrders();
-  }, []);
-  
+    if (token) {
+      fetchOrders();
+    }
+  }, [token]);
 
   //! Función para calcular las ordenes a mostrar en la página actual
   const getCurrentPageOrders = () => {
-    const filteredProducts = filterOrders();
+    const filteredOrders = filterOrders();
     const startIndex = (currentPage - 1) * ORDERS_PER_PAGE;
     const endIndex = startIndex + ORDERS_PER_PAGE;
-    return filteredProducts.slice(startIndex, endIndex);
+    return filteredOrders.slice(startIndex, endIndex);
   };
 
   //! Función para filtrar las ordenes
   const filterOrders = () => {
     if (searchTerm === "") {
-      return orders; // Si el campo de búsqueda está vacío, mostrar todos los productos
+      return orders; // Si el campo de búsqueda está vacío, mostrar todas las órdenes
     } else {
-      return orders.filter((orders) =>
-        orders.id.toLowerCase().includes(searchTerm.toLowerCase())
+      return orders.filter((order) =>
+        order.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
   };
@@ -77,8 +92,6 @@ const OrderList = () => {
     setCurrentPage(1); // Reiniciar la página actual al cambiar el término de búsqueda
   };
   const onPageChange = (page: number) => setCurrentPage(page);
-
-
 
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
@@ -105,7 +118,7 @@ const OrderList = () => {
                   <input
                     type="text"
                     id="simple-search"
-                    placeholder="Search for products"
+                    placeholder="Search for orders"
                     required
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     onChange={handleSearchChange}
@@ -113,7 +126,6 @@ const OrderList = () => {
                 </div>
               </form>
             </div>
-            
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -122,7 +134,6 @@ const OrderList = () => {
                   <th scope="col" className="p-4">
                     Id
                   </th>
-                  
                   <th scope="col" className="p-4">
                     Fecha
                   </th>
@@ -151,7 +162,6 @@ const OrderList = () => {
                       className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
                       <div className="flex items-center">
-                       
                         {order.id}
                       </div>
                     </th>
@@ -172,8 +182,6 @@ const OrderList = () => {
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       {order.orderDetail.transactions[0].status}
                     </td>
-                   
-                   
                   </tr>
                 ))}
               </tbody>

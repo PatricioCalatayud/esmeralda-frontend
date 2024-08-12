@@ -1,12 +1,10 @@
-
 "use client";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { GiSettingsKnobs } from "react-icons/gi";
-import { useRouter, usePathname } from "next/navigation";
-
-
+import { useRouter, usePathname } from "next/navigation"
+import Swal from "sweetalert2";
 
 const links = [
   { name: "Producto", href: "../../dashboard/product" },
@@ -29,23 +27,31 @@ export default function DashboardLayout({
   //! Obtener token de usuario-Session
   useEffect(() => {
     if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        const token = parsedSession.userData.accessToken;
-        setUserSession(token);
-          const decodedToken: DecodedToken = jwtDecode(token);
-            if(decodedToken){
-              setUserEmail(decodedToken.email);
-              setUserName(decodedToken.name);
-              setUserRole(decodedToken.roles[0]);
-              setUserTelefono(decodedToken.phone);
+      const userSessionString = localStorage.getItem("userSession");
+      if (userSessionString) {
+        const userSession = JSON.parse(userSessionString);
+        const accessToken = userSession.accessToken;
+        setUserSession(accessToken);
+        if (accessToken) {
+          const decodedToken: any = jwtDecode(accessToken);
+          if (decodedToken) {
+            setUserEmail(decodedToken.email);
+            setUserName(decodedToken.name);
+            setUserRole(decodedToken.roles ? decodedToken.roles[0] : null);
+            setUserTelefono(decodedToken.phone);
           }
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Debes estar logueado para poder hacer un comentario",
+          text: "Redirigiendo a la página de inicio de sesión...",
+        }).then(() => {
+          router.push("/login");
+        });
       }
     }
   }, [router]);
-
-
 
   return (
     <>
@@ -66,8 +72,6 @@ export default function DashboardLayout({
                     <span className="ml-3">{link.name}</span>
                   </Link>
                 </li>
-                
-                
               ))}
             </ul>
           </div>
@@ -75,7 +79,6 @@ export default function DashboardLayout({
         {/* Contenido principal */}
         <div className="flex-1 overflow-y-auto">
           {/* Barra de navegación */}
-
           <div className="bg-gray-200 p-1 md:p-4 dark:bg-gray-600">
             <h2 className="text-lg font-semibold mb-2 dark:text-white">
               Bienvenido usuario Administrador
@@ -83,18 +86,17 @@ export default function DashboardLayout({
             <div className="bg-gray-50 p-4 rounded shadow dark:bg-gray-300">
               {/* Aquí irían los datos del usuario */}
               <p>
-              <b>Nombre:</b> {userName}
-            </p>
-            <p>
-              <b>Email:</b> {userEmail}
-            </p>
-            <p>
-              <b>Telefono:</b> {userTelefono}
+                <b>Nombre:</b> {userName}
               </p>
-            <p>
-              <b>Rol:</b> {userRole} 
-            </p>
-           
+              <p>
+                <b>Email:</b> {userEmail}
+              </p>
+              <p>
+                <b>Telefono:</b> {userTelefono}
+              </p>
+              <p>
+                <b>Rol:</b> {userRole}
+              </p>
             </div>
           </div>
           <div className="p-1 md:p-1 flex flex-col flex-1">

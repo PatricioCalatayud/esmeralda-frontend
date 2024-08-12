@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import MercadoLibreIcon from "@/components/MercadoLibreBotton/MercadoLibreBotton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AiFillInstagram, AiFillTwitterCircle, AiFillYoutube } from "react-icons/ai";
@@ -129,17 +130,16 @@ const Footer: React.FC = () => {
           <FooterList>
             <h3 style={{ fontSize: "1rem", color: "#38b2ac", fontWeight: "bold", marginBottom: "0.5rem" }}>Síguenos</h3>
             <div style={{ display: "flex", gap: "0.5rem" }}>
-              <Link href={"https://www.facebook.com/"}>
+              <Link href={"https://www.facebook.com/cafelaesmeralda10"}>
                 <MdFacebook size={24} />
               </Link>
-              <Link href={"https://twitter.com/"}>
-                <AiFillTwitterCircle size={24} />
-              </Link>
+            
               <Link href={"https://www.instagram.com/cafelaesmeralda/"}>
                 <AiFillInstagram size={24} />
               </Link>
-              <Link href={"https://www.youtube.com/"}>
-                <AiFillYoutube size={24} />
+             
+              <Link href={"https://listado.mercadolibre.com.ar/_CustId_510408628?item_id=MLA1670664876&category_id=MLA409413&seller_id=510408628&client=recoview-selleritems&recos_listing=true"}>
+              <MercadoLibreIcon />
               </Link>
             </div>
           </FooterList>
