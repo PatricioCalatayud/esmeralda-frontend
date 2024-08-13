@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 
 const MVV: React.FC = () => {
@@ -28,7 +29,7 @@ const MVV: React.FC = () => {
         
         </div>
         <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
-          <img className="object-cover object-center rounded" alt="hero" src="esmeralda5.png" />
+          <Image width={500} height={500} className="object-cover object-center rounded" alt="hero" src="/esmeralda5.png" priority={true} />
         </div>
       </div>
     </section>

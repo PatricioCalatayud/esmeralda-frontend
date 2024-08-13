@@ -16,6 +16,9 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Image from "next/image";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { IconButton } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
 
 const theme = createTheme();
 
@@ -41,6 +44,13 @@ const Login = () => {
     email: false,
     password: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -185,16 +195,30 @@ const Login = () => {
                   margin="normal"
                   required
                   fullWidth
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   label="Contraseña"
                   name="password"
-                  type="password"
                   autoComplete="current-password"
                   value={dataUser.password}
                   onChange={handleChange}
                   error={!!error.password}
                   helperText={error.password}
                   InputLabelProps={{ style: { color: "teal" } }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
                 <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
                   <div className="flex items-center">

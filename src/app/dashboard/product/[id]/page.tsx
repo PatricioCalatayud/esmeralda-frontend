@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { getCategories } from "@/helpers/categories";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
+import Image from "next/image";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
@@ -444,7 +445,9 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               onChange={handleImageChange}
             />
             {dataProduct.imgUrl && (
-              <img
+              <Image
+                width={500}
+                height={500}
                 src={dataProduct.imgUrl}
                 alt="Product Image"
                 className="mt-2 rounded-md"

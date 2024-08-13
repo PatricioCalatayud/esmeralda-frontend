@@ -7,12 +7,13 @@ interface MercadoPagoButtonProps {
 
 const MercadoPagoButton: React.FC<MercadoPagoButtonProps> = ({
   preferenceId,
+
 }) => {
   useEffect(() => {}, [preferenceId]);
 
   return (
     <div>
-      <Wallet initialization={{ preferenceId }} />
+      <Wallet initialization={{ preferenceId, redirectMode: "modal" }} />
     </div>
   );
 };

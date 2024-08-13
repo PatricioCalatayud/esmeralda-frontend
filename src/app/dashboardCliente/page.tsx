@@ -10,6 +10,7 @@ import axios from "axios";
 import { FcOk } from "react-icons/fc";
 import Spinner from "@/app/Spinner";
 import {jwtDecode} from "jwt-decode"; // Importar jwt-decode
+import Image from "next/image";
 
 // Interfaces
 interface User {
@@ -96,25 +97,25 @@ const Dashboard = () => {
     }
   }, []);
 
-  const listOrders = async (userId: string): Promise<Order[]> => {
-    try {
-      const { data } = await axios.get(`${apiURL}/order/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return data;
-    } catch (error: any) {
-      console.error(error);
-      return [];
-    }
-  };
-
   useEffect(() => {
+    const listOrders = async (userId: string): Promise<Order[]> => {
+      try {
+        const { data } = await axios.get(`${apiURL}/order/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return data;
+      } catch (error: any) {
+        console.error(error);
+        return [];
+      }
+    };
+  
     if (userId) {
       listOrders(userId).then(setOrders);
     }
-  }, [userId]);
+  }, [userId, token]);
 
   function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -237,7 +238,10 @@ const Dashboard = () => {
                           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             {order.productsOrder.map((productOrder, productIndex) => (
                               <div key={productIndex} className="mb-2 text-start">
-                                <img
+                                <Image
+                                  width={500}
+                                  height={500}
+                                  priority={true}
                                   src={productOrder.product.imgUrl}
                                   alt={productOrder.product.description}
                                   className="w-10 h-10 inline-block mr-2 rounded-full"

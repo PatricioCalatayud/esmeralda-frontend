@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getCategories } from '@/helpers/categories.helper';
 import { Category } from '@/interfaces/IProductList';
+import Image from 'next/image';
 
 function HeadlineCards() {
   const [categories, setCategories] = useState<Category[] | undefined>([]);
@@ -36,7 +37,7 @@ function HeadlineCards() {
             <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-teal-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Pedir Ahora</button>
           </Link>
         </div>
-        <img className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de comida' />
+        < Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de comida' />
       </div>
 
       <div className='rounded-xl relative'>
@@ -47,7 +48,7 @@ function HeadlineCards() {
             <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Descúbrelos</button>
           </Link>
         </div>
-        <img className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/122370/pexels-photo-122370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de restaurante' />
+        <Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/122370/pexels-photo-122370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de restaurante' />
       </div>
 
       <div className='rounded-xl relative'>
@@ -62,7 +63,7 @@ function HeadlineCards() {
             <p>No se encontró la categoría accesorios</p>
           )}
         </div>
-        <img className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/324028/pexels-photo-324028.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de postre' />
+        <Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/324028/pexels-photo-324028.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de postre' />
       </div>
     </div>
   );

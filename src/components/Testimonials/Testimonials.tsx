@@ -4,6 +4,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { FaStar } from 'react-icons/fa';
 import axios from 'axios';
+import Image from 'next/image';
 
 interface Testimonial {
   id: string;
@@ -97,9 +98,9 @@ const Testimonials: React.FC = () => {
           <Slider {...settings}>
             {testimonials.map((data) => (
               <div key={data.id} className="px-4">
-                <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative shadow-lg">
+                <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative">
                   <div className="mb-4 flex justify-center">
-                    <img
+                    <Image priority={true} width={500} height={500}
                       src={getAvatarUrl(data.user.id)}
                       alt={`Avatar of ${data.user.name}`}
                       className="rounded-full w-20 h-20 shadow-lg bg-gray-200"
