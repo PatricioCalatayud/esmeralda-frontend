@@ -5,7 +5,7 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getCategories(): Promise<Category[] | undefined> {
   try {
-    const res = await axios.get(`${apiURL}/category`);
+    const res = await axios.get(`${apiURL}/categories`);
     const categories: Category[] = res.data;
     return categories;
   } catch (error: any) {
