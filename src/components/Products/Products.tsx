@@ -4,6 +4,7 @@ import { getProducts } from "@/helpers/products.helper";
 import { IProduct } from "@/interfaces/IProduct";
 import { Rating } from "@mui/material";
 import { IProductList } from "@/interfaces/IProductList";
+import Image from "next/image";
 
 const Products = () => {
   const [products, setProducts] = useState<IProductList[] | undefined>([]);
@@ -35,14 +36,15 @@ const Products = () => {
           {products?.map((product: IProductList) => (
             <Link href={`/categories/${product.id}`} key={product.id}>
             <div>
-              <img
+              <Image
+                priority={true} width={500} height={500}
                 src={product.imgUrl}
                 alt={product.description}
-                className="h-[300px] w-[200px] object-cover rounded-md"
+                className="h-[300px] sm:w-[200px] object-cover rounded-md w-full"
               />
               <div className="product-item text-center">
                 <Rating name="read-only" value={5} readOnly />
-                <h3 className="font-bold">{product.description}</h3>
+                <h3 className="font-bold h-14">{product.description}</h3>
                 <p className="text-sm text-gray-600">${product.price}</p>
                 <div className="flex items-center gap-1"></div>
               </div>

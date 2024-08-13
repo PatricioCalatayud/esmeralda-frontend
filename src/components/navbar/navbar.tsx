@@ -134,9 +134,11 @@ const Navbar = () => {
               size={30}
               className="mr-2 cursor-pointer sm:hidden"
             />
-            <Link href="/home" className="flex items-center text-gray-900">
+            <Link href="/" className="flex items-center text-gray-900">
               <div className="w-20 h-25 text-white p-2 md:w-16 md:h-20">
-                <img
+                <Image
+                width={500}
+                height={500}
                   src="/esmeraldaLogosolo.png"
                   alt="Logo"
                   className="w-full h-full object-cover"
@@ -224,7 +226,7 @@ const Navbar = () => {
           <Link href="/mvv" className={` hover:text-gray-900 ${pathname === "/mvv" && "text-gray-900 font-bold"}`}>
             MVV
           </Link>
-          <Link href="/nosotros" className={` hover:text-gray-900 ${pathname === "/nosotros" && "text-gray-900 font-bold"}`}>
+          <Link href="/preguntasFrecuentes" className={` hover:text-gray-900 ${pathname === "/preguntasFrecuentes" && "text-gray-900 font-bold"}`}>
             F&Q
           </Link>
         </nav>
@@ -289,11 +291,11 @@ const Navbar = () => {
                 </span>
               </Dropdown.Header>
               {userRole === "admin" ? (
-                <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
+                <Dropdown.Item href="/dashboard/product">Dashboard</Dropdown.Item>
               ) : (
                 <div className="flex flex-col">
                 <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
-                <Dropdown.Item href="/tracking">Dashboard</Dropdown.Item>
+                <Dropdown.Item href="/tracking">Envios</Dropdown.Item>
                 </div>
               )}
               <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
@@ -312,7 +314,9 @@ const Navbar = () => {
               onClick={handleProductClick}
             >
               <div className="flex items-center p-2 border-b border-gray-200">
-                <img
+                <Image
+                  width={500}
+                  height={500}
                   src={product.imgUrl}
                   alt={product.description}
                   className="w-12 h-12 object-cover mr-2"
@@ -348,19 +352,7 @@ const Navbar = () => {
         </h2>
         <nav>
           <ul className="flex flex-col p-4 text-gray-800">
-            <li className="text-xl py-4 flex">
-              <Link
-                href="/tracking"
-                className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/tracking" ? "text-orange-400 font-bold" : ""
-                }`}
-                onClick={handleNavLinkClick}
-              >
-                <TbTruckDelivery size={25}  />
-                Envios
-              </Link>
-            </li>
-            <li className="text-xl py-4 flex">
+          <li className="text-xl py-4 flex">
               
               <Link
                 href="/"
@@ -373,6 +365,19 @@ const Navbar = () => {
                 Inicio
               </Link>
             </li>
+            {userSession && <li className="text-xl py-4 flex">
+              <Link
+                href="/tracking"
+                className={`hover:text-orange-400 gap-4 flex ${
+                  pathname === "/tracking" ? "text-orange-400 font-bold" : ""
+                }`}
+                onClick={handleNavLinkClick}
+              >
+                <TbTruckDelivery size={25}  />
+                Envios
+              </Link>
+            </li>}
+            
             <li className="text-xl py-4 flex">
               
               <Link
@@ -383,7 +388,7 @@ const Navbar = () => {
                 onClick={handleNavLinkClick}
               >
                 <AiFillProduct size={25}/>
-                Productos
+                Tienda Online
               </Link>
             </li>
             <li className="text-xl py-4 flex">
@@ -415,27 +420,55 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               
               <Link
-                href="/aboutus"
+                href="/sobrenosotros"
                 className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/aboutus" ? "text-orange-400 font-bold" : ""
+                  pathname === "/sobrenosotros" ? "text-orange-400 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
                 <MdHelp size={25} />
-                Nosotros
+                Sobre la Esmeralda
               </Link>
             </li>
             <li className="text-xl py-4 flex">
               
               <Link
-                href="/ayuda"
+                href="/politica"
                 className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/ayuda" ? "text-orange-400 font-bold" : ""
+                  pathname === "/politica" ? "text-orange-400 font-bold" : ""
+                }`}
+                onClick={handleNavLinkClick}
+              >
+                <AiFillProduct size={25}/>
+                Politica
+              </Link>
+            </li>
+            <li className="text-xl py-4 flex">
+              
+              <Link
+                href="/mvv"
+                className={`hover:text-orange-400 gap-4 flex ${
+                  pathname === "/mvv" ? "text-orange-400 font-bold" : ""
+                }`}
+                onClick={handleNavLinkClick}
+              >
+                <AiFillProduct size={25}/>
+                MVV
+              </Link>
+            </li>
+
+            
+            <li className="text-xl py-4 flex">
+              
+              <Link
+                href="/preguntasFrecuentes"
+                className={`hover:text-orange-400 gap-4 flex ${
+                  pathname === "/preguntasFrecuentes" ? "text-orange-400 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
                 <MdHelp size={25}/>
-                Ayuda
+                F&Q
               </Link>
             </li>
           </ul>

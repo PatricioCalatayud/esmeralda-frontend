@@ -23,7 +23,7 @@ export async function getProductsByCategory(
   categoryName: string
 ): Promise<IProductList[] | undefined> {
   try {
-    const res = await axios.get(`${apiURL}/products?category=${categoryName}`);
+    const res = await axios.get(`${apiURL}/products?categories=${categoryName}`);
     const products: IProductList[] = res.data;
     return products;
   } catch (error: any) {

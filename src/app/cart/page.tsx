@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
+import Image from "next/image";
 
 const Cart = () => {
   const router = useRouter();
@@ -94,7 +95,9 @@ const Cart = () => {
     return (
       <section className="text-gray-600 body-font">
         <div className="container mx-auto flex px-5 py-24 mt-14 items-center justify-center flex-col">
-          <img
+          <Image
+            width={300}
+            height={300}
             className="lg:w-2/6 md:w-3/6 w-5/6 mb-10 object-cover object-center rounded"
             alt="hero"
             src="/cart-empty.png"
@@ -135,7 +138,10 @@ const Cart = () => {
               >
                 <div className="sm:col-span-2 flex items-center gap-4">
                   <div className="w-24 h-24 shrink-0 bg-white p-1 rounded-md">
-                    <img
+                    <Image
+                      width={500}
+                      height={500}
+                      priority={true}
                       src={item.imgUrl}
                       className="w-full h-full object-contain"
                       alt={item.description}

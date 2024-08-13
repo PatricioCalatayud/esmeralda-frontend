@@ -8,6 +8,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
+import InputAdornment from '@mui/material/InputAdornment';
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Swal from "sweetalert2";
 import Image from "next/image"; // Importación del componente Image
@@ -16,6 +17,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { NewUser } from "@/helpers/Autenticacion.helper";
 import { IUserErrorProps, IUserProps } from "@/types/user";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
+import Link from "next/link";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { IconButton } from "@mui/material";
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -44,7 +48,13 @@ const RegisterUser = () => {
     password: false,
     phone: false,
   });
+  const [showPassword, setShowPassword] = React.useState(false);
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
   const handleReset = (): void => {
     setDataUser(initialUserData);
     setError(initialErrorState);
@@ -213,20 +223,34 @@ const RegisterUser = () => {
                 InputLabelProps={{ style: { color: 'teal' } }} // Color teal
               />
               <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="password"
-                label="Contraseña"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={dataUser.password}
-                onChange={handleChange}
-                error={!!error.password}
-                helperText={error.password}
-                InputLabelProps={{ style: { color: 'teal' } }} // Color teal
-              />
+  margin="normal"
+  required
+  fullWidth
+  id="password"
+  type={showPassword ? 'text' : 'password'}
+  label="Contraseña"
+  name="password"
+  autoComplete="new-password"
+  value={dataUser.password}
+  onChange={handleChange}
+  error={!!error.password}
+  helperText={error.password}
+  InputLabelProps={{ style: { color: 'teal' } }} // Color teal
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          aria-label="toggle password visibility"
+          onClick={handleClickShowPassword}
+          onMouseDown={handleMouseDownPassword}
+          edge="end"
+        >
+          {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
               <TextField
                 margin="normal"
                 required
@@ -264,6 +288,23 @@ const RegisterUser = () => {
               >
                 Borrar Formulario
               </Button>
+              <Link href="/" passHref>
+                    <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 3,
+                         mb: 2,
+                         backgroundColor: "teal",
+                         "&:hover": {
+                           backgroundColor: "darkslategray",
+                         },
+                       }}
+                    >
+                      Volver al Inicio
+                    </Button>
+                </Link>
             </Box>
           </Box>
         </Container>

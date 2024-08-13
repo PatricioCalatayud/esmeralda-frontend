@@ -84,7 +84,7 @@ const Contacto: React.FC = () => {
           ></iframe>
         </div>
         <div className="container px-5 py-24 mx-auto flex">
-          <div className="lg:w-1/3 md:w-1/2 bg-white dark:bg-gray-700  rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0 relative z-10 shadow-md">
+          <div className="lg:w-1/3 md:w-1/2 bg-white dark:bg-gray-700  rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0 relative z-[2] shadow-md">
             <h2 className="text-gray-900 text-lg mb-1 font-medium title-font dark:text-teal-500">
               Danos tu Opinión!
             </h2>
@@ -108,6 +108,7 @@ const Contacto: React.FC = () => {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  className="p-2"
                 />
               </div>
               <div className="relative mb-4">

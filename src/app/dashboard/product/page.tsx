@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
+import Image from "next/image";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -308,7 +309,10 @@ const ProductList = () => {
                       className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
                       <div className="flex items-center">
-                        <img
+                        <Image
+                          width={500}
+                          height={500}
+                          priority={true}
                           src={product.imgUrl}
                           alt={product.description}
                           className="h-12 w-auto mr-3"
