@@ -266,7 +266,7 @@ setUserImage(session.user?.image ?? '');
           <Link href="/mvv" className={` hover:text-gray-900 ${pathname === "/mvv" && "text-gray-900 font-bold"}`}>
             MVV
           </Link>
-          <Link href="/preguntasFrecuentes" className={` hover:text-gray-900 ${pathname === "/preguntasFrecuentes" && "text-gray-900 font-bold"}`}>
+          <Link href="/faq" className={` hover:text-gray-900 ${pathname === "/faq" && "text-gray-900 font-bold"}`}>
             F&Q
           </Link>
         </nav>
@@ -511,9 +511,9 @@ setUserImage(session.user?.image ?? '');
             <li className="text-xl py-4 flex">
               
               <Link
-                href="/preguntasFrecuentes"
+                href="/faq"
                 className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/preguntasFrecuentes" ? "text-orange-400 font-bold" : ""
+                  pathname === "/faq" ? "text-orange-400 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >

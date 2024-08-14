@@ -1,6 +1,6 @@
 "use client";
 import { LoginUser } from "@/helpers/Autenticacion.helper";
-import { ILoginErrorProps, ILoginProps } from "@/types/login";
+import { ILoginErrorProps, ILoginProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
