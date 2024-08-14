@@ -27,12 +27,13 @@ const Navbar = () => {
   const { searchResults: searchProductResults, searchProducts } = useProductContext();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [showUser, setShowUser] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [userName, setUserName] = useState("");
+  
   const [userRole, setUserRole] = useState("");
   const [userGoogle, setUserGoogle] = useState(false);
-  const [userImage, setUserImage] = useState();
 
+  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
+  const [userImage, setUserImage] = useState<string | undefined>(undefined);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -82,9 +83,9 @@ const Navbar = () => {
   
       if (session) {
         console.log("Usuario:", session.user);
-        setUserEmail(session.user?.email);
-        setUserName(session.user?.name);
-        setUserImage(session.user?.image);
+        setUserEmail(session.user?.email ?? '');
+setUserName(session.user?.name ?? '');
+setUserImage(session.user?.image ?? '');
         setUserRole("user");
         setUserSession(true);
         setShowUser(true);
