@@ -36,7 +36,7 @@ export async function getProductById(id: string) {
           const product: IProductList = res.data;
           return product;
         } else {
-          throw new Error("No se encontró el token de acceso.");
+          //throw new Error("No se encontró el token de acceso.");
         }
       } else {
         throw new Error("No se encontró la sesión de usuario.");
