@@ -13,6 +13,7 @@ import Image from "next/image";
 import Swal from "sweetalert2";
 import {jwtDecode} from "jwt-decode"; // Asegúrate de importar correctamente
 import { useProductContext } from '@/context/product.context';
+import {getSessionGoogle, signOutWithGoogle} from "@/utils/singGoogle";
 
 const Navbar = () => {
   const router = useRouter();
@@ -22,13 +23,15 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [allProducts, setAllProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [userSession, setUserSession] = useState(null);
+  const [userSession, setUserSession] = useState(false);
   const { searchResults: searchProductResults, searchProducts } = useProductContext();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [showUser, setShowUser] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [userGoogle, setUserGoogle] = useState(false);
+  const [userImage, setUserImage] = useState();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -46,12 +49,14 @@ const Navbar = () => {
 
   //! Obtener token de usuario-Session
   useEffect(() => {
+    
     if (typeof window !== "undefined" && window.localStorage) {
       const userSession = localStorage.getItem("userSession");
+      
       if (userSession) {
         const parsedSession = JSON.parse(userSession);
         const token = parsedSession.accessToken;
-        setUserSession(token);
+        setUserSession(true);
 
         try {
           const decodedToken: any = jwtDecode(token);
@@ -68,20 +73,48 @@ const Navbar = () => {
         }
       }
     }
-  }, [router]);
 
+  }, [router]);
+  useEffect(() => {
+    const someFunction = async () => {
+      const session = await getSessionGoogle();
+      console.log(session); // Aquí tienes acceso a la data de la sesión
+  
+      if (session) {
+        console.log("Usuario:", session.user);
+        setUserEmail(session.user?.email);
+        setUserName(session.user?.name);
+        setUserImage(session.user?.image);
+        setUserRole("user");
+        setUserSession(true);
+        setShowUser(true);
+        setUserGoogle(true);
+        
+      } else {
+        console.log("No hay sesión activa");
+      }
+    };
+  
+    someFunction();
+  }, []); 
+  
   //! Cerrar sesión
   const handleSignOut = () => {
-    localStorage.removeItem("userSession");
-    localStorage.removeItem("cart");
-    setUserSession(null);
-    setShowUser(false);
-    setUserEmail("");
-    setUserName("");
-    setUserRole("");
+    if(userGoogle === true){
+      signOutWithGoogle();
+      //setUserGoogle(false);
+      console.log("Cerrando sesión");
+    }
+    //localStorage.removeItem("userSession");
+    //.removeItem("cart");
+    //setUserSession(false);
+    //setShowUser(false);
+    //setUserEmail("");
+    //setUserName("");
+   // setUserRole("");
 
-    Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
-    router.push("/categories");
+    //Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
+    //router.push("/");
   };
 
   //! Mostrar User si hay sesión de usuario
@@ -92,7 +125,7 @@ const Navbar = () => {
         setUserSession(JSON.parse(userToken));
         setShowUser(true);
       } else {
-        setUserSession(null);
+        setUserSession(false);
         setShowUser(false);
       }
     } else {
@@ -123,7 +156,7 @@ const Navbar = () => {
   if (hideNavbar) {
     return null;
   }
-
+  
   return (
     <header className="relative text-gray-600 body-font">
       <div className="relative z-10 container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between">
@@ -168,41 +201,47 @@ const Navbar = () => {
                 </span>
               )}
             </button>
-            {!userSession && (
+            {userSession === false && (
               <Link href="/login">
                 <button className="text-gray-900 font-bold">Iniciar Sesion</button>
               </Link>
             )}
-            {userSession && (
-              <Dropdown
-                arrowIcon={false}
-                inline
-                label={
-                  <Image
-                    src={"/perfilModerno.png"}
-                    alt="imagen"
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                }
-              >
-                <Dropdown.Header>
-                  <span className="block text-sm">
-                    {userName}
-                  </span>
-                  <span className="block truncate text-sm font-medium">
-                    {userEmail}
-                  </span>
-                </Dropdown.Header>
-                {userRole === "admin" ? (
-                  <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
-                ) : (
-                  <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
-                )}
-                <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
-              </Dropdown>
-            )}
+            {userSession === true && (
+  <Dropdown
+    arrowIcon={false}
+    inline
+    label={
+      userImage ? (
+        <Image
+          src={userImage}
+          alt="imagen"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+      ) : (
+        <Image
+          src="/perfilModerno.png"
+          alt="imagen por defecto"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+      )
+    }
+  >
+    <Dropdown.Header>
+      <span className="block text-sm">{userName}</span>
+      <span className="block truncate text-sm font-medium">{userEmail}</span>
+    </Dropdown.Header>
+    {userRole === "admin" ? (
+      <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
+    ) : (
+      <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
+    )}
+    <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
+  </Dropdown>
+)}
           </div>
         </div>
         <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center gap-5 mx-5">
@@ -273,13 +312,23 @@ const Navbar = () => {
               inline
               label={
                 <div className="flex  items-center gap-2">
-                <Image
-                  src={"/perfilModerno.png"}
-                  alt="imagen"
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+                {userImage ? (
+        <Image
+          src={userImage}
+          alt="imagen"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+      ) : (
+        <Image
+          src="/perfilModerno.png"
+          alt="imagen por defecto"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+      )}
                 <p className="text-sm text-center w-20 text-wrap">{userName}</p>
                 </div>
               }

@@ -19,7 +19,8 @@ import Image from "next/image";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { IconButton } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
-
+import {signInWithGoogle} from "@/utils/singGoogle";
+import { signInWithFacebook } from "@/utils/singFacebook";
 const theme = createTheme();
 
 const Login = () => {
@@ -136,6 +137,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+  
 
   const isDisabled = Object.values(error).some((x) => x !== "");
 
@@ -275,7 +277,7 @@ const Login = () => {
                   <hr className="border-gray-600 border-2 my-3" />
                 </div>
                 <div className="space-x-6 flex justify-center mt-2">
-                  <button type="button" className="border-none outline-none">
+                  <button type="button" className="border-none outline-none" onClick={() => signInWithGoogle()}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="32px"
@@ -314,7 +316,7 @@ const Login = () => {
                       />
                     </svg>
                   </button>
-                  <button type="button" className="border-none outline-none">
+                  <button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="32px"
