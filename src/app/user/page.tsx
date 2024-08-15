@@ -2,7 +2,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { NewUser } from "@/helpers/Autenticacion.helper";
-import { IUserErrorProps, IUserProps } from "@/interfaces/user";
+import { IUserErrorProps, IUserProps } from "@/interfaces/IUser";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
 
 import { useRouter } from "next/navigation";

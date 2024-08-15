@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import { IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
-import { getCategories } from "@/helpers/categories";
+import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
+import { getCategories } from "@/helpers/categories.helper";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import Image from "next/image";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -15,38 +15,41 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[] | undefined>([]);
 
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
-    article_id: "",
+
     description: "",
-    imgUrl: "",
+    //imgUrl: "",
     price: "",
     stock: "",
     discount: "",
     presentacion: "",
     tipoGrano: "",
     medida: "",
-    category: {
+    categoryID: "",
+    /*category: {
       id: "",
       name: "",
-    },
+    },*/
   });
 
   const [errors, setErrors] = useState<IProductErrorUpdate>({
-    article_id: "",
+
     description: "",
-    imgUrl: "",
+    //imgUrl: "",
     price: "",
     stock: "",
     discount: "",
     presentacion: "",
     tipoGrano: "",
     medida: "",
+    categoryID: "",
+    /*
     category: {
       id: "",
       name: "",
-    },
+    },*/
   });
 
   //! Obtener producto por ID
@@ -122,7 +125,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const imageUrl = URL.createObjectURL(file);
       setDataProduct({
         ...dataProduct,
-        imgUrl: imageUrl,
+        //imgUrl: imageUrl,
       });
     }
   };
@@ -144,12 +147,12 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
 
     try {
       const formData = new FormData();
-      formData.append("article_id", dataProduct.article_id);
+      //formData.append("article_id", dataProduct.article_id);
       formData.append("description", dataProduct.description);
       formData.append("price", dataProduct.price.toString());
       formData.append("stock", dataProduct.stock.toString());
       formData.append("discount", dataProduct.discount.toString());
-      formData.append("category", dataProduct.category.id);
+      //formData.append("category", dataProduct.category.id);
       formData.append("presentacion", dataProduct.presentacion);
       formData.append("tipoGrano", dataProduct.tipoGrano);
       formData.append("medida", dataProduct.medida);
@@ -215,25 +218,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="article_id"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Código de Producto
-            </label>
-            <input
-              type="number"
-              name="article_id"
-              id="article_id"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              value={dataProduct.article_id}
-              onChange={handleChange}
-            />
-            {errors.article_id && (
-              <span className="text-red-500">{errors.article_id}</span>
-            )}
-          </div>
+
+
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
               <label
@@ -267,19 +253,19 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 id="category"
                 name="category"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                value={dataProduct.category.id}
+                value={dataProduct.categoryID}
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
-                {categories.map((category) => (
+                {categories?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
                 ))}
               </select>
-              {errors.category.id && (
+              {/*errors.category.id && (
                 <span className="text-red-500">{errors.category.id}</span>
-              )}
+              )*/}
             </div>
 
             <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
@@ -444,7 +430,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
               onChange={handleImageChange}
             />
-            {dataProduct.imgUrl && (
+            {/*dataProduct.imgUrl && (
               <Image
                 width={500}
                 height={500}
@@ -453,7 +439,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 className="mt-2 rounded-md"
                 style={{ maxHeight: "150px", objectFit: "contain" }}
               />
-            )}
+            )*/}
             {/* {errors.imgUrl && (
               <span className="text-red-500">{errors.imgUrl}</span>
             )} */}

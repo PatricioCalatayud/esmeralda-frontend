@@ -1,4 +1,4 @@
-import { IUser } from "@/interfaces/IUser";
+import { IUserProps } from "@/interfaces/IUser";
 import { ILoginProps } from "@/interfaces/ILogin";
 import axios from "axios";
 
@@ -50,7 +50,7 @@ export async function LoginUser(user: ILoginProps) {
 }
 //! Funcion para registrar usuario
 
-export async function NewUser(user: IUser): Promise<IUser | undefined> {
+export async function NewUser(user: IUserProps): Promise<IUserProps | undefined> {
   try {
     const res = await axios.post("http://localhost:3001/users/signup", user, {
       headers: {
@@ -65,7 +65,7 @@ export async function NewUser(user: IUser): Promise<IUser | undefined> {
       console.log(`Error registrando usuario: ${res.status} - ${res.data.message}`);
     }
     console.log(res.data);
-    const newUser = res.data as IUser;
+    const newUser = res.data as IUserProps;
 
     return newUser;
   } catch (error: any) {

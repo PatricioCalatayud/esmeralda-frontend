@@ -174,7 +174,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         {/* Contenido principal */}
         <div className="w-full lg:w-3/4 p-4">
           {filteredProducts && filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id
@@ -182,31 +182,33 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                     key={product.article_id}
-                    className="p-4 rounded-lg h-full"
+                    className=" rounded-lg h-[400px] shadow-lg hover:scale-105"
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
-                    <div className="relative pb-56 flex justify-items-start">
+
                       <Image
                       width={500}
                         height={500}
                         src={product.imgUrl}
                         alt={product.description}
-                        className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        className="relative inset-0 w-46 h-4/6 object-cover rounded-t-lg animate-fade-in-up  transition-transform duration-300 cursor-pointer"
                       />
-                    </div>
+                    <hr className=" bg-blue-gray-600"/>
+                    <div className="p-4 flex flex-col justify-between w-full h-2/6">
                     {productCategory && (
                       <h3 className="text-gray-500">{productCategory.name}</h3>
                     )}
                     <h2 className="text-xl font-semibold">
                       {product.description}
                     </h2>
-                    <p className="text-lg font-bold mt-2">${product.price}</p>
+                    <p className="text-lg font-bold mt-2">$ {product.price}</p>
+                    </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500">No hay productos para mostrar en esta categoría.</h1></div>
+            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500 w-full text-center">No hay productos para mostrar en esta categoría.</h1></div>
           )}
         </div>
       </div>

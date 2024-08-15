@@ -16,6 +16,10 @@ interface AuthContextType {
   session: ISession | undefined;
   handleSignOut: () => void;
   userGoogle: boolean;
+  token: string | undefined;
+  userId: string | undefined;
+  authLoading: boolean;
+  setSession: (session: ISession | undefined) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,51 +35,62 @@ export const useAuthContext = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-
   const [session, setSession] = useState<ISession | undefined>();
   const [userGoogle, setUserGoogle] = useState(false);
+  const [token, setToken] = useState<string | undefined>();
+  const [userId, setUserId] = useState<string | undefined>();
+  const [authLoading, setAuthLoading] = useState(true);
+
   const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        const token = parsedSession.accessToken;
-        try {
+    const userSession = localStorage.getItem("userSession");
+    if (userSession) {
+      const parsedSession = JSON.parse(userSession);
+      const token = parsedSession.accessToken;
+      setToken(token);
+      try {
         //decodifico el token
-          const decodedToken: any = jwtDecode(token);
-          console.log(decodedToken);
-          // si hay token decodificado
-          if (decodedToken) {
-            // seteo la sesion con el token decodificado
-            setSession({name: decodedToken.name,
-                email: decodedToken.email,
-                image: undefined,
-                role: decodedToken.roles[0]});
-          }
-        } catch (error) {
-          console.error("Error decoding token:", error);
+        const decodedToken: any = jwtDecode(token);
+        // si hay token decodificado
+        if (decodedToken) {
+          setUserId(decodedToken.sub);
+          // seteo la sesion con el token decodificado
+          setSession({
+            name: decodedToken.name,
+            email: decodedToken.email,
+            image: undefined,
+            role: decodedToken.roles[0],
+            phone: decodedToken.phone,
+          });
         }
+      } catch (error) {
+        console.error("Error decoding token:", error);
       }
-    
+    }
+    setAuthLoading(false);
   }, []);
   useEffect(() => {
     const someFunction = async () => {
-      const session = await getSessionGoogle();
-      console.log(session); // Aquí tienes acceso a la data de la sesión
-
-      if (session) {
-        console.log("Usuario:", session.user);
-        setSession({name: session.user?.name ?? "",
-            email: session.user?.email ?? "",
-            image: session.user?.image ?? "",
-            role: "user"}),
+      const sessionGoogle = await getSessionGoogle();
+      console.log(sessionGoogle); // Aquí tienes acceso a la data de la sesión
+  
+      if (sessionGoogle) {
+        console.log("Usuario:", sessionGoogle.user);
+        setSession({
+          name: sessionGoogle.user?.name ?? "",
+          email: sessionGoogle.user?.email ?? "",
+          image: sessionGoogle.user?.image ?? "",
+          role: "user",
+          phone: undefined,
+        }),
         setUserGoogle(true);
       } else {
         console.log("No hay sesión activa");
       }
+      setAuthLoading(false);
     };
-
+  
     someFunction();
   }, []);
 
@@ -85,16 +100,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       signOutWithGoogle();
       //setUserGoogle(false);
       console.log("Cerrando sesión");
-    }else{
-        localStorage.removeItem("userSession");
-        localStorage.removeItem("cart");
-        //setUserSession(false);
-        setSession(undefined);
+    } else {
+      localStorage.removeItem("userSession");
+      localStorage.removeItem("cart");
+      //setUserSession(false);
+      setSession(undefined);
     }
     Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
     router.push("/");
   };
+  console.log(session);
 
-
-  return <AuthContext.Provider value={{session, handleSignOut, userGoogle}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ session, handleSignOut, userGoogle, token, userId, authLoading, setSession }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

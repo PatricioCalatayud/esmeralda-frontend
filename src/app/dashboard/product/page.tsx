@@ -10,16 +10,18 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
+import { deleteProducts, putProducts } from "@/helpers/products.helper";
+import { useAuthContext } from "@/context/auth.context";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductList = () => {
   const router = useRouter();
+  const { token } = useAuthContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<IProductList[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [token, setToken] = useState<string | null>(null);
   const PRODUCTS_PER_PAGE = 10; // Cantidad de productos por página
   const [loading, setLoading] = useState(true);
 
@@ -28,10 +30,9 @@ const ProductList = () => {
     if (typeof window !== "undefined" && window.localStorage) {
       const userSessionString = localStorage.getItem("userSession");
       if (userSessionString) {
-        const userSession = JSON.parse(userSessionString);
-        const accessToken = userSession.accessToken; // Access the accessToken correctly
-        console.log("userToken", accessToken);
-        setToken(accessToken);
+
+        console.log("userToken", token);
+
       } else {
         Swal.fire(
           "¡Error!",
@@ -110,17 +111,12 @@ const ProductList = () => {
           return;
         }
 
-        const response = await fetch(`${apiURL}/products/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await deleteProducts(id, token);
 
-        const responseData = await response.json();
-        console.log("Response data:", responseData);
 
-        if (response.ok) {
+        console.log("Response data:", response);
+
+        if (response && response.status === 200) {
           Swal.fire("¡Eliminado!", "El producto ha sido eliminado", "success");
           setProducts((prevProducts) =>
             prevProducts.filter((product) => product.id !== id)
@@ -129,14 +125,14 @@ const ProductList = () => {
         } else {
           console.error(
             "Error en la respuesta del servidor:",
-            response.status,
-            response.statusText,
-            responseData
+            response?.status,
+            response?.statusText,
+            response
           );
           Swal.fire(
             "¡Error!",
             `Error del servidor: ${
-              responseData.message || "No se pudo eliminar el producto"
+              response?.statusText || "No se pudo eliminar el producto"
             }`,
             "error"
           );
@@ -154,6 +150,7 @@ const ProductList = () => {
 
   //! Función para habilitar un producto
   const handleEnableProduct = async (id: string) => {
+    const dataProducts = { isAvailable: true };
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -164,16 +161,13 @@ const ProductList = () => {
     }
 
     try {
-      const response = await axios.put(
-        `${apiURL}/products/${id}`,
-        { isAvailable: true },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Producto habilitado:", response.data);
+      const response = await putProducts(
+        dataProducts ,
+        id,
+        token
+      )
+
+      console.log("Producto habilitado:", response);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === id ? { ...product, isAvailable: true } : product
@@ -191,6 +185,7 @@ const ProductList = () => {
 
   //! Función para manejar la deshabilitación de un producto
   const handleDisableProduct = async (id: string) => {
+    const dataProducts = { isAvailable: false };
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -201,16 +196,12 @@ const ProductList = () => {
     }
 
     try {
-      const response = await axios.put(
-        `${apiURL}/products/${id}`,
-        { isAvailable: false },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Producto deshabilitado:", response.data);
+      const response = await putProducts(
+        dataProducts ,
+        id,
+        token
+      )
+      console.log("Producto deshabilitado:", response);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === id ? { ...product, isAvailable: false } : product
@@ -265,7 +256,7 @@ const ProductList = () => {
                   type="button"
                   id="createProductButton"
                   data-modal-toggle="createProductModal"
-                  className="flex items-center justify-center text-white bg-teal-800 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+                  className=" gap-2 flex items-center justify-center text-white bg-teal-800 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
                   href="../../dashboard/productAdd"
                 >
                   <RiAddLargeFill />
@@ -278,22 +269,22 @@ const ProductList = () => {
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Producto
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Stock
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Precio
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Descuento
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Acciones
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Habilitar
                   </th>
                 </tr>
@@ -308,31 +299,29 @@ const ProductList = () => {
                       scope="row"
                       className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center ">
                         <Image
                           width={500}
                           height={500}
                           priority={true}
                           src={product.imgUrl}
                           alt={product.description}
-                          className="h-12 w-auto mr-3"
+                          className="h-12 w-12 mr-3 rounded-lg"
                         />
                         {product.description}
                       </div>
                     </th>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      <div className="flex justify-center items-center">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                         {product.stock}
-                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                      $ {product.price} 
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                      {product.discount} %
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {product.price}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {product.discount}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-4 justify-center">
                         <Tooltip content="Editar">
                           <Link
                             type="button"

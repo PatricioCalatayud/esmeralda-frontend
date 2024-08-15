@@ -2,45 +2,47 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import axios from "axios";
 import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { Category, IProductResponse } from "@/interfaces/IProductList";
+import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
 
 import { productAddValidation } from "@/utils/productAddValidation";
+import { getCategories } from "@/helpers/categories.helper";
+import { useAuthContext } from "@/context/auth.context";
+import { postProducts } from "@/helpers/products.helper";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const InsertProduct = () => {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[] | undefined>([]);
+  const {token} = useAuthContext();
+  
 
   //! Estado para almacenar los datos del producto
-  const [dataProduct, setDataProduct] = useState<IProductResponse>({
-    article_id: "",
+  const [dataProduct, setDataProduct] = useState<IProductUpdate>({
     description: "",
     price: "",
     stock: "",
     discount: "",
     categoryID: "",
-    imgUrl: "",
+
     presentacion: "",
     tipoGrano: "",
     medida: "",
   });
 
   //! Estado para almacenar los errores
-  const [errors, setErrors] = useState<any>({
-    article_id: "",
+  const [errors, setErrors] = useState<IProductUpdate>({
     description: "",
     price: "",
     stock: "",
     discount: "",
-    categoryId: "",
-    imgUrl: "",
+    categoryID: "",
+
     presentacion: "",
     tipoGrano: "",
     medida: "",
@@ -49,8 +51,7 @@ const InsertProduct = () => {
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await axios.get(`${apiURL}/category`);
-      const categories = response.data;
+      const categories = await getCategories();
       setCategories(categories);
     };
 
@@ -87,7 +88,6 @@ const InsertProduct = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("article_id", Number(dataProduct.article_id).toString());
     formData.append("description", dataProduct.description);
     formData.append("presentacion", dataProduct.presentacion || "");
     formData.append("tipoGrano", dataProduct.tipoGrano || "");
@@ -116,11 +116,8 @@ const InsertProduct = () => {
     });
 
     try {
-      const response = await axios.post(`${apiURL}/products`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+
+      const response = await postProducts(formData, token);
 
       console.log("Response:", response);
       console.log("Product added successfully");
@@ -146,11 +143,11 @@ const InsertProduct = () => {
   };
 
   //!Validar formulario
-  useEffect(() => {
+/*  useEffect(() => {
     const validationErrors = productAddValidation(dataProduct);
     setErrors(validationErrors);
   }, [dataProduct]);
-
+*/
   return (
     <div className="min-h-screen flex flex-col justify-start items-center p-10 dark:bg-gray-700">
       <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
@@ -161,25 +158,7 @@ const InsertProduct = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="article_id"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Código de Producto
-            </label>
-            <input
-              type="number"
-              name="article_id"
-              id="article_id"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-              value={dataProduct.article_id}
-              onChange={handleChange}
-            />
-            {errors.article_id && (
-              <span className="text-red-500">{errors.article_id}</span>
-            )}
-          </div>
+
           <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
               <label
@@ -217,7 +196,7 @@ const InsertProduct = () => {
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
-                {categories.map((category: Category) => (
+                {categories?.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>

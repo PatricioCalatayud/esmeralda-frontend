@@ -165,7 +165,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   }
 
   if (!product) {
-    return <p>No se encontró el producto.</p>;
+    return <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">No se encontró el producto.</p>;
   }
 
   const sizeOptions =

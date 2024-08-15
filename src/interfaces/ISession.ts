@@ -3,4 +3,5 @@ export interface ISession {
   email: string;
   image: string | undefined;
   role: string;
+  phone?: string | undefined;
 }

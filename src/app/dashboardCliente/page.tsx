@@ -6,114 +6,42 @@ import { IoHome } from "react-icons/io5";
 import { MdBorderColor } from "react-icons/md";
 import { FaCartPlus } from "react-icons/fa";
 import Link from "next/link";
-import axios from "axios";
 import { FcOk } from "react-icons/fc";
 import Spinner from "@/app/Spinner";
 import {jwtDecode} from "jwt-decode"; // Importar jwt-decode
 import Image from "next/image";
-
-// Interfaces
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    isAvailable: boolean;
-    isDeleted: boolean;
-    password: string;
-    phone: string;
-    role: string;
-}
-
-interface UserData {
-    success: string;
-    accessToken: string;
-    user: User;
-}
-
-interface Product {
-    id: string;
-    description: string;
-    imgUrl: string;
-    price: string;
-    discount: string;
-}
-
-interface ProductsOrder {
-    cantidad: number;
-    product: Product;
-}
-
-interface Transaction {
-    status: string;
-    timestamp: string;
-}
-
-interface OrderDetail {
-    deliveryDate: string;
-    totalPrice: number;
-    transactions: Transaction[];
-}
-
-interface Order {
-    id: string;
-    date: string;
-    user: {
-        id: string;
-    };
-    productsOrder: ProductsOrder[];
-    orderDetail: OrderDetail;
-}
-
-interface userSession {
-    userData: UserData;
-}
-
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+import { IUserProps } from "@/interfaces/IUser";
+import {  getOrders } from "@/helpers/Order.helper";
+import { IOrders } from "@/interfaces/IOrders";
+import { useAuthContext } from "@/context/auth.context";
 
 const Dashboard = () => {
-  const [token, setToken] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [userName, setUserName] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string>("");
-  const [userPhone, setUserPhone] = useState<string>("");
-  const [userId, setUserId] = useState<string>("");
+  const [orders, setOrders] = useState<IOrders[] | undefined>([]);
+  const {session, token, userId, authLoading} = useAuthContext();
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        const token = parsedSession.accessToken;
-        const decodedToken: any = jwtDecode(token);
-        setToken(token);
-        setUserName(decodedToken.name);
-        setUserEmail(decodedToken.email);
-        setUserPhone(decodedToken.phone);
-        setUserId(decodedToken.sub);
-      } else {
+    if (!authLoading) {
+      if (!session) {
+        console.log("Session no exists:");
         redirect("/login");
       }
     }
-  }, []);
-
+  }, [authLoading, session]);
+  
   useEffect(() => {
-    const listOrders = async (userId: string): Promise<Order[]> => {
+    const listOrders = async (userId: string) => {
       try {
-        const { data } = await axios.get(`${apiURL}/order/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        return data;
-      } catch (error: any) {
-        console.error(error);
-        return [];
+        const data = await getOrders(userId, token);
+        setOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
       }
     };
   
-    if (userId) {
-      listOrders(userId).then(setOrders);
+    if (userId && token) {
+      listOrders(userId);
     }
   }, [userId, token]);
 
@@ -145,7 +73,7 @@ const Dashboard = () => {
           <ul>
             <li className="mb-2">
               <a
-                href="/dashboard"
+                href="/dashboardCliente"
                 className="flex flex-row items-center py-2 md:px-4 rounded hover:bg-gray-700"
               >
                 <MdBorderColor /> &nbsp; Órdenes
@@ -184,13 +112,13 @@ const Dashboard = () => {
             <div className="p-4">
               <div className="bg-gray-50 dark:bg-gray-300 p-4 rounded shadow mb-4">
                 <p>
-                  <b>Nombre:</b> {userName}
+                  <b>Nombre:</b> {session?.name}
                 </p>
                 <p>
-                  <b>Email:</b> {userEmail}
+                  <b>Email:</b> {session?.email}
                 </p>
                 <p>
-                  <b>Teléfono:</b> {userPhone}
+                  <b>Teléfono:</b> {session?.phone}
                 </p>
                 {/* Agrega más campos si es necesario */}
               </div>
@@ -219,8 +147,8 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.length > 0 ? (
-                      orders.map((order, index) => (
+                    {orders && orders?.length > 0 ? (
+                      orders?.map((order, index) => (
                         <tr
                           key={index}
                           className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"

@@ -51,27 +51,24 @@ export interface IProductErrorResponse {
 }
 
 export interface IProductUpdate {
-  article_id: string;
   description: string;
-  imgUrl: string;
   price: string;
   stock: string;
   discount: string;
   presentacion: string;
   tipoGrano: string;
   medida: string;
-  category: Category;
+  categoryID: string;
+  file?: File;
 }
 
 export interface IProductErrorUpdate {
-  article_id: string;
   description: string;
-  imgUrl: string;
   price: string;
   stock: string;
   discount: string;
   presentacion: string;
   tipoGrano: string;
   medida: string;
-  category: Category;
+  categoryID: string;
 }

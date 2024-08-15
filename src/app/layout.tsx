@@ -6,6 +6,7 @@ import Footer from "@/components/footer/Footer";
 import { ProductProvider } from "@/context/product.context";
 import { AuthProvider } from "@/context/auth.context";
 import { CartProvider } from "@/context/cart.context";
+import { CategoryProvider } from "@/context/categories.context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,15 +25,17 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/cafe.ico" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} h-min-screen`}>
         <AuthProvider>
+          <CategoryProvider>
         <ProductProvider>
-          <CartProvider>
+        <CartProvider>
         <Navbar />
         {children}
         <Footer />
-          </CartProvider>
+        </CartProvider>
         </ProductProvider>
+        </CategoryProvider>
         </AuthProvider>
       </body>
     </html>

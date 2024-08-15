@@ -1,4 +1,4 @@
-import { IUserErrorProps, IUserProps } from "@/interfaces/user";
+import { IUserErrorProps, IUserProps } from "@/interfaces/IUser";
 
 export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
   let errors: IUserProps = {

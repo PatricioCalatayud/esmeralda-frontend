@@ -7,22 +7,23 @@ import {
     product: IProductUpdate
   ): IProductErrorUpdate {
     const errors: IProductErrorUpdate = {
-      article_id: "",
+      //article_id: "",
       description: "",
-      imgUrl: "",
+      //imgUrl: "",
       price: "",
       stock: "",
       discount: "",
       presentacion: "",
       tipoGrano: "",
       medida: "",
-      category: {
+      categoryID: "",
+      /*category: {
         id: "",
         name: "",
-      },
+      },*/
         
     };
-    if (!product.article_id) {
+    /*if (!product.article_id) {
       errors.article_id = "El código de artículo es obligatorio";
     }
   
@@ -32,7 +33,7 @@ import {
   
     if (!product.imgUrl) {
       errors.imgUrl = "La imagen es obligatoria";
-    }
+    }*/
   
     if (!product.price) {
       errors.price = "El precio es obligatorio";
@@ -58,9 +59,9 @@ import {
       errors.medida = "La medida es obligatoria";
     }
   
-    if (!product.category.id) {
+    /*if (!product.category.id) {
       errors.category.id = "La categoría es obligatoria";
-    }
+    }*/
     return errors;
   }
   

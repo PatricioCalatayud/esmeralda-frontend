@@ -21,6 +21,8 @@ import { IconButton } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import {signInWithGoogle} from "@/utils/singGoogle";
 import { signInWithFacebook } from "@/utils/singFacebook";
+import { useAuthContext } from "@/context/auth.context";
+import { jwtDecode } from "jwt-decode";
 const theme = createTheme();
 
 const Login = () => {
@@ -46,6 +48,7 @@ const Login = () => {
     password: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const{setSession} = useAuthContext();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -101,6 +104,18 @@ const Login = () => {
     try {
       const response = await LoginUser(dataUser);
 
+      if (response) {
+        const decodedToken: any = jwtDecode(response.accessToken as string);
+        setSession({
+          name: decodedToken.name,
+          email: decodedToken.email,
+          image: undefined,
+          role: decodedToken.roles[0],
+          phone: decodedToken.phone,
+        })
+      }
+      
+      
       console.log(response);
 
       if (response) {
