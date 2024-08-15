@@ -1,5 +1,5 @@
 import { IUser } from "@/interfaces/IUser";
-import { ILoginProps } from "@/types/login";
+import { ILoginProps } from "@/interfaces/ILogin";
 import axios from "axios";
 
 

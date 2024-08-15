@@ -10,30 +10,22 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { MdHelp } from "react-icons/md";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
-import Swal from "sweetalert2";
-import {jwtDecode} from "jwt-decode"; // Asegúrate de importar correctamente
 import { useProductContext } from '@/context/product.context';
-import {getSessionGoogle, signOutWithGoogle} from "@/utils/singGoogle";
+import { useAuthContext } from "@/context/auth.context";
+import { useCartContext } from "@/context/cart.context";
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const hideNavbar = pathname === "/login" || pathname === "/register";
+  
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [allProducts, setAllProducts] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [userSession, setUserSession] = useState(false);
   const { searchResults: searchProductResults, searchProducts } = useProductContext();
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [showUser, setShowUser] = useState(false);
+  const {session, handleSignOut, userGoogle} = useAuthContext();
+  const { cartItemCount } = useCartContext();
+  const hideNavbar = pathname === "/login" || pathname === "/register";
   
-  const [userRole, setUserRole] = useState("");
-  const [userGoogle, setUserGoogle] = useState(false);
 
-  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
-  const [userName, setUserName] = useState<string | undefined>(undefined);
-  const [userImage, setUserImage] = useState<string | undefined>(undefined);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -48,111 +40,6 @@ const Navbar = () => {
     setNav(false);
   };
 
-  //! Obtener token de usuario-Session
-  useEffect(() => {
-    
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSession = localStorage.getItem("userSession");
-      
-      if (userSession) {
-        const parsedSession = JSON.parse(userSession);
-        const token = parsedSession.accessToken;
-        setUserSession(true);
-
-        try {
-          const decodedToken: any = jwtDecode(token);
-          
-          console.log(decodedToken);
-          
-          if (decodedToken) {
-            setUserEmail(decodedToken.email);
-            setUserName(decodedToken.name);
-            setUserRole(decodedToken.roles[0]);
-          }
-        } catch (error) {
-          console.error("Error decoding token:", error);
-        }
-      }
-    }
-
-  }, [router]);
-  useEffect(() => {
-    const someFunction = async () => {
-      const session = await getSessionGoogle();
-      console.log(session); // Aquí tienes acceso a la data de la sesión
-  
-      if (session) {
-        console.log("Usuario:", session.user);
-        setUserEmail(session.user?.email ?? '');
-setUserName(session.user?.name ?? '');
-setUserImage(session.user?.image ?? '');
-        setUserRole("user");
-        setUserSession(true);
-        setShowUser(true);
-        setUserGoogle(true);
-        
-      } else {
-        console.log("No hay sesión activa");
-      }
-    };
-  
-    someFunction();
-  }, []); 
-  
-  //! Cerrar sesión
-  const handleSignOut = () => {
-    if(userGoogle === true){
-      signOutWithGoogle();
-      //setUserGoogle(false);
-      console.log("Cerrando sesión");
-    }
-    //localStorage.removeItem("userSession");
-    //.removeItem("cart");
-    //setUserSession(false);
-    //setShowUser(false);
-    //setUserEmail("");
-    //setUserName("");
-   // setUserRole("");
-
-    //Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
-    //router.push("/");
-  };
-
-  //! Mostrar User si hay sesión de usuario
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userToken = localStorage.getItem("userSession");
-      if (userToken) {
-        setUserSession(JSON.parse(userToken));
-        setShowUser(true);
-      } else {
-        setUserSession(false);
-        setShowUser(false);
-      }
-    } else {
-      setShowUser(false);
-    }
-  }, [pathname]);
-
-  //! Función para obtener y actualizar la cantidad de elementos en el carrito
-  const updateCartItemCount = () => {
-    const cartItems = localStorage.getItem("cart");
-
-    if (cartItems) {
-      const items = JSON.parse(cartItems);
-      setCartItemCount(items.length);
-    } else {
-      setCartItemCount(0);
-    }
-  };
-
-  //! Actualizar la cantidad de elementos en el carrito
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateCartItemCount();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [cartItemCount]);
 
   if (hideNavbar) {
     return null;
@@ -202,19 +89,19 @@ setUserImage(session.user?.image ?? '');
                 </span>
               )}
             </button>
-            {userSession === false && (
+            {!session && (
               <Link href="/login">
                 <button className="text-gray-900 font-bold">Iniciar Sesion</button>
               </Link>
             )}
-            {userSession === true && (
+            {session && (
   <Dropdown
     arrowIcon={false}
     inline
     label={
-      userImage ? (
+      session.image ? (
         <Image
-          src={userImage}
+          src={session.image}
           alt="imagen"
           width={40}
           height={40}
@@ -232,10 +119,10 @@ setUserImage(session.user?.image ?? '');
     }
   >
     <Dropdown.Header>
-      <span className="block text-sm">{userName}</span>
-      <span className="block truncate text-sm font-medium">{userEmail}</span>
+      <span className="block text-sm">{session.name}</span>
+      <span className="block truncate text-sm font-medium">{session.email}</span>
     </Dropdown.Header>
-    {userRole === "admin" ? (
+    {session?.role === "admin" ? (
       <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
     ) : (
       <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
@@ -249,7 +136,7 @@ setUserImage(session.user?.image ?? '');
           <Link href="/categories" className={` hover:text-gray-900 ${pathname === "/categories" && "text-gray-900 font-bold"}`}>
             Tienda Online
           </Link>
-          {userRole === "admin" && (
+          {session?.role === "admin" && (
             <Link href="/dashboard/product" className={` hover:text-gray-900 ${pathname === "/dashboard/product" && "text-gray-900 font-bold"}`}>
               Admin Dashboard
             </Link>
@@ -266,7 +153,7 @@ setUserImage(session.user?.image ?? '');
           <Link href="/mvv" className={` hover:text-gray-900 ${pathname === "/mvv" && "text-gray-900 font-bold"}`}>
             MVV
           </Link>
-          <Link href="/preguntasFrecuentes" className={` hover:text-gray-900 ${pathname === "/preguntasFrecuentes" && "text-gray-900 font-bold"}`}>
+          <Link href="/faq" className={` hover:text-gray-900 ${pathname === "/faq" && "text-gray-900 font-bold"}`}>
             F&Q
           </Link>
         </nav>
@@ -295,27 +182,22 @@ setUserImage(session.user?.image ?? '');
               </span>
             )}
           </button>
-          {!showUser && (
+          {!session && (
             <Link href="/login">
               <button className="text-gray-900 font-bold">
                 Iniciar Sesion
               </button>
             </Link>
           )}
-          {/*showUser && (
-            <label className="text-gray-900 font-bold cursor-pointer">
-              Bienvenido: {userName}
-            </label>
-          )*/}
-          {showUser && (
+          {session && (
             <Dropdown
               arrowIcon={false}
               inline
               label={
                 <div className="flex  items-center gap-2">
-                {userImage ? (
+                {session?.image ? (
         <Image
-          src={userImage}
+          src={session?.image}
           alt="imagen"
           width={40}
           height={40}
@@ -330,17 +212,17 @@ setUserImage(session.user?.image ?? '');
           className="rounded-full"
         />
       )}
-                <p className="text-sm text-center w-20 text-wrap">{userName}</p>
+                <p className="text-sm text-center w-20 text-wrap">{session?.name}</p>
                 </div>
               }
             >
               <Dropdown.Header>
-                <span className="block text-sm">{userName}</span>
+                <span className="block text-sm">{session?.name}</span>
                 <span className="block truncate text-sm font-medium">
-                  {userEmail}
+                  {session?.email}
                 </span>
               </Dropdown.Header>
-              {userRole === "admin" ? (
+              {session?.role === "admin" ? (
                 <Dropdown.Item href="/dashboard/product">Dashboard</Dropdown.Item>
               ) : (
                 <div className="flex flex-col">
@@ -415,7 +297,7 @@ setUserImage(session.user?.image ?? '');
                 Inicio
               </Link>
             </li>
-            {userSession && <li className="text-xl py-4 flex">
+            {session && <li className="text-xl py-4 flex">
               <Link
                 href="/tracking"
                 className={`hover:text-orange-400 gap-4 flex ${
@@ -511,9 +393,9 @@ setUserImage(session.user?.image ?? '');
             <li className="text-xl py-4 flex">
               
               <Link
-                href="/preguntasFrecuentes"
+                href="/faq"
                 className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/preguntasFrecuentes" ? "text-orange-400 font-bold" : ""
+                  pathname === "/faq" ? "text-orange-400 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >

@@ -15,7 +15,7 @@ import Image from "next/image"; // Importación del componente Image
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { NewUser } from "@/helpers/Autenticacion.helper";
-import { IUserErrorProps, IUserProps } from "@/types/user";
+import { IUserErrorProps, IUserProps } from "@/interfaces/user";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
 import Link from "next/link";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
