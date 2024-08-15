@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { Category } from '@/interfaces/IProductList';
 
-import { getCategories } from '@/helpers/categories.helper';
+import { getCategories } from '@/helpers/Categories.helper';
 
 interface CategoryContextType {
   categories: Category[] | undefined;
@@ -20,16 +20,29 @@ export const useCategoryContext = () => {
 
 export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[] | undefined>([]);
+  type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
 
   useEffect(() => {
     const fetchCategory = async () => {
+      const categoryTranslations: Record<CategoryName, string> = {
+        "Coffee": "Café",
+        "Tea": "Té",
+        "Accesory": "Accesorio",
+        "Sweetener": "Endulzante",
+        "Mate": "Mate",
+      };
+  
       const categories = await getCategories();
-      setCategories(categories);
+      const translatedCategories = categories?.map(category => ({
+        ...category,
+        name: categoryTranslations[category.name as CategoryName] || category.name
+      }));
+      setCategories(translatedCategories);
+      console.log(translatedCategories);
     };
-
+  
     fetchCategory();
   }, []);
-
 
   return (
     <CategoryContext.Provider value={{ categories }}>

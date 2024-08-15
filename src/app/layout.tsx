@@ -28,14 +28,14 @@ export default function RootLayout({
       <body className={`${inter.className} h-min-screen`}>
         <AuthProvider>
           <CategoryProvider>
-        <ProductProvider>
-        <CartProvider>
-        <Navbar />
-        {children}
-        <Footer />
-        </CartProvider>
-        </ProductProvider>
-        </CategoryProvider>
+            <ProductProvider>
+              <CartProvider>
+                <Navbar />
+                {children}
+                <Footer />
+              </CartProvider>
+            </ProductProvider>
+          </CategoryProvider>
         </AuthProvider>
       </body>
     </html>

@@ -6,7 +6,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import Link from "next/link";
 import Swal from "sweetalert2";
 import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
-import { getCategories } from "@/helpers/categories.helper";
+import { getCategories } from "@/helpers/Categories.helper";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import Image from "next/image";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;

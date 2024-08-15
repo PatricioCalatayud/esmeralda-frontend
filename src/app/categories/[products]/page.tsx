@@ -2,10 +2,11 @@ import ProductList from "@/components/ProductList/ProductList";
 import {
   getCategories,
   getProductsByCategory,
-} from "@/helpers/categories.helper";
+} from "@/helpers/Categories.helper";
 
 export async function generateStaticParams() {
   const categories = await getCategories();
+  console.log(categories);
   if (!categories) return [];
   return categories?.map((category: any) => ({
     categories: category.id,

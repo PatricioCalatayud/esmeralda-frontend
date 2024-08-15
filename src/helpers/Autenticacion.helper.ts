@@ -1,20 +1,18 @@
 import { IUserProps } from "@/interfaces/IUser";
 import { ILoginProps } from "@/interfaces/ILogin";
 import axios from "axios";
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 
 //! Funcion para iniciar sesion
 export async function LoginUser(user: ILoginProps) {
   try {
-    const res = await axios.post("http://localhost:3001/users/signin", user, {
+    const res = await axios.post(`${apiURL}/users/signin`, user, {
       headers: {
         "Content-Type": "application/json",
       },
     });
     if (res.status !== 200 && res.status !== 201) {
-      /*throw new Error(
-        `Error al iniciar sesión : ${res.status} - ${res.data.message}`
-      );*/
       console.log(`Error al iniciar sesión : ${res.status} - ${res.data.message}`);
     }
     console.log(res.data);
@@ -22,27 +20,12 @@ export async function LoginUser(user: ILoginProps) {
     return login;
   } catch (error: any) {
     if (error.response) {
-      // El servidor respondió con un código de estado fuera del rango de 2xx
-      /*throw new Error(
-        `Error iniciando sesión: ${error.response.status} - ${
-          error.response.data.message || error.response.statusText
-        }`
-      );*/
-        
       console.log(`Error iniciando sesión: ${error.response.status} - ${
         error.response.data.message || error.response.statusText
       }`);
     } else if (error.request) {
-      // La solicitud fue hecha pero no se recibió respuesta
-      /*throw new Error(
-        "Error iniciando sesión: No se recibió respuesta del servidor."
-      );*/
-
       console.log("Error iniciando sesión: No se recibía respuesta del servidor.");
     } else {
-      // Algo sucedió al configurar la solicitud
-      /*throw new Error(`Error iniciando sesión: ${error.message}`);*/
-
       console.log(`Error iniciando sesión: ${error.message}`);
     }
   }
@@ -52,16 +35,12 @@ export async function LoginUser(user: ILoginProps) {
 
 export async function NewUser(user: IUserProps): Promise<IUserProps | undefined> {
   try {
-    const res = await axios.post("http://localhost:3001/users/signup", user, {
+    const res = await axios.post(`${apiURL}/users/signup`, user, {
       headers: {
         "Content-Type": "application/json",
       },
     });
     if (res.status !== 200 && res.status !== 201) {
-      /*throw new Error(
-        `Error registrando usuario: ${res.status} - ${res.data.message}`
-      );*/
-
       console.log(`Error registrando usuario: ${res.status} - ${res.data.message}`);
     }
     console.log(res.data);
@@ -70,22 +49,52 @@ export async function NewUser(user: IUserProps): Promise<IUserProps | undefined>
     return newUser;
   } catch (error: any) {
     if (error.response) {
-      /*
-      throw new Error(
-        `Error registrando usuario: ${error.response.status} - ${error.response.data.message}`
-      );*/
-
       console.log(`Error registrando usuario: ${error.response.status} - ${error.response.data.message}`);
     } else if (error.request) {
-      /*throw new Error(
-        "Error registrando usuario: No se recibió respuesta del servidor."
-      );*/
-
       console.log("Error registrando usuario: No se recibía respuesta del servidor.");
     } else {
-      /*throw new Error(`Error registrando usuario: ${error.message}`);*/
-
       console.log(`Error registrando usuario: ${error.message}`);
     }
+  }
+}
+
+export async function getUser(userId: string, token: string | undefined) { 
+  try {
+    const response = await axios.get(`${apiURL}/users/${userId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+    const user: IUserProps = response.data;
+    return user;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function putUser(userId: string, user: IUserProps, token: string | undefined) {
+  try {
+    const response = await axios.put(`${apiURL}/users/${userId}`, user, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const updatedUser: IUserProps = response.data; // Renombrar a 'updatedUser'
+    return updatedUser;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function deleteUser(userId: string, token: string | undefined) {
+  try {
+    const response = await axios.delete(`${apiURL}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const deletedUser: IUserProps = response.data; // Renombrar a 'deletedUser'
+    return deletedUser;
+  } catch (error: any) {
+    console.log(error);
   }
 }

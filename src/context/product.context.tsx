@@ -1,7 +1,7 @@
 "use client"
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { IProductList } from '@/interfaces/IProductList';
-import { getProducts } from '@/helpers/products.helper';
+import { getProducts } from '@/helpers/Products.helper';
 
 interface ProductContextType {
   allProducts: IProductList[] | undefined;
@@ -22,7 +22,7 @@ export const useProductContext = () => {
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [allProducts, setAllProducts] = useState<IProductList[] | undefined>([]);
   const [searchResults, setSearchResults] = useState<IProductList[] | undefined>([]);
-
+  console.log(allProducts);
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();

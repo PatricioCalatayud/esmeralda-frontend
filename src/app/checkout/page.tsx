@@ -1,20 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
+import { postMarketPay } from "@/helpers/MarketPay.helper";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
   locale: "es-AR",
 });
 
 const Checkout = () => {
-  const apiURL = process.env.NEXT_PUBLIC_API_URL;
-  const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
@@ -39,11 +36,9 @@ const Checkout = () => {
           unit_price: Number(item.price),
         }));
 
-        const response = await axios.post(`${apiURL}/market-pay/url-proccess`, {
-          items,
-        });
+        const response = await postMarketPay(items);
 
-        const { id } = response.data;
+        const { id } = response;
         setPreferenceId(id);
       } catch (error) {
         console.error("Error creating payment preference:", error);

@@ -1,10 +1,9 @@
 "use client";
-import {jwtDecode} from "jwt-decode";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { GiSettingsKnobs } from "react-icons/gi";
-import { useRouter, usePathname } from "next/navigation"
-import Swal from "sweetalert2";
+import { redirect } from "next/navigation";
+import { useAuthContext } from "@/context/auth.context";
 
 const links = [
   { name: "Producto", href: "../../dashboard/product" },
@@ -16,42 +15,18 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [view, setView] = useState<string>("modifyProducts");
-  const [userSession, setUserSession] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [userTelefono, setUserTelefono] = useState<string | null>(null);
-  const router = useRouter();
+  const { session, authLoading } = useAuthContext();
+
 
   //! Obtener token de usuario-Session
   useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSessionString = localStorage.getItem("userSession");
-      if (userSessionString) {
-        const userSession = JSON.parse(userSessionString);
-        const accessToken = userSession.accessToken;
-        setUserSession(accessToken);
-        if (accessToken) {
-          const decodedToken: any = jwtDecode(accessToken);
-          if (decodedToken) {
-            setUserEmail(decodedToken.email);
-            setUserName(decodedToken.name);
-            setUserRole(decodedToken.roles ? decodedToken.roles[0] : null);
-            setUserTelefono(decodedToken.phone);
-          }
-        }
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Debes estar logueado para poder hacer un comentario",
-          text: "Redirigiendo a la página de inicio de sesión...",
-        }).then(() => {
-          router.push("/login");
-        });
+    if (!authLoading) {;
+      if (!session) {
+        console.log("Session no exists:");
+        redirect("/login");
       }
     }
-  }, [router]);
+  }, [authLoading, session]);
 
   return (
     <>
@@ -86,16 +61,16 @@ export default function DashboardLayout({
             <div className="bg-gray-50 p-4 rounded shadow dark:bg-gray-300">
               {/* Aquí irían los datos del usuario */}
               <p>
-                <b>Nombre:</b> {userName}
+                <b>Nombre:</b> {session?.name}
               </p>
               <p>
-                <b>Email:</b> {userEmail}
+                <b>Email:</b> {session?.email}
               </p>
               <p>
-                <b>Telefono:</b> {userTelefono}
+                <b>Telefono:</b> {session?.phone}
               </p>
               <p>
-                <b>Rol:</b> {userRole}
+                <b>Rol:</b> {session?.role}
               </p>
             </div>
           </div>

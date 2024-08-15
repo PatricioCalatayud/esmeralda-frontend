@@ -10,10 +10,8 @@ export async function getCategories(): Promise<Category[] | undefined> {
     return categories;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
-      /*throw new Error(`Failed to fetch categories: ${error.response?.status} - ${error.message}`);*/
       console.log(`Failed to fetch categories: ${error.response?.status} - ${error.message}`);
     } else {
-      /*throw new Error(`An unexpected error occurred: ${error.message}`);*/
       console.log(`An unexpected error occurred: ${error.message}`);
     }
   }
@@ -28,11 +26,8 @@ export async function getProductsByCategory(
     return products;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
-      /*throw new Error(
-        `Failed to fetch products for category "${categoryName}": ${error.response?.status} - ${error.message}`
-      );*/ console.log(`Failed to fetch products for category "${categoryName}": ${error.response?.status} - ${error.message}`);
+      console.log(`Failed to fetch products for category "${categoryName}": ${error.response?.status} - ${error.message}`);
     } else {
-      /*throw new Error(`An unexpected error occurred: ${error.message}`);*/
       console.log(`An unexpected error occurred: ${error.message}`);
     }
   }

@@ -8,7 +8,6 @@ import { FaCartPlus } from "react-icons/fa";
 import Link from "next/link";
 import { FcOk } from "react-icons/fc";
 import Spinner from "@/app/Spinner";
-import {jwtDecode} from "jwt-decode"; // Importar jwt-decode
 import Image from "next/image";
 import { IUserProps } from "@/interfaces/IUser";
 import {  getOrders } from "@/helpers/Order.helper";
@@ -22,7 +21,7 @@ const Dashboard = () => {
   const {session, token, userId, authLoading} = useAuthContext();
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading) {;
       if (!session) {
         console.log("Session no exists:");
         redirect("/login");

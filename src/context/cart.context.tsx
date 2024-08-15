@@ -1,7 +1,5 @@
 "use client"
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import {usePathname } from "next/navigation";
-
 interface CartContextType {
   cartItemCount: number;
 }

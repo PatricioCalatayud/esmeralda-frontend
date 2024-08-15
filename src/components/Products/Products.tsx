@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { getProducts } from "@/helpers/products.helper";
+import { getProducts } from "@/helpers/Products.helper";
 import { IProduct } from "@/interfaces/IProduct";
 import { Rating } from "@mui/material";
 import { IProductList } from "@/interfaces/IProductList";

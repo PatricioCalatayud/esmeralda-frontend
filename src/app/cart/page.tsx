@@ -6,12 +6,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
+import { useAuthContext } from "@/context/auth.context";
 
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
-  const [userSession, setUserSession] = useState<boolean>(true); // Aquí deberías manejar el estado de la sesión del usuario según corresponda
-
+  const { session } = useAuthContext();
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -227,13 +227,13 @@ const Cart = () => {
               <button
                 type="button"
                 className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
-                  userSession && cart.length > 0
+                  session && cart.length > 0
                     ? "bg-gray-200 hover:bg-gray-700 text-teal-600"
                     : "bg-gray-300 cursor-not-allowed text-gray-500"
                 }`}
-                disabled={!userSession || cart.length === 0}
+                disabled={!session || cart.length === 0}
                 title={
-                  !userSession
+                  !session
                     ? "Necesita estar logueado para continuar con el pago"
                     : cart.length === 0
                     ? "El carrito está vacío"

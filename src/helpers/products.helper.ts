@@ -9,7 +9,6 @@ export async function getProducts() {
     const products: IProductList[] = res.data;
     return products;
   } catch (error: any) {
-    /*throw new Error(error);*/
     console.log(error);
   }
 }
@@ -37,19 +36,15 @@ export async function getProductById(id: string) {
           const product: IProductList = res.data;
           return product;
         } else {
-          //throw new Error("No se encontró el token de acceso.");
           console.log("No se encontró el token de acceso.");
         }
       } else {
-        //throw new Error("No se encontró la sesión de usuario.");
         console.log("No se encontró la sesión de usuario.");
       }
     } else {
-      //throw new Error("El acceso al localStorage no está disponible.");
       console.log("El acceso al localStorage no está disponible.");
     }
   } catch (error: any) {
-    //throw new Error(error);
     console.log(error);
   }
 }
@@ -66,7 +61,6 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
     //const products: IProductList[] = res.data;
     //return products;
   } catch (error: any) {
-    /*throw new Error(error);*/
     console.log(error);
   }
 }

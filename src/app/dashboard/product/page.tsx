@@ -6,66 +6,35 @@ import { Pagination, Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
-import { deleteProducts, putProducts } from "@/helpers/products.helper";
+import { deleteProducts, putProducts } from "@/helpers/Products.helper";
 import { useAuthContext } from "@/context/auth.context";
-
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+import { useProductContext } from "@/context/product.context";
 
 const ProductList = () => {
-  const router = useRouter();
-  const { token } = useAuthContext();
+  const {token} = useAuthContext();
   const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState<IProductList[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const PRODUCTS_PER_PAGE = 10; // Cantidad de productos por página
-  const [loading, setLoading] = useState(true);
-
-  //! Obtener token de usuario
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSessionString = localStorage.getItem("userSession");
-      if (userSessionString) {
-
-        console.log("userToken", token);
-
-      } else {
-        Swal.fire(
-          "¡Error!",
-          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
-          "error"
-        ).then(() => {
-          router.push("/login");
-        });
-      }
-    }
-  }, [router]);
+  const {allProducts} = useProductContext();
+  const [products, setProducts] = useState<IProductList[] | undefined>([]);
 
   //! Obtener los productos
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const response = await axios.get(`${apiURL}/products`);
-        const products = response.data;
-        setProducts(products);
-        setTotalPages(Math.ceil(products.length / PRODUCTS_PER_PAGE));
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    }
-    fetchProducts();
-  }, []);
+    if (allProducts)
+        setTotalPages(Math.ceil(allProducts.length / PRODUCTS_PER_PAGE));
+        setProducts(allProducts);
+
+  }, [allProducts]);
 
   //! Función para calcular los productos a mostrar en la página actual
   const getCurrentPageProducts = () => {
     const filteredProducts = filterProducts();
     const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
     const endIndex = startIndex + PRODUCTS_PER_PAGE;
-    return filteredProducts.slice(startIndex, endIndex);
+    return filteredProducts?.slice(startIndex, endIndex);
   };
 
   //! Función para filtrar los productos
@@ -73,7 +42,7 @@ const ProductList = () => {
     if (searchTerm === "") {
       return products; // Si el campo de búsqueda está vacío, mostrar todos los productos
     } else {
-      return products.filter((product) =>
+      return products?.filter((product) =>
         product.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -119,7 +88,7 @@ const ProductList = () => {
         if (response && response.status === 200) {
           Swal.fire("¡Eliminado!", "El producto ha sido eliminado", "success");
           setProducts((prevProducts) =>
-            prevProducts.filter((product) => product.id !== id)
+            prevProducts?.filter((product) => product.id !== id)
           );
           console.log("Producto eliminado:", id);
         } else {
@@ -169,7 +138,7 @@ const ProductList = () => {
 
       console.log("Producto habilitado:", response);
       setProducts((prevProducts) =>
-        prevProducts.map((product) =>
+        prevProducts?.map((product) =>
           product.id === id ? { ...product, isAvailable: true } : product
         )
       );
@@ -203,7 +172,7 @@ const ProductList = () => {
       )
       console.log("Producto deshabilitado:", response);
       setProducts((prevProducts) =>
-        prevProducts.map((product) =>
+        prevProducts?.map((product) =>
           product.id === id ? { ...product, isAvailable: false } : product
         )
       );
@@ -290,7 +259,7 @@ const ProductList = () => {
                 </tr>
               </thead>
               <tbody>
-                {getCurrentPageProducts().map((product: IProductList) => (
+                {getCurrentPageProducts()?.map((product: IProductList) => (
                   <tr
                     key={product.id}
                     className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"

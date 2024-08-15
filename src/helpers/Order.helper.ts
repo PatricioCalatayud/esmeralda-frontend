@@ -10,7 +10,58 @@ export async function getOrders(userId: string, token: string | undefined) {
       const products: IOrders[] = response.data;
       return products;
     } catch (error: any) {
-      /*throw new Error(error);*/
       console.log(error);
     }
   }
+// verificar
+export async function getOrder(orderId: string, token: string | undefined) {
+  try {
+    const response = await axios.get(`${apiURL}/order/${orderId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+    const product: IOrders = response.data;
+    return product;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function postOrder(order: IOrders, token: string | undefined) { 
+  try {
+    const response = await axios.post(`${apiURL}/order`, order,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+    const product: IOrders = response.data;
+    return product;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function deleteOrder(orderId: string, token: string | undefined) {
+  try {
+    const response = await axios.delete(`${apiURL}/order/${orderId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+    const product: IOrders = response.data;
+    return product;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function putOrder(orderId: string, order: IOrders, token: string | undefined) {
+  try {
+    const response = await axios.put(`${apiURL}/order/${orderId}`, order,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+    const product: IOrders = response.data;
+    return product;
+  } catch (error: any) {
+    console.log(error);
+  }
+}

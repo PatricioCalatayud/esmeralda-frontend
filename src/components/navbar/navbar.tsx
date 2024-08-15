@@ -21,7 +21,7 @@ const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { searchResults: searchProductResults, searchProducts } = useProductContext();
-  const {session, handleSignOut, authLoading} = useAuthContext();
+  const {session, handleSignOut} = useAuthContext();
   const { cartItemCount } = useCartContext();
   const hideNavbar = pathname === "/login" || pathname === "/register";
 
@@ -123,11 +123,11 @@ const Navbar = () => {
       <span className="block truncate text-sm font-medium">{session.email}</span>
     </Dropdown.Header>
     {session?.role === "Administrador" ? (
-      <Dropdown.Item href="/dashboard">Dashboard de Administrador
+      <Dropdown.Item href="/dashboard">Panel de Administrador
       </Dropdown.Item>
     ) : (
 
-      <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
+      <Dropdown.Item href="/dashboardCliente">Panel de Cliente </Dropdown.Item>
     )}
     <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
   </Dropdown>
@@ -225,10 +225,10 @@ const Navbar = () => {
                 </span>
               </Dropdown.Header>
               {session?.role === "Administrador" ? (
-                <Dropdown.Item href="/dashboard/product">Dashboard de Administrador</Dropdown.Item>
+                <Dropdown.Item href="/dashboard/product">Panel de Administrador</Dropdown.Item>
               ) : (
                 <div className="flex flex-col">
-                <Dropdown.Item href="/dashboardCliente">Dashboard</Dropdown.Item>
+                <Dropdown.Item href="/dashboardCliente">Panel de cliente</Dropdown.Item>
                 <Dropdown.Item href="/tracking">Envios</Dropdown.Item>
                 </div>
               )}

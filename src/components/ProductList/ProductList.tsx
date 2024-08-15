@@ -2,11 +2,11 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Category, IProductList } from "@/interfaces/IProductList";
-import { getCategories } from "@/helpers/categories.helper";
 import { useProductContext } from "@/context/product.context";
 import Link from "next/link";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
+import { useCategoryContext } from "@/context/categories.context";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -23,11 +23,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const { searchResults } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
-  const [categories, setCategories] = useState<Category[] | undefined>([]);
-
-  useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
+  const {categories } = useCategoryContext();
 
   useEffect(() => {
     let sortedProducts = productsList || [];

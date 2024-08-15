@@ -9,9 +9,9 @@ import Swal from "sweetalert2";
 import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
 
 import { productAddValidation } from "@/utils/productAddValidation";
-import { getCategories } from "@/helpers/categories.helper";
+import { getCategories } from "@/helpers/Categories.helper";
 import { useAuthContext } from "@/context/auth.context";
-import { postProducts } from "@/helpers/products.helper";
+import { postProducts } from "@/helpers/Products.helper";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 

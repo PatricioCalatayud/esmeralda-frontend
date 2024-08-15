@@ -67,8 +67,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } catch (error) {
         console.error("Error decoding token:", error);
       }
+      setAuthLoading(false);
     }
-    setAuthLoading(false);
+    
   }, []);
   useEffect(() => {
     const someFunction = async () => {
