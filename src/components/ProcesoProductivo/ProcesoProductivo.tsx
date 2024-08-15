@@ -32,7 +32,7 @@ const ProcesoProductivo: React.FC = () => {
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
             <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/videos/cosecha.mp4" type="video/mp4" />
+              <source src="/cosecha.mp4" type="video/mp4" />
               Tu navegador no soporta la etiqueta de video.
             </video>
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
@@ -44,7 +44,7 @@ const ProcesoProductivo: React.FC = () => {
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
             <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/videos/procesamiento.mp4" type="video/mp4" />
+              <source src="/preparacion.mp4" type="video/mp4" />
               Tu navegador no soporta la etiqueta de video.
             </video>
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
@@ -56,7 +56,7 @@ const ProcesoProductivo: React.FC = () => {
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
             <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/videos/preparacion.mp4" type="video/mp4" />
+              <source src="/TomaCafe.mp4" type="video/mp4" />
               Tu navegador no soporta la etiqueta de video.
             </video>
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
