@@ -108,7 +108,7 @@ const Login = () => {
 
         Swal.fire({
           icon: "success",
-          title: "¡Bienvenido a La Esmeralda!",
+          title: "¡Bienvenido a La Esmeralda !",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -142,6 +142,7 @@ const Login = () => {
   const isDisabled = Object.values(error).some((x) => x !== "");
 
   return (
+    
     <ThemeProvider theme={theme}>
       <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
         <video

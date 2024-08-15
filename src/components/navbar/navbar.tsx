@@ -12,16 +12,18 @@ import { Dropdown } from "flowbite-react";
 import Image from "next/image";
 import { useProductContext } from '@/context/product.context';
 import { useAuthContext } from "@/context/auth.context";
+import { useCartContext } from "@/context/cart.context";
 
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const hideNavbar = pathname === "/login" || pathname === "/register";
+  
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { searchResults: searchProductResults, searchProducts } = useProductContext();
-  const {session, handleSignOut, userSession:showUser, userGoogle} = useAuthContext();
-  const [cartItemCount, setCartItemCount] = useState(0);
+  const {session, handleSignOut, userGoogle} = useAuthContext();
+  const { cartItemCount } = useCartContext();
+  const hideNavbar = pathname === "/login" || pathname === "/register";
   
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,25 +40,6 @@ const Navbar = () => {
     setNav(false);
   };
 
-  //! Función para obtener y actualizar la cantidad de elementos en el carrito
-  const updateCartItemCount = () => {
-    const cartItems = localStorage.getItem("cart");
-
-    if (cartItems) {
-      const items = JSON.parse(cartItems);
-      setCartItemCount(items.length);
-    } else {
-      setCartItemCount(0);
-    }
-  };
-
-  //! Actualizar la cantidad de elementos en el carrito
-  useEffect(() => {
-    const interval = setInterval(() => {
-      updateCartItemCount();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [cartItemCount]);
 
   if (hideNavbar) {
     return null;
@@ -199,14 +182,14 @@ const Navbar = () => {
               </span>
             )}
           </button>
-          {!showUser && (
+          {!session && (
             <Link href="/login">
               <button className="text-gray-900 font-bold">
                 Iniciar Sesion
               </button>
             </Link>
           )}
-          {showUser && (
+          {session && (
             <Dropdown
               arrowIcon={false}
               inline

@@ -20,12 +20,13 @@ export async function getProductById(id: string) {
     // Acceder al token desde el localStorage
     if (typeof window !== "undefined" && window.localStorage) {
       const userSessionString = localStorage.getItem("userSession");
-
+      
       if (userSessionString) {
         const userSession = JSON.parse(userSessionString);
         const accessToken = userSession.accessToken;
 
         if (accessToken) {
+          console.log("llegue aca?");
           // Realizar la solicitud con el token en los encabezados
           const res = await axios.get(`${apiURL}/products/${id}`, {
             headers: {
@@ -37,14 +38,18 @@ export async function getProductById(id: string) {
           return product;
         } else {
           //throw new Error("No se encontró el token de acceso.");
+          console.log("No se encontró el token de acceso.");
         }
       } else {
-        throw new Error("No se encontró la sesión de usuario.");
+        //throw new Error("No se encontró la sesión de usuario.");
+        console.log("No se encontró la sesión de usuario.");
       }
     } else {
-      throw new Error("El acceso al localStorage no está disponible.");
+      //throw new Error("El acceso al localStorage no está disponible.");
+      console.log("El acceso al localStorage no está disponible.");
     }
   } catch (error: any) {
-    throw new Error(error);
+    //throw new Error(error);
+    console.log(error);
   }
 }

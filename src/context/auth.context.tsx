@@ -15,7 +15,6 @@ import Swal from "sweetalert2";
 interface AuthContextType {
   session: ISession | undefined;
   handleSignOut: () => void;
-  userSession: boolean;
   userGoogle: boolean;
 }
 
@@ -35,7 +34,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const [session, setSession] = useState<ISession | undefined>();
   const [userGoogle, setUserGoogle] = useState(false);
-  const [userSession, setUserSession] = useState(false);
   const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
@@ -43,7 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (userSession) {
         const parsedSession = JSON.parse(userSession);
         const token = parsedSession.accessToken;
-        setUserSession(true);
         try {
         //decodifico el token
           const decodedToken: any = jwtDecode(token);
@@ -73,7 +70,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             email: session.user?.email ?? "",
             image: session.user?.image ?? "",
             role: "user"}),
-        setUserSession(true);
         setUserGoogle(true);
       } else {
         console.log("No hay sesión activa");
@@ -100,5 +96,5 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
 
-  return <AuthContext.Provider value={{session, handleSignOut, userSession, userGoogle}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{session, handleSignOut, userGoogle}}>{children}</AuthContext.Provider>;
 };
