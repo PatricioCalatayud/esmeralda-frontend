@@ -8,9 +8,9 @@ import Link from "next/link";
 import Swal from "sweetalert2";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
-import { deleteProducts, putProducts } from "@/helpers/Products.helper";
 import { useAuthContext } from "@/context/auth.context";
 import { useProductContext } from "@/context/product.context";
+import { deleteProducts, putProducts } from "@/helpers/Products.helper";
 
 const ProductList = () => {
   const {token} = useAuthContext();
