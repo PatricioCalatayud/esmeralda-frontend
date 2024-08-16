@@ -57,7 +57,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       return (
         <h1 className="text-lg font-bold animate-fade-in-up">
           <Link href="/categories">
-            <p className="hover:font-bold">Productos</p>
+            <p className="hover:font-bold">Productos  </p>
           </Link>
         </h1>
       );
