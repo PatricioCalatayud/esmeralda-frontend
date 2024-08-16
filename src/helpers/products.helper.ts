@@ -14,36 +14,16 @@ export async function getProducts() {
 }
 
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string, token: string | undefined) {
   try {
-    // Acceder al token desde el localStorage
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSessionString = localStorage.getItem("userSession");
-      
-      if (userSessionString) {
-        const userSession = JSON.parse(userSessionString);
-        const accessToken = userSession.accessToken;
-
-        if (accessToken) {
-          console.log("llegue aca?");
-          // Realizar la solicitud con el token en los encabezados
-          const res = await axios.get(`${apiURL}/products/${id}`, {
+          const res = await axios.get(`${apiURL}/products?id=${id}`, {
             headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+              Authorization: `Bearer ${token}`,
+            }, 
           });
-
+          console.log(res)
           const product: IProductList = res.data;
           return product;
-        } else {
-          console.log("No se encontró el token de acceso.");
-        }
-      } else {
-        console.log("No se encontró la sesión de usuario.");
-      }
-    } else {
-      console.log("El acceso al localStorage no está disponible.");
-    }
   } catch (error: any) {
     console.log(error);
   }

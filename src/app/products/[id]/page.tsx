@@ -12,6 +12,7 @@ import { Category, IProductList } from "@/interfaces/IProductList";
 import { createStorageOrder } from "@/helpers/StorageCart.helper";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
+import { useAuthContext } from "@/context/auth.context";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
@@ -19,12 +20,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const {token} = useAuthContext()
   const router = useRouter();
   const productId = params.id;
-
+    console.log(product);
   useEffect(() => {
     const loadProductData = async () => {
-      const fetchedProduct = await getProductById(productId);
+      const fetchedProduct = await getProductById(productId, token);
+      console.log(fetchedProduct);
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         setCategory(fetchedProduct.category);
@@ -174,6 +177,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       : category?.name === "Máquinas"
       ? []
       : ["250g", "500g", "1kg"];
+
+      console.log(product);
   return (
     <div className="container mx-auto p-4 my-32">
       <div
