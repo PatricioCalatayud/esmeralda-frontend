@@ -6,7 +6,7 @@ import Link from "next/link";
 import Swal from "sweetalert2";
 import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
-import { getCategories } from "@/helpers/Categories.helper";
+import { getCategories } from "../../../../helpers/Categories.helper";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {

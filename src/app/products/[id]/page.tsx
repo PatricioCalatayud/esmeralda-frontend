@@ -7,7 +7,7 @@ import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
 
-import { getProductById } from "@/helpers/Products.helper";
+import { getProductById } from "../../../helpers/Products.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import { createStorageOrder } from "@/helpers/StorageCart.helper";
 import { jwtDecode } from "jwt-decode";
