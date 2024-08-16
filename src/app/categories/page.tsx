@@ -1,4 +1,4 @@
-import { getProducts } from "@/helpers/Products.helper";
+import { getProducts } from "@/helpers/ProductsServices.helper";
 import ProductList from "../../components/ProductList/ProductList";
 
 export default async function ProductsPage() {

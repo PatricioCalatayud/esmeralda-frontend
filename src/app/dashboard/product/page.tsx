@@ -10,7 +10,7 @@ import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { useProductContext } from "@/context/product.context";
-//import { deleteProducts, putProducts } from "../../../helpers/Products.helper";
+//import { deleteProducts, putProducts } from "../../../helpers/ProductsServices.helper";
 
 const ProductList = () => {
   const {token} = useAuthContext();

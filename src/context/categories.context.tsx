@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { Category } from '@/interfaces/IProductList';
 
-import { getCategories } from '@/helpers/Categories.helper';
+import { getCategories } from '@/helpers/CategoriesServices.helper';
 
 interface CategoryContextType {
   categories: Category[] | undefined;

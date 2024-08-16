@@ -2,7 +2,7 @@ import ProductList from "@/components/ProductList/ProductList";
 import {
   getCategories,
   getProductsByCategory,
-} from "@/helpers/Categories.helper";
+} from "@/helpers/CategoriesServices.helper";
 
 export async function generateStaticParams() {
   const categories = await getCategories();

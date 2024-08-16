@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getCategories } from '@/helpers/Categories.helper';
+import { getCategories } from '@/helpers/CategoriesServices.helper';
 import { Category } from '@/interfaces/IProductList';
 import Image from 'next/image';
 

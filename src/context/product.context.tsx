@@ -1,7 +1,7 @@
 "use client"
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { IProductList } from '@/interfaces/IProductList';
-import { getProducts } from '@/helpers/Products.helper';
+import { getProducts } from '@/helpers/ProductsServices.helper';
 
 interface ProductContextType {
   allProducts: IProductList[] | undefined;
