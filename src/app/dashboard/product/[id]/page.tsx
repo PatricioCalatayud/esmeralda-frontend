@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Swal from "sweetalert2";
-//import { getCategories } from '@/helpers/CategoriesServices.helper';
+import { getCategories } from '@/helpers/CategoriesServices.helper';
 
 import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";

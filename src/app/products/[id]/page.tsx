@@ -7,7 +7,7 @@ import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
 
-//import { getProductById } from "../../../helpers/ProductsServices.helper";
+import { getProductById } from "../../../helpers/ProductsServices.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import { createStorageOrder } from "@/helpers/StorageCart.helper";
 import { jwtDecode } from "jwt-decode";
@@ -26,7 +26,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     console.log(product);
   useEffect(() => {
     const loadProductData = async () => {
-      /*const fetchedProduct = await getProductById(productId, token);
+      const fetchedProduct = await getProductById(productId, token);
       console.log(fetchedProduct);
       if (fetchedProduct) {
         setProduct(fetchedProduct);
@@ -45,7 +45,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         if (cartItem) {
           setQuantity(cartItem.quantity);
         }
-      }*/
+      }
       setIsLoaded(true);
     };
 

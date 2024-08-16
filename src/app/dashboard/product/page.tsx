@@ -10,7 +10,7 @@ import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { useProductContext } from "@/context/product.context";
-//import { deleteProducts, putProducts } from "../../../helpers/ProductsServices.helper";
+import { deleteProducts, putProducts } from "../../../helpers/ProductsServices.helper";
 
 const ProductList = () => {
   const {token} = useAuthContext();
@@ -80,7 +80,7 @@ const ProductList = () => {
           return;
         }
 
-        /*const response = await deleteProducts(id, token);
+        const response = await deleteProducts(id, token);
 
 
         console.log("Response data:", response);
@@ -105,7 +105,7 @@ const ProductList = () => {
             }`,
             "error"
           );
-        }*/
+        }
       } catch (error) {
         console.error("Error deleting product:", error);
         Swal.fire(
@@ -130,13 +130,13 @@ const ProductList = () => {
     }
 
     try {
-      /*const response = await putProducts(
+      const response = await putProducts(
         dataProducts ,
         id,
         token
       )
 
-      console.log("Producto habilitado:", response);*/
+      console.log("Producto habilitado:", response);
       setProducts((prevProducts) =>
         prevProducts?.map((product) =>
           product.id === id ? { ...product, isAvailable: true } : product
@@ -165,12 +165,12 @@ const ProductList = () => {
     }
 
     try {
-      /*const response = await putProducts(
+      const response = await putProducts(
         dataProducts ,
         id,
         token
-      )*/
-      /*console.log("Producto deshabilitado:", response);*/
+      )
+      console.log("Producto deshabilitado:", response);
       setProducts((prevProducts) =>
         prevProducts?.map((product) =>
           product.id === id ? { ...product, isAvailable: false } : product

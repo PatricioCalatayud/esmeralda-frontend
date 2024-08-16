@@ -8,11 +8,11 @@ import Image from "next/image";
 import Swal from "sweetalert2";
 import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
 
-//import { productAddValidation } from "@/utils/productAddValidation";
+import { productAddValidation } from "@/utils/productAddValidation";
 
 import { useAuthContext } from "@/context/auth.context";
-//import { getCategories } from "../../../helpers/CategoriesServices.helper";
-//import { postProducts } from "../../../helpers/ProductsServices.helper";
+import { getCategories } from "../../../helpers/CategoriesServices.helper";
+import { postProducts } from "../../../helpers/ProductsServices.helper";
 
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -53,7 +53,7 @@ const InsertProduct = () => {
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-      //const categories = await getCategories();
+      const categories = await getCategories();
       setCategories(categories);
     };
 
@@ -119,9 +119,9 @@ const InsertProduct = () => {
 
     try {
 
-      /*const response = await postProducts(formData, token);
+      const response = await postProducts(formData, token);
 
-      console.log("Response:", response);*/
+      console.log("Response:", response);
       console.log("Product added successfully");
 
       // Mostrar alerta de éxito
