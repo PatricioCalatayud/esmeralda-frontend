@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<IOrders[] | undefined>([]);
   const {session, token, userId, authLoading} = useAuthContext();
+  
 
   useEffect(() => {
     if (!authLoading) {;
@@ -66,38 +67,8 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-row min-h-screen dark:bg-gray-700">
-      <div className="bg-gray-900 text-teal-400 w-36 md:w-52">
-        <div className="p-1 md:p-4">
-          <h2 className="text-xl text-white font-semibold mb-4">Dashboard</h2>
-          <ul>
-            <li className="mb-2">
-              <a
-                href="/dashboardCliente"
-                className="flex flex-row items-center py-2 md:px-4 rounded hover:bg-gray-700"
-              >
-                <MdBorderColor /> &nbsp; Órdenes
-              </a>
-            </li>
-            <li className="mb-2">
-              <Link
-                href="/categories"
-                className="flex flex-row items-center py-2 md:px-4 rounded hover:bg-teal-700"
-              >
-                <IoHome /> &nbsp; Ir a la tienda
-              </Link>
-            </li>
-            <li className="mb-2">
-              <a
-                href="/cart"
-                className="flex flex-row items-center py-2 md:px-4 rounded hover:bg-teal-700"
-              >
-                <FaCartPlus />
-                &nbsp; Carrito
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+
+        
       <div className="flex-1 overflow-y-auto p-3 sm:p-5 antialiased h-screen">
         <div className="mx-auto max-w-screen-2xl px-4 lg:px-12">
           <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -109,18 +80,6 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="p-4">
-              <div className="bg-gray-50 dark:bg-gray-300 p-4 rounded shadow mb-4">
-                <p>
-                  <b>Nombre:</b> {session?.name}
-                </p>
-                <p>
-                  <b>Email:</b> {session?.email}
-                </p>
-                <p>
-                  <b>Teléfono:</b> {session?.phone}
-                </p>
-                {/* Agrega más campos si es necesario */}
-              </div>
               <h2 className="text-lg font-semibold mb-2 dark:text-white">
                 Historial de Ordenes
               </h2>

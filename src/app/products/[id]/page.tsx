@@ -18,6 +18,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [buttonSize, setButtonSize ] = useState()
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const {token} = useAuthContext()
@@ -31,7 +32,9 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         setCategory(fetchedProduct.category);
-
+        /*if(fetchedProduct.subproducts){
+            const sizes = fetchedProduct.subproducts.map()
+        }  */ 
         if (fetchedProduct.category?.name === "coffee") {
           setSelectedSize("250g");
         } else {
@@ -179,10 +182,12 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       : ["250g", "500g", "1kg"];
 
       console.log(product);
+  
+
   return (
     <div className="container mx-auto p-4 my-32">
       <div
-        className={`flex flex-col md:flex-row transition-opacity duration-1000 ${
+        className={`flex flex-col md:flex-row transition-opacity duration-1000 gap-8 ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -201,11 +206,11 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     priority={true}
     src={product.imgUrl}
     alt={product.description}
-    className="relative w-full h-96 object-contain rounded-lg"
+    className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
   />
         </div>
 
-        <div className="md:w-1/2 md:pl-8 mt-4 md:mt-0 animate-fade-in-up">
+        <div className="md:w-1/2 mt-4 md:mt-0 animate-fade-in-up">
           {renderBreadcrumb()}
           {category && (
             <h3 className="text-gray-500 mt-4 animate-fade-in-up">
@@ -220,6 +225,17 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           </p>
           {sizeOptions.length > 0 && (
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
+              {product.subproducts?.map((subproduct, index) => (
+                  <button
+                  key={index}
+                  className={`py-2 px-4 rounded-full transition-colors duration-300 
+                    bg-brown-400 text-white hover:bg-brown-500
+                  `}
+                >
+                  {`${subproduct.amount} ${subproduct.unit}`}
+                  
+                </button>
+              ))}
               {sizeOptions.map((size) => (
                 <button
                   key={size}

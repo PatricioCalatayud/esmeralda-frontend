@@ -17,6 +17,15 @@ export interface IProductList {
   tipoGrano?: string;
   quantity?: number;
   medida?: string;
+  subproducts?: ISubProduct[];
+
+}
+export interface ISubProduct {
+amount: string
+id: number
+price: string
+stock: number
+unit: string
 }
 
 export interface Category {

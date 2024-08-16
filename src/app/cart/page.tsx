@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import { faMinus, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
@@ -125,16 +127,18 @@ const Cart = () => {
 
   return (
     <div className="font-sans max-w-4xl mx-auto py-20 h-screen">
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white p-4 rounded-md">
-          <h2 className="text-2xl font-bold text-gray-900">Carrito</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Carrito</h2>
+      <div className="grid md:flex md:flex-row gap-4 mt-8">
+      
+        <div className="md:flex md:flex-row bg-white rounded-md">
+          
           <hr className="border-white my-4" />
 
           <div className="space-y-4">
             {cart.map((item, index) => (
               <div
                 key={item.article_id}
-                className="grid sm:grid-cols-3 items-center gap-4"
+                className="grid sm:grid-cols-3 items-center gap-4 border border-gray-400 rounded-2xl px-4 py-2"
               >
                 <div className="sm:col-span-2 flex items-center gap-4">
                   <div className="w-24 h-24 shrink-0 bg-white p-1 rounded-md">
@@ -143,33 +147,35 @@ const Cart = () => {
                       height={500}
                       priority={true}
                       src={item.imgUrl}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover rounded-2xl"
                       alt={item.description}
                     />
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-gray-800">
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-base font-bold text-gray-800 text-nowrap">
                       {item.description} ({item.size})
                     </h3>
-                    <h6
+                    <div
                       onClick={() => removeFromCart(index)}
-                      className="text-xs text-red-500 cursor-pointer mt-0.5"
+                      className="flex items-center text-sm font-semibold text-red-500 cursor-pointer gap-2"
                     >
+                      <FontAwesomeIcon icon={faTrash} />
                       Eliminar
-                    </h6>
-                    <div className="flex gap-4 mt-4">
+                      
+                    </div>
+                    <div className="flex gap-3 font-bold">
                       <button
-                        className="text-white bg-gray-900 w-6 h-6 font-bold justify-center items-center rounded-md mx-2"
+                        className="text-white border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md "
                         onClick={() => handleDecrease(item.article_id)}
                       >
-                        -
+                        <FontAwesomeIcon icon={faMinus} style={{width: "10px", height: "10px", color : "black"}}/>
                       </button>
                       {item.quantity || 1}
                       <button
-                        className="text-white bg-gray-900 w-6 h-6 font-bold justify-center items-center rounded-md mx-2"
+                        className="text-white border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md "
                         onClick={() => handleIncrease(item.article_id)}
                       >
-                        +
+                        <FontAwesomeIcon icon={faPlus} style={{width: "10px", height: "10px", color : "black"}}/>
                       </button>
                     </div>
                   </div>
@@ -201,28 +207,28 @@ const Cart = () => {
           </div>
         </div>
 
-        <div className="bg-brown-800 rounded-md p-4 md:sticky top-0">
-          <h2 className="text-base font-bold text-white">Resumen de compra</h2>
-
+        <div className="bg-brown-800 rounded-xl p-4 md:sticky top-0 flex flex-col justify-between">
+          <h2 className="text-xl font-bold text-white">Resumen de compra</h2>
+            
           <ul className="text-white mt-8 space-y-4">
             <li className="flex flex-wrap gap-4 text-sm">
               Subtotal{" "}
               <span className="ml-auto font-bold">${subtotal.toFixed(2)}</span>
             </li>
             {descuento > 0 && (
-              <li className="flex flex-wrap gap-4 text-sm">
+              <li className="flex flex-wrap gap-4 text-lg font-medium">
                 Descuento{" "}
                 <span className="ml-auto font-bold">
                   -${descuento.toFixed(2)}
                 </span>
               </li>
             )}
-            <li className="flex flex-wrap gap-4 text-sm font-bold">
+            <li className="flex flex-wrap gap-4 text-lg font-bold">
               Total <span className="ml-auto">${total.toFixed(2)}</span>
             </li>
           </ul>
 
-          <div className="mt-8 space-y-2">
+          <div className="mt-8 space-y-2 flex flex-col gap-2 w-80">
             <Link href="/checkout">
               <button
                 type="button"

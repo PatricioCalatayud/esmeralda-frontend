@@ -11,8 +11,8 @@ import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProduc
 import { productAddValidation } from "@/utils/productAddValidation";
 
 import { useAuthContext } from "@/context/auth.context";
-import { getCategories } from "../../../helpers/CategoriesServices.helper";
-import { postProducts } from "../../../helpers/ProductsServices.helper";
+import { getCategories } from "../../../../helpers/CategoriesServices.helper";
+import { postProducts } from "../../../../helpers/ProductsServices.helper";
 
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;

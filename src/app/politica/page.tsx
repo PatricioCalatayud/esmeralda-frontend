@@ -38,7 +38,7 @@ const DeliveryPolicy: React.FC = () => {
             </p>
           </div>
         </div>
-        <Link href="/home">
+        <Link href="/categories">
         <button className="flex mx-auto mt-16 text-white bg-teal-500 border-0 py-2 px-8 focus:outline-none hover:bg-teal-600 rounded text-lg">
           Ordenar Ahora
         </button>

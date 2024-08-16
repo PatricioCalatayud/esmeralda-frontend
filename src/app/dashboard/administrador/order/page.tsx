@@ -2,7 +2,7 @@
 import { MdEdit } from "react-icons/md";
 import { IoSearchSharp } from "react-icons/io5";
 import { RiDeleteBin6Fill, RiAddLargeFill } from "react-icons/ri";
-import { Pagination, Tooltip } from "flowbite-react";
+import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
@@ -10,6 +10,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import { IOrders } from "@/interfaces/IOrders";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -72,12 +74,15 @@ const OrderList = () => {
     const filteredOrders = filterOrders();
     const startIndex = (currentPage - 1) * ORDERS_PER_PAGE;
     const endIndex = startIndex + ORDERS_PER_PAGE;
+
     return filteredOrders.slice(startIndex, endIndex);
+    
   };
 
   //! Función para filtrar las ordenes
   const filterOrders = () => {
     if (searchTerm === "") {
+      console.log(orders);
       return orders; // Si el campo de búsqueda está vacío, mostrar todas las órdenes
     } else {
       return orders.filter((order) =>
@@ -96,11 +101,10 @@ const OrderList = () => {
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
-        <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-1 p-4 bg-gray-900">
+        <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-1 p-4 bg-gray-50 border border-gray-200 rounded-t-lg">
             <div className="flex-1 flex items-center space-x-2">
-              <h5>
-                <span className="text-green-400">Listado de Ordenes</span>
+              <h5 className="text-gray-700 font-bold text-center w-full">Listado de Ordenes
               </h5>
             </div>
             <div className="flex-shrink-0 flex flex-col items-start md:flex-row md:items-center lg:justify-end space-y-3 md:space-y-0 md:space-x-3"></div>
@@ -129,24 +133,24 @@ const OrderList = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 border-y-2 dark:text-gray-400">
                 <tr>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 ">
                     Id
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Fecha
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Precio
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     F.Delivery
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Total
                   </th>
-                  <th scope="col" className="p-4">
+                  <th scope="col" className="p-4 text-center">
                     Status
                   </th>
                 </tr>
@@ -165,21 +169,25 @@ const OrderList = () => {
                         {order.id}
                       </div>
                     </th>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                       <div className="flex justify-center items-center">
-                        {order.date}
+                      {format(new Date(order.date), "dd'-'MM'-'yyyy", {
+                locale: es,
+              })}
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                       {order.orderDetail.totalPrice}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {order.orderDetail.deliveryDate}
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                      {format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", {
+                locale: es,
+              })}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {order.orderDetail.totalPrice}
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                      $ {order.orderDetail.totalPrice}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                       {order.orderDetail.transactions[0].status}
                     </td>
                   </tr>
@@ -187,16 +195,8 @@ const OrderList = () => {
               </tbody>
             </table>
           </div>
-          <div className="flex overflow-x-auto sm:justify-center py-5 bg-gray-900">
-            <Pagination
-              layout="pagination"
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-              previousLabel="Anterior"
-              nextLabel="Siguiente"
-              showIcons
-            />
+          <div className="flex overflow-x-auto sm:justify-center py-5 ">
+          <Pagination count={totalPages} shape="rounded" />
           </div>
         </div>
       </div>
