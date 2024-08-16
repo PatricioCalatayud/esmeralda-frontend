@@ -8,11 +8,11 @@ import Image from "next/image";
 import Swal from "sweetalert2";
 import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
 
-import { productAddValidation } from "@/utils/productAddValidation";
+//import { productAddValidation } from "@/utils/productAddValidation";
 
 import { useAuthContext } from "@/context/auth.context";
-import { getCategories } from "../../../helpers/Categories.helper";
-import { postProducts } from "../../../helpers/Products.helper";
+//import { getCategories } from "../../../helpers/Categories.helper";
+//import { postProducts } from "../../../helpers/Products.helper";
 
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
