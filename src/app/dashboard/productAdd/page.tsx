@@ -53,7 +53,7 @@ const InsertProduct = () => {
   //! Obtener las categorías
   useEffect(() => {
     const fetchCategories = async () => {
-      const categories = await getCategories();
+      //const categories = await getCategories();
       setCategories(categories);
     };
 
@@ -119,9 +119,9 @@ const InsertProduct = () => {
 
     try {
 
-      const response = await postProducts(formData, token);
+      /*const response = await postProducts(formData, token);
 
-      console.log("Response:", response);
+      console.log("Response:", response);*/
       console.log("Product added successfully");
 
       // Mostrar alerta de éxito
