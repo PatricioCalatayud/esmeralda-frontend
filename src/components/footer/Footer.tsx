@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import MercadoLibreIcon from "@/components/MercadoLibreBotton/MercadoLibreBotton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AiFillInstagram} from "react-icons/ai";
