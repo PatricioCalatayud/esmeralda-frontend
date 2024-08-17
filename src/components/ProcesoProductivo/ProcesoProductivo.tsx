@@ -54,7 +54,7 @@ const ProcesoProductivo: React.FC = () => {
               Las cerezas de café se procesan para extraer los granos, que luego se secan, clasifican y empaquetan. Los granos son enviados a distintos lugares del mundo, llegando a tostadores que los preparan para su posterior infusión.
             </p>
           </div>
-          <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-l-2 border-gray-200 border-opacity-60">
+          <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 border-x-2 border-gray-200 border-opacity-60">
             <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
               <source src="/TomaCafe.mp4" type="video/mp4" />
               Tu navegador no soporta la etiqueta de video.

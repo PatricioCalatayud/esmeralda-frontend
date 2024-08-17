@@ -118,7 +118,7 @@ const Cart = () => {
             </p>
             <div className="flex justify-center">
               <Link href="/categories">
-                <button className="inline-flex text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded text-lg">
+                <button className="inline-flex text-white bg-teal-600 border-0 py-2 px-6 focus:outline-none hover:bg-teal-800 rounded text-lg">
                   Empezar a comprar
                 </button>
               </Link>

@@ -3,6 +3,8 @@ import { GrSecure } from "react-icons/gr";
 import { IoFastFood } from "react-icons/io5";
 import { GiCoffeeBeans, GiDeliveryDrone } from "react-icons/gi";
 import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleExclamation, faLock, faMugSaucer, faTruck } from "@fortawesome/free-solid-svg-icons";
 
 const Banner = () => {
   return (
@@ -21,7 +23,7 @@ const Banner = () => {
           </div>
 
           {/* sección de detalles de texto */}
-          <div className="flex flex-col justify-center gap-6 sm:pt-0">
+          <div className="flex flex-col justify-center gap-6 sm:px-0 mx-10 ">
             <h1 data-aos="fade-up" className="text-3xl sm:text-4xl font-bold">
               ¡Descubre Nuestro Café en Grano Premium!
             </h1>
@@ -35,19 +37,27 @@ const Banner = () => {
             </p>
             <div className="flex flex-col gap-4">
               <div data-aos="fade-up" className="flex items-center gap-4">
-                <GrSecure className="text-4xl h-12 w-12 shadow-sm p-4 rounded-full bg-teal-100 dark:bg-teal-400" />
+              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+              <FontAwesomeIcon icon={faLock} size="lg"/>
+              </div  >
                 <p>Calidad Garantizada</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
-                <IoFastFood className="text-4xl h-12 w-12 shadow-sm p-4 rounded-full bg-teal-100 dark:bg-teal-400" />
+              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+              <FontAwesomeIcon icon={faCircleExclamation} size="lg"/>
+              </div  >
                 <p>Servicio Rápido</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
-                <GiCoffeeBeans className="text-4xl h-12 w-12 shadow-sm p-4 rounded-full bg-teal-100 dark:bg-teal-400" />
+              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+                <FontAwesomeIcon icon={faMugSaucer} size="lg"/>
+                </div>
                 <p>Café en Grano Seleccionado</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
-                <GiDeliveryDrone className="text-4xl h-12 w-12 shadow-sm p-4 rounded-full bg-teal-100 dark:bg-teal-400" />
+                <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+              <FontAwesomeIcon icon={faTruck} size="lg"/>
+              </div  >
                 <p>Entrega Rápida</p>
               </div>
             </div>

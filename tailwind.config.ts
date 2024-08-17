@@ -21,7 +21,7 @@ module.exports = withMT({
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       boxShadow: {
-        "3xl": "0px 0px 10px #111010",
+        "3xl": "0px 0px 10px #929191",
       }
     },
   },
