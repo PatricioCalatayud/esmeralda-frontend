@@ -13,6 +13,8 @@ import { productAddValidation } from "@/utils/productAddValidation";
 import { useAuthContext } from "@/context/auth.context";
 import { getCategories } from "../../../../helpers/CategoriesServices.helper";
 import { postProducts } from "../../../../helpers/ProductsServices.helper";
+import { Spinner } from "@material-tailwind/react";
+import { useCategoryContext } from "@/context/categories.context";
 
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -20,9 +22,8 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 const InsertProduct = () => {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<Category[] | undefined>([]);
   const {token} = useAuthContext();
-  
+  const {categories, categoriesLoading} = useCategoryContext();
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
@@ -50,15 +51,6 @@ const InsertProduct = () => {
     medida: "",
   });
 
-  //! Obtener las categorías
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
-    };
-
-    fetchCategories();
-  }, []);
 
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
@@ -130,7 +122,7 @@ const InsertProduct = () => {
         title: "¡Agregado!",
         text: "El producto ha sido agregado con éxito.",
       }).then(() => {
-        router.push("../../dashboard/product");
+        router.push("../../dashboard/administrador/product");
       });
     } catch (error) {
       console.error("Error adding product:", error);
@@ -151,8 +143,16 @@ const InsertProduct = () => {
   }, [dataProduct]);
 */
   return (
-    <div className="min-h-screen flex flex-col justify-start items-center p-10 dark:bg-gray-700">
-      <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
+    categoriesLoading ? <div className="flex items-center justify-center h-screen">
+    <Spinner
+      color="teal"
+      className="h-12 w-12"
+      onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}
+    />
+  </div> :
+    <div className="min-h-screen flex flex-col justify-start items-center px-10 dark:bg-gray-700">
+      <div className="relative p-4 bg-white rounded-lg shadow-2xl dark:bg-gray-800 sm:p-5">
         <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Agregar un nuevo producto
@@ -404,7 +404,7 @@ const InsertProduct = () => {
               data-modal-toggle="createProductModal"
               type="button"
               className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-              href="../../dashboard/product"
+              href="../../dashboard/administrador/product"
             >
               <FaArrowLeft />
               &nbsp; Volver

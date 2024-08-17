@@ -14,6 +14,8 @@ import { useProductContext } from "@/context/product.context";
 import { deleteProducts, putProducts } from "../../../../helpers/ProductsServices.helper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Spinner } from "@material-tailwind/react";
+import { set } from "date-fns";
 
 const ProductList = () => {
   const {token} = useAuthContext();
@@ -23,12 +25,14 @@ const ProductList = () => {
   const PRODUCTS_PER_PAGE = 10; // Cantidad de productos por página
   const {allProducts} = useProductContext();
   const [products, setProducts] = useState<IProductList[] | undefined>([]);
+  const [loading, setLoading] = useState(true);
 
   //! Obtener los productos
   useEffect(() => {
     if (allProducts)
         setTotalPages(Math.ceil(allProducts.length / PRODUCTS_PER_PAGE));
         setProducts(allProducts);
+        setLoading(false);
 
   }, [allProducts]);
 
@@ -190,6 +194,14 @@ const ProductList = () => {
   };
 
   return (
+    loading ? <div className="flex items-center justify-center h-screen">
+    <Spinner
+      color="teal"
+      className="h-12 w-12"
+      onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}
+    />
+  </div> :
     <section className="p-1 sm:p-1 antialiased  dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">
@@ -229,7 +241,7 @@ Listado de Productos
                   id="createProductButton"
                   data-modal-toggle="createProductModal"
                   className=" gap-2 flex items-center justify-center text-white bg-teal-800 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-                  href="../../dashboard/productAdd"
+                  href="../../dashboard/administrador/productAdd"
                 >
                   <RiAddLargeFill />
                   Agregar Producto
@@ -301,7 +313,7 @@ Listado de Productos
                             data-drawer-show="drawer-update-product"
                             aria-controls="drawer-update-product"
                             className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                            href={`../../dashboard/product/${product.id}`}
+                            href={`../../dashboard/administrador/product/${product.id}`}
                           >
                             <FontAwesomeIcon icon={faPen} />
                           </Link>

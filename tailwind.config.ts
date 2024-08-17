@@ -1,5 +1,7 @@
 // import type { Config } from "tailwindcss";
 
+import shadows from "@mui/material/styles/shadows";
+
 const withMT = require("@material-tailwind/react/utils/withMT");
 
 module.exports = withMT({
@@ -18,6 +20,9 @@ module.exports = withMT({
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      boxShadow: {
+        "3xl": "0px 0px 10px #111010",
+      }
     },
   },
   plugins: [require("tailwindcss-animated")],

@@ -8,6 +8,9 @@ import { getCategories } from '@/helpers/CategoriesServices.helper';
 
 import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import Image from "next/image";
+import { FaArrowLeft } from "react-icons/fa";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
@@ -183,7 +186,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         title: "¡Actualizado!",
         text: "El producto ha sido actualizado con éxito.",
       }).then(() => {
-        router.push("../../dashboard/product");
+        router.push("../../dashboard/administrador/product");
       });
     } catch (error) {
       console.error("Error updating product:", error);
@@ -208,8 +211,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-start items-center p-10 dark:bg-gray-700">
-      <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
+    <div className="min-h-screen flex flex-col justify-start items-center px-10 dark:bg-gray-700">
+      <div className="relative p-4 bg-white rounded-lg shadow-2xl dark:bg-gray-800 sm:p-5 w-full">
         <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Editar producto
@@ -415,20 +418,50 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
           </div>
 
           <div className="sm:col-span-2">
-            <label
-              htmlFor="imgUrl"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Imagen
-            </label>
-            <input
-              type="file"
-              name="imgUrl"
-              id="imgUrl"
-              accept="image/*"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              onChange={handleImageChange}
-            />
+            
+          <div className="mb-4">
+            <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Imagen del producto
+            </span>
+            <div className="flex justify-center items-center w-full">
+              <label
+                htmlFor="dropzone-file"
+                className="flex flex-col justify-center items-center w-full h-18 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+              >
+                <div className="flex flex-col justify-center items-center pt-5 pb-6">
+                  <IoCloudUploadOutline />
+                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-semibold">
+                      Click para subir imagen
+                    </span>
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    PNG, JPG or JPGE (MAX. 800x400px)
+                  </p>
+                </div>
+                <input
+                  id="dropzone-file"
+                  type="file"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+            </div>
+
+            {imageFile && (
+              <div className="mt-4 flex justify-center">
+                <Image
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Imagen del producto"
+                  width={500} // debes especificar un ancho
+                  height={300} // y una altura
+                  className="max-w-44 h-auto"
+                />
+              </div>
+            )}
+          </div>
+
+
             {/*dataProduct.imgUrl && (
               <Image
                 width={500}
@@ -447,16 +480,17 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
           <div className="flex items-center space-x-4 mt-4">
             <button
               type="submit"
-              className="w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              className="w-full sm:w-auto justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
             >
               Actualizar producto
             </button>
             <Link
-              href="../../dashboard/product"
-              className="w-full text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 border border-gray-300 rounded-lg text-sm px-5 py-2.5 text-center"
+              href="../../dashboard/administrador/product"
+              className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
             >
               
-             Volver
+              <FaArrowLeft />
+              &nbsp; Volver
             </Link>
           </div>
         </form>

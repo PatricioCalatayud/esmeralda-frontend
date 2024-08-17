@@ -1,7 +1,5 @@
 "use client";
-import { MdEdit } from "react-icons/md";
 import { IoSearchSharp } from "react-icons/io5";
-import { RiDeleteBin6Fill, RiAddLargeFill } from "react-icons/ri";
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -12,6 +10,7 @@ import { IProductList } from "@/interfaces/IProductList";
 import { IOrders } from "@/interfaces/IOrders";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { Spinner } from "@material-tailwind/react";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -59,6 +58,7 @@ const OrderList = () => {
         console.log("orders", orders);
         setOrders(orders);
         setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching orders:", error);
         Swal.fire("¡Error!", "No se pudieron obtener las órdenes", "error");
@@ -99,6 +99,14 @@ const OrderList = () => {
   const onPageChange = (page: number) => setCurrentPage(page);
 
   return (
+    loading ? <div className="flex items-center justify-center h-screen">
+    <Spinner
+      color="teal"
+      className="h-12 w-12"
+      onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}
+    />
+  </div> :
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">

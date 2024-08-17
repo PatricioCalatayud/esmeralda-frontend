@@ -1,13 +1,22 @@
 "use client";
 
 import { useAuthContext } from "@/context/auth.context";
+import { Spinner } from "@material-tailwind/react";
 
 const Profile = () => {
 
 
-  const { session } = useAuthContext();
+  const { session, authLoading } = useAuthContext();
   //! Obtener token de usuario
   return (
+    authLoading ? <div className="flex items-center justify-center h-screen">
+    <Spinner
+      color="teal"
+      className="h-12 w-12"
+      onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}
+    />
+  </div> :
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">

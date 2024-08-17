@@ -40,15 +40,21 @@ export default function DashboardLayout({
 
   return (
     <>
-      <div className="flex flex-row min-h-screen dark:bg-gray-700">
+      <div className="flex flex-row min-h-screen dark:bg-gray-700 justify-center w-full">
         {/* Barra lateral */}
-        <div className="bg-teal-800 backdrop:w-36 md:w-80 m-4 rounded-2xl">
+        <div className="bg-teal-800 backdrop:w-36 md:w-80 m-4 rounded-2xl shadow-2xl">
           <div className="p-1 md:p-4">
             <p className="text-xl text-white font-semibold mb-4 flex items-center text-center p-2">
               <FontAwesomeIcon
                 icon={faScrewdriverWrench}
-                style={{ marginRight: "10px" }}
-              />{" "}
+                style={{ marginRight: "10px",
+                  width: "20px",
+                  height: "20px",
+                  transition: "none", }}
+                  
+
+              />
+              {" "}
               Panel de control
             </p>
             <ul className="space-y-2 pb-2 ">
@@ -76,7 +82,7 @@ export default function DashboardLayout({
         {/* Contenido principal */}
         <div className="flex-1 overflow-y-auto">
           <main>
-            <div className="p-4">{children}</div>
+            <div className="w-full p-4">{children}</div>
           </main>
         </div>
       </div>
