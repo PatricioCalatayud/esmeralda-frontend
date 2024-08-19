@@ -68,7 +68,7 @@ const Contacto: React.FC = () => {
     <div>
       <section className="text-gray-600 body-font relative">
         <div
-          className="absolute inset-0 bg-gray-300"
+          className="absolute inset-0 bg-gray-300 rounded-2xl h-[600px]"
           style={{ margin: "20px" }}
         >
           <iframe
@@ -80,7 +80,7 @@ const Contacto: React.FC = () => {
             marginWidth={0}
             title="mapa"
             scrolling="no"
-            style={{ opacity: 0.4 }}
+            style={{ opacity: 0.8, borderRadius: "16px" }}
           ></iframe>
         </div>
         <div className="container px-5 py-24 mx-auto flex">

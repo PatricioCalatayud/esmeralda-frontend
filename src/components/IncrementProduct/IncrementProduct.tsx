@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 
 const IncrementProduct: React.FC<{
+  stock: string;
   productId: string;
   initialQuantity: number;
   onQuantityChange: (quantity: number) => void;
-}> = ({ productId, initialQuantity, onQuantityChange }) => {
+}> = ({ productId, initialQuantity, onQuantityChange, stock }) => {
   const [quantity, setQuantity] = useState<number>(initialQuantity);
 
   const handleIncrease = () => {
@@ -22,17 +23,19 @@ const IncrementProduct: React.FC<{
   }, [quantity, onQuantityChange]);
 
   return (
-    <div className="flex gap-4 my-6">
+    <div className="flex gap-3 font-bold items-center">
       <button
-        className="text-white bg-gray-900 w-6 h-6 font-bold justify-center items-center rounded-md mx-2"
+        className="text-black border border-gray-600 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-none disabled:text-white"
         onClick={handleDecrease}
+        disabled={quantity === 1}
       >
         -
       </button>
       {quantity}
       <button
-        className="text-white bg-gray-900 w-6 h-6 font-bold justify-center items-center rounded-md mx-2"
+        className="text-black border border-gray-600 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-none disabled:text-white"
         onClick={handleIncrease}
+        disabled={quantity === Number(stock)}
       >
         +
       </button>

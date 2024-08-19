@@ -7,6 +7,12 @@ import { ProductProvider } from "@/context/product.context";
 import { AuthProvider } from "@/context/auth.context";
 import { CartProvider } from "@/context/cart.context";
 import { CategoryProvider } from "@/context/categories.context";
+import { Fab } from "@mui/material";
+import { MdAddIcCall } from "react-icons/md";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import Link from "next/link";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +38,13 @@ export default function RootLayout({
               <CartProvider>
                 <Navbar />
                 {children}
+                <div className="fixed bottom-6 right-6">
+                <Link href="https://api.whatsapp.com/send?phone=541158803709">
+                  <button  className="bg-primary hover:bg-teal-800 text-white rounded-full py-5 px-5 shadow-xl w-20 h-20">
+                  <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}}/>
+                  </button>
+                </Link>
+              </div>
                 <Footer />
               </CartProvider>
             </ProductProvider>

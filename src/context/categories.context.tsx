@@ -6,6 +6,7 @@ import { getCategories } from '@/helpers/CategoriesServices.helper';
 
 interface CategoryContextType {
   categories: Category[] | undefined;
+  categoriesLoading: boolean;
 }
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export const useCategoryContext = () => {
 
 export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[] | undefined>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
 
   useEffect(() => {
@@ -38,14 +40,14 @@ export const CategoryProvider: React.FC<{ children: ReactNode }> = ({ children }
         name: categoryTranslations[category.name as CategoryName] || category.name
       }));
       setCategories(translatedCategories);
-      console.log(translatedCategories);
+      setCategoriesLoading(false);
     };
   
     fetchCategory();
   }, []);
 
   return (
-    <CategoryContext.Provider value={{ categories }}>
+    <CategoryContext.Provider value={{ categories, categoriesLoading }}>
       {children}
     </CategoryContext.Provider>
   );

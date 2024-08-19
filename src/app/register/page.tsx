@@ -20,6 +20,8 @@ import { validateRegisterUserForm } from "@/utils/userFormValidation";
 import Link from "next/link";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { IconButton } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -177,7 +179,7 @@ const RegisterUser = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.6)", // Más transparente
+              backgroundColor: "rgba(255, 255, 255, 0.7)", // Más transparente
               padding: 4,
               borderRadius: 2,
               boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -271,7 +273,7 @@ const RegisterUser = () => {
                 variant="contained"
                 sx={{
                   mt: 3,
-                  mb: 2,
+                  mb: 1,
                   backgroundColor: "teal",
                   "&:hover": {
                     backgroundColor: "darkslategray", // Color teal más oscuro en hover
@@ -281,6 +283,29 @@ const RegisterUser = () => {
               >
                 {loading ? "Registrando..." : "Registrarse"}
               </Button>
+              <Link href="/" passHref>
+                    <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 1,
+                         mb: 2,
+                         backgroundColor: "transparent",
+                         "&:hover": {
+                           backgroundColor: "gray",
+                           border: "1px solid gray",
+                           color:"white"
+                         },
+                         border: "1px solid black",
+                         boxShadow: "none",
+                         color: "black",
+                       }}
+                    >
+                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
+                      Volver al Inicio
+                    </Button>
+                  </Link>
               <Button
                 onClick={handleReset}
                 fullWidth
@@ -288,23 +313,6 @@ const RegisterUser = () => {
               >
                 Borrar Formulario
               </Button>
-              <Link href="/" passHref>
-                    <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 3,
-                         mb: 2,
-                         backgroundColor: "teal",
-                         "&:hover": {
-                           backgroundColor: "darkslategray",
-                         },
-                       }}
-                    >
-                      Volver al Inicio
-                    </Button>
-                </Link>
             </Box>
           </Box>
         </Container>

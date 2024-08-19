@@ -16,7 +16,7 @@ export async function getProducts() {
 
 export async function getProductById(id: string, token: string | undefined) {
   try {
-          const res = await axios.get(`${apiURL}/products?id=${id}`, {
+          const res = await axios.get(`${apiURL}/products/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             }, 

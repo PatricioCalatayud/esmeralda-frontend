@@ -3,28 +3,37 @@ import Link from 'next/link';
 import { getCategories } from '@/helpers/CategoriesServices.helper';
 import { Category } from '@/interfaces/IProductList';
 import Image from 'next/image';
+import { useCategoryContext } from '@/context/categories.context';
+import { Spinner } from '@material-tailwind/react';
 
 function HeadlineCards() {
-  const [categories, setCategories] = useState<Category[] | undefined>([]);
+
   const [accessoriesCategoryId, setAccessoriesCategoryId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const {categories, categoriesLoading} = useCategoryContext();
+  
   useEffect(() => {
-    getCategories().then((fetchedCategories) => {
-      setCategories(fetchedCategories);
-      const accessoriesCategory = fetchedCategories?.find(category => category.name.toLowerCase() === 'accesorio');
-      if (accessoriesCategory) {
-        setAccessoriesCategoryId(accessoriesCategory.id);
-      }
-      setLoading(false); // Cambia el estado de carga a false una vez que las categorías se han obtenido
-    }).catch(error => {
-      console.error("Error fetching categories:", error);
-      setLoading(false); // Cambia el estado de carga a false en caso de error
-    });
-  }, []);
+  if (!categoriesLoading) { 
+    const accessoriesCategory = categories?.find(category => category.name.toLowerCase() === 'accesorio');
+    console.log(categories);
+    console.log(accessoriesCategory);
+    if (accessoriesCategory) {
+      setAccessoriesCategoryId(accessoriesCategory.id);
+    }
+    setLoading(false);
+  } else {
+    console.log('Categories loading...');
+  }
+}, [categoriesLoading, categories]);
 
   if (loading) {
-    return <p>Loading...</p>; // Puedes personalizar este mensaje de carga si es necesario
+    return <div className='flex items-center justify-center w-full h-72'>
+    <Spinner
+    color="teal"
+    className="h-12 w-12"
+    onPointerEnterCapture={() => {}}
+    onPointerLeaveCapture={() => {}}
+  /></div>; // Puedes personalizar este mensaje de carga si es necesario
   }
 
   return (

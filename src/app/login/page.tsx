@@ -23,6 +23,8 @@ import {signInWithGoogle} from "@/utils/singGoogle";
 import { signInWithFacebook } from "@/utils/singFacebook";
 import { useAuthContext } from "@/context/auth.context";
 import { jwtDecode } from "jwt-decode";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const theme = createTheme();
 
 const Login = () => {
@@ -178,7 +180,7 @@ const Login = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.6)",
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
                 padding: 4,
                 borderRadius: 2,
                 boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -268,7 +270,7 @@ const Login = () => {
                   variant="contained"
                   sx={{
                     mt: 3,
-                    mb: 2,
+                    mb: 1,
                     backgroundColor: "teal",
                     "&:hover": {
                       backgroundColor: "darkslategray",
@@ -277,6 +279,30 @@ const Login = () => {
                 >
                   Iniciar sesión
                 </Button>
+                  <Link href="/" passHref>
+                  <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 1,
+                         mb: 2,
+                         backgroundColor: "transparent",
+                         "&:hover": {
+                           backgroundColor: "gray",
+                           border: "1px solid gray",
+                           color:"white"
+                         },
+                         border: "1px solid black",
+                         boxShadow: "none",
+                         color: "black",
+                       }}
+                    >
+                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
+                      Volver al Inicio
+                    </Button>
+                  </Link>
+                
                 <p className="text-sm mt-8 text-center font-semibold text-gray-800">
                   ¿No tienes cuenta?{" "}
                   <a
@@ -346,25 +372,7 @@ const Login = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="mt-4">
-                  <Link href="/" passHref>
-                    <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 3,
-                         mb: 2,
-                         backgroundColor: "teal",
-                         "&:hover": {
-                           backgroundColor: "darkslategray",
-                         },
-                       }}
-                    >
-                      Volver al Inicio
-                    </Button>
-                  </Link>
-                </div>
+                
               </Box>
             </Box>
           </Container>
