@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
 import { useCategoryContext } from "@/context/categories.context";
+import categorySpanish from "@/utils/categorySpanish";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -24,7 +25,8 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
   const {categories } = useCategoryContext();
-
+  console.log(category);
+console.log(productsList);
   useEffect(() => {
     let sortedProducts = productsList || [];
     if (searchResults !== undefined && productsList !== undefined) {
@@ -81,7 +83,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       <h1 className="text-2xl mb-4 lg:mb-0">
         <Link href="/categories">Productos</Link>
         {" / "}
-        <span className="font-bold">{category.name}</span>
+        <span className="font-bold">{categorySpanish(category.name)|| category.name} </span>
       </h1>
     );
   };
