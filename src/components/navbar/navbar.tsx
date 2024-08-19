@@ -62,7 +62,7 @@ const Navbar = () => {
             <AiOutlineMenu
               onClick={() => setNav(!nav)}
               size={30}
-              className="mr-2 cursor-pointer sm:hidden"
+              className="mr-2 cursor-pointer lg:hidden"
             />
             <Link href="/" className="flex items-center text-gray-900">
               <div className="w-20 h-25 text-white p-2 md:w-16 md:h-20">
@@ -152,7 +152,7 @@ const Navbar = () => {
             )}
           </div>
         </div>
-        <nav className="hidden md:flex md:ml-auto md:mr-auto flex-wrap items-center text-base justify-center gap-5 mx-5">
+        <nav className="hidden lg:flex xl:ml-auto xl:mr-auto flex-wrap items-center text-base justify-center gap-5 mx-2">
           <Link
             href="/categories"
             className={` hover:text-gray-900 ${
@@ -340,7 +340,7 @@ const Navbar = () => {
       {searchProductResults !== undefined &&
         searchProductResults.length > 0 &&
         searchTerm && (
-          <div className="absolute top-20 right-40 z-50  shadow-xl w-1/3 bg-white flex flex-col rounded-lg justify-end border border-gray-300">
+          <div className="absolute sm:top-20 top-24 sm:right-40 right-0 z-50 sm:w-1/2 w-full shadow-xl lg:w-1/3 bg-white flex flex-col rounded-lg justify-end border border-gray-300">
             {searchProductResults?.map((product: any) => (
               <Link
                 href={`/products/${product.id}`}
