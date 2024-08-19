@@ -11,14 +11,19 @@ import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import { FaArrowLeft } from "react-icons/fa";
+import { useCategoryContext } from "@/context/categories.context";
+import { putProducts } from "@/helpers/ProductsServices.helper";
+import { useAuthContext } from "@/context/auth.context";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<Category[] | undefined>([]);
 
+  
+  const {categories} = useCategoryContext();
+  const {token} = useAuthContext();
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
 
     description: "",
@@ -97,14 +102,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     fetchProduct();
   }, [params.id]);
 
-  //! Obtener categorias  -----OK
-  useEffect(() => {
-    const fetchCategories = async () => {
-      //const categories = await getCategories();
-      setCategories(categories);
-    };
-    fetchCategories();
-  }, []);
+
 
   //! Actualizar campos del producto
   const handleChange = (
@@ -162,22 +160,16 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         formData.append("file", imageFile);
       }
       console.log("formData", formData);
-      const response = await fetch(
-        `${apiURL}/products/${params.id}`,
-        {
-          method: "PUT",
-
-          body: formData,
-        }
-      );
+      console.log("token", token);
+      const response = putProducts( formData,params.id,token);
 
       
 
-      if (!response.ok) {
+      /*if (response.status !== 200) {
         throw new Error("Failed to update product");
-      }
+      }*/
 
-      const updatedProduct = await response.json();
+      const updatedProduct = await response;
       console.log("Product updated successfully:", updatedProduct);
 
       // Mostrar alerta de éxito
@@ -186,7 +178,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         title: "¡Actualizado!",
         text: "El producto ha sido actualizado con éxito.",
       }).then(() => {
-        router.push("../../dashboard/administrador/product");
+        //router.push("../administrador/product");
       });
     } catch (error) {
       console.error("Error updating product:", error);
