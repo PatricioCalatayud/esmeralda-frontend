@@ -86,7 +86,7 @@ const Navbar = () => {
                 onChange={handleSearchChange}
               />
               <AiOutlineSearch
-                size={20}
+                style={{width: "20px", height: "20px"}}
                 className="absolute left-2 text-gray-600"
               />
             </div>
@@ -340,7 +340,7 @@ const Navbar = () => {
       {searchProductResults !== undefined &&
         searchProductResults.length > 0 &&
         searchTerm && (
-          <div className="absolute top-16 left-0 right-0 z-50 bg-white shadow-md">
+          <div className="absolute top-20 right-40 z-50  shadow-xl w-1/3 bg-white flex flex-col rounded-lg justify-end border border-gray-300">
             {searchProductResults?.map((product: any) => (
               <Link
                 href={`/products/${product.id}`}
@@ -359,7 +359,7 @@ const Navbar = () => {
                 </div>
               </Link>
             ))}
-          </div>
+            </div>
         )}
 
       {nav && (

@@ -81,10 +81,10 @@ const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
       <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-1 p-4 bg-gray-50 border border-gray-200 rounded-t-lg">
-          <div className="flex-1 flex items-center space-x-2">
-                <h5 className="text-teal-400">Historial de Ordenes
-                </h5>
-              </div>
+        <div className="flex-1 flex items-center space-x-2">
+              <h5 className="text-gray-700 font-bold text-center w-full">Listado de Ordenes
+              </h5>
+            </div>
               <div className="flex-shrink-0 flex flex-col items-start md:flex-row md:items-center lg:justify-end space-y-3 md:space-y-0 md:space-x-3"></div>
             </div>
             <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">

@@ -7,8 +7,7 @@ import { MdFacebook } from "react-icons/md";
 import Container from "@/components/container/Container";
 import FooterList from "./FooterList";
 import { useCategoryContext } from "@/context/categories.context";
-import Image from "next/image";
-import mpIcon from "/mercado-libre-svgrepo-com.svg"
+import MercadoPagoIcon from "./MercadoPagoIcon"
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
@@ -139,7 +138,7 @@ const Footer: React.FC = () => {
               </Link>
              
               <Link href={"https://listado.mercadolibre.com.ar/_CustId_510408628?item_id=MLA1670664876&category_id=MLA409413&seller_id=510408628&client=recoview-selleritems&recos_listing=true"}>
-              <Image src={mpIcon } alt="Mercado Libre" width={28} height={28} />
+              <MercadoPagoIcon  />
               </Link>
             </div>
           </FooterList>
