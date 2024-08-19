@@ -22,8 +22,9 @@ export default async function ProductsPage({
   const categories = await getCategories();
   const category =
     categories?.find((cat) => cat.id === selectedCategory) || null;
-  const productsList = await getProductsByCategory(category?.name || "");
-  console.log(productsList);
+    
+  const productsList = await getProductsByCategory(category?.name || "Coffee");
+
 
   return (
     <ProductList
