@@ -11,7 +11,7 @@ import MercadoPagoIcon from "./MercadoPagoIcon"
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
-  const hideFooter = pathname === "/login" || pathname === "/register" ||  /^\/dashboard(\/|$)/.test(pathname) ||  /^\/dashboardCliente(\/|$)/.test(pathname); // Ocultar footer en login y register
+  const hideFooter = pathname === "/login" || pathname === "/register" ||  /^\/dashboard(\/|$)/.test(pathname) ||  /^\/dashboardCliente(\/|$)/.test(pathname) ||  pathname === "/forgotPassword" ||  pathname === "/resetPassword"; // Ocultar footer en login y register
   const [footerHeight, setFooterHeight] = useState("600px");
   const [flexDirection, setFlexDirection] = useState<"row" | "column">("row");
   const [backgroundStyle, setBackgroundStyle] = useState<React.CSSProperties>({});
