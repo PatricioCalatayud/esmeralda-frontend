@@ -25,8 +25,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
   const {categories } = useCategoryContext();
-  console.log(category);
-console.log(productsList);
+
   useEffect(() => {
     let sortedProducts = productsList || [];
     if (searchResults !== undefined && productsList !== undefined) {
@@ -63,6 +62,8 @@ console.log(productsList);
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
+    } else if (id=== "promociones") {
+      router.push(`/promociones`);
     } else {
       router.push(`/categories/${id}`);
     }
@@ -97,7 +98,7 @@ console.log(productsList);
         <Dropdown
           arrowIcon={false}
           label={
-            <div className="flex justify-between w-[200px] md:w-[400px]" id="custom-dropdown-button">
+            <div className="flex justify-between w-[300px] md:w-[400px]" id="custom-dropdown-button">
               <span>Filtrar</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +119,9 @@ console.log(productsList);
             border: "1px solid white",
             backgroundColor: "#00695c",
             outline: 'none',
+            
           }}
+
         >
           <Dropdown.Item onClick={() => setFilterOption("price-asc")} className="md:w-[400px]">
             Ordenar por precio: Menor a Mayor
@@ -135,12 +138,13 @@ console.log(productsList);
         </Dropdown>
       </div>
 
-      <div className="flex flex-col lg:flex-row ">
+      <div className="flex flex-col lg:flex-row m-10">
         {/* Sidebar de categorías */}
-        <div className="w-full lg:w-1/4 p-4 lg:ml-24 px-16 lg:px-0">
-          <h2 className="text-lg font-bold mb-4 text-gray-400">Categorías</h2>
-          <ul>
-            <li className="mb-2">
+        <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600  rounded-xl lg:mr-10 mr-0">
+          <h2 className="text-lg font-bold mb-4 text-gray-600">Categorías</h2>
+          <hr className="border-teal-600"/>
+          <ul className="mt-4 flex flex-col gap-2">
+            <li >
               <button
                 onClick={() => handleCategoryChange(null)}
                 className={`text-lg ${
@@ -151,9 +155,22 @@ console.log(productsList);
               >
                 Todo
               </button>
+              
             </li>
+            <li>
+            <button
+                onClick={() => handleCategoryChange("promociones")}
+                className={`text-lg ${
+                  selectedCategory === "promociones"
+                    ? "font-bold text-teal-800"
+                    : "text-teal-600"
+                }`}
+              >
+                Promociones
+              </button>
+              </li>
             {categories?.map((cat) => (
-              <li key={cat.id} className="mb-2">
+              <li key={cat.id} >
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`text-lg ${
@@ -170,9 +187,9 @@ console.log(productsList);
         </div>
 
         {/* Contenido principal */}
-        <div className="w-full lg:w-3/4 p-4">
+        <div className="w-full lg:w-3/4  my-10 lg:my-0">
           {filteredProducts && filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8  px-12 lg:px-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id

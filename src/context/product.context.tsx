@@ -7,6 +7,8 @@ interface ProductContextType {
   allProducts: IProductList[] | undefined;
   searchResults: IProductList[] | undefined;
   searchProducts: (searchTerm: string) => void;
+  productsPromotions: IProductList[] | undefined;
+  productLoading: boolean;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -22,14 +24,22 @@ export const useProductContext = () => {
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [allProducts, setAllProducts] = useState<IProductList[] | undefined>([]);
   const [searchResults, setSearchResults] = useState<IProductList[] | undefined>([]);
+  const [productsPromotions, setProductsPromotions] = useState<IProductList[] | undefined>([]);
+  const [productLoading, setProductLoading] = useState(true);
   console.log(allProducts);
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();
       setAllProducts(products);
+      if (products) {
+      const productsWithDiscount = products.filter(product => parseFloat(product.discount) > 0);
+      setProductsPromotions(productsWithDiscount);
+    }
+      setProductLoading(false);
     };
 
     fetchProducts();
+
   }, []);
 
   const searchProducts = (searchTerm: string) => {
@@ -44,7 +54,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   return (
-    <ProductContext.Provider value={{ allProducts, searchResults, searchProducts }}>
+    <ProductContext.Provider value={{ allProducts, searchResults, searchProducts , productsPromotions, productLoading}}>
       {children}
     </ProductContext.Provider>
   );

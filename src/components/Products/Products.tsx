@@ -38,12 +38,12 @@ const Products = () => {
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 place-items-center gap-4 px-10">
           {products?.map((product: IProductList) => (
-            <Link href={`/categories/${product.id}`} key={product.id} className="shadow-lg bg-blue-gray-50 rounded-lg  sm:w-[200px] w-full">
+            <Link href={`/categories/${product.id}`} key={product.id} className="shadow-lg bg-blue-gray-50 rounded-lg   w-full">
               <Image
                 priority={true} width={500} height={500}
                 src={product.imgUrl}
                 alt={product.description}
-                className="h-[260px] sm:w-[200px] object-cover rounded-t-md w-full"
+                className="h-[260px] w-full object-cover rounded-t-md "
               />
               <div className="product-item text-center">
                 
