@@ -317,7 +317,7 @@ const RegisterUser = () => {
           </Box>
         </Container>
       </div>
-      <div className="absolute top-1 left-1">
+      <div className="absolute bottom-1 left-1">
         <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
       </div>
     </div><ToastContainer /></>

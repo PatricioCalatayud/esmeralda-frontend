@@ -34,7 +34,7 @@ const Navbar = () => {
     useProductContext();
   const { session, handleSignOut } = useAuthContext();
   const { cartItemCount } = useCartContext();
-  const hideNavbar = pathname === "/login" || pathname === "/register";
+  const hideNavbar = pathname === "/login" || pathname === "/register" || pathname === "/forgotPassword" || pathname === "/resetPassword";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;

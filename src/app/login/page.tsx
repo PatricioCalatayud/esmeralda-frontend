@@ -256,13 +256,12 @@ const Login = () => {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a
-                      href="#"
-                      className="text-teal-600 font-semibold hover:underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </a>
-                  </div>
+  <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
+    
+      ¿Olvidaste tu contraseña?
+    
+  </Link>
+</div>
                 </div>
                 <Button
                   type="submit"
@@ -379,7 +378,7 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
-      <div className="absolute bottom-1 right-1 hidden md:block">
+      <div className="absolute bottom-1 left-1 hidden md:block">
         <Image
           src="/logoblanco.png"
           alt="Logo"

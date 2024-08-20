@@ -100,11 +100,12 @@ const Testimonials: React.FC = () => {
               <div key={data.id} className="px-4">
                 <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative">
                   <div className="mb-4 flex justify-center">
-                    <Image priority={true} width={500} height={500}
+                    <img
                       src={getAvatarUrl(data.user.id)}
                       alt={`Avatar of ${data.user.name}`}
                       className="rounded-full w-20 h-20 shadow-lg bg-gray-200"
-                    />
+
+                  />
                   </div>
                   <div className="flex flex-col items-center gap-4">
                     <div className="space-y-3 text-center">
