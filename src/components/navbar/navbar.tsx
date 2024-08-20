@@ -96,7 +96,7 @@ const Navbar = () => {
             >
               <FontAwesomeIcon icon={faCartShopping} size="xl" />
               {cartItemCount > 0 && (
-                <span className="bg-teal-800 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
+                <span className="bg-red-500 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
                   {cartItemCount}
                 </span>
               )}
@@ -140,14 +140,16 @@ const Navbar = () => {
                 </Dropdown.Header>
                 {session?.role === "Administrador" ? (
                   <Dropdown.Item href="/dashboard/administrador/profile">
+                    <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
                     Panel de Administrador
                   </Dropdown.Item>
                 ) : (
                   <Dropdown.Item href="/dashboard/cliente/profile">
-                    Panel de Cliente{" "}
+                    <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
+                    Panel de Cliente
                   </Dropdown.Item>
                 )}
-                <Dropdown.Item onClick={handleSignOut}>Salir</Dropdown.Item>
+                <Dropdown.Item onClick={handleSignOut}><FontAwesomeIcon icon={faXmark} style={{ marginRight: "5px" }} size="xl"/>Salir</Dropdown.Item>
               </Dropdown>
             )}
           </div>
@@ -161,16 +163,6 @@ const Navbar = () => {
           >
             Tienda Online
           </Link>
-          {session?.role === "admin" && (
-            <Link
-              href="/dashboard/administrador/profile"
-              className={` hover:text-gray-900 ${
-                pathname === "/dashboard/administrador/profile" && "text-gray-900 font-bold"
-              }`}
-            >
-              Admin Dashboard
-            </Link>
-          )}
           <Dropdown
             arrowIcon={true}
             inline
@@ -220,9 +212,9 @@ const Navbar = () => {
             </Link>
           )}
           <Link
-            href="/promotions"
+            href="/promociones"
             className={` hover:text-gray-900 ${
-              pathname === "/promotions" && "text-gray-900 font-bold"
+              pathname === "/promociones" && "text-gray-900 font-bold"
             }`}
           >
             Promociones
@@ -427,9 +419,9 @@ const Navbar = () => {
             </li>
             <li className="text-xl py-4 flex">
               <Link
-                href="/promotions"
+                href="/promociones"
                 className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/promotions" ? "text-orange-400 font-bold" : ""
+                  pathname === "/promociones" ? "text-orange-400 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >

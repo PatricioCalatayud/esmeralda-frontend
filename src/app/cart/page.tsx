@@ -239,7 +239,7 @@ const Cart = () => {
             </li>
           </ul>
           </div>
-          <div className="mt-8 space-y-2 flex flex-col gap-2 w-80 p-4">
+          <div className="mt-8 space-y-2 flex flex-col gap-2 lg:w-80 p-4 w-full">
             <Link href="/checkout">
               <button
                 type="button"

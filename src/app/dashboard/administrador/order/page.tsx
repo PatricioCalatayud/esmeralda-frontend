@@ -153,13 +153,13 @@ const OrderList = () => {
                     Precio
                   </th>
                   <th scope="col" className="p-4 text-center">
-                    F.Delivery
+                    Fecha de entrega
                   </th>
                   <th scope="col" className="p-4 text-center">
                     Total
                   </th>
                   <th scope="col" className="p-4 text-center">
-                    Status
+                    Estado
                   </th>
                 </tr>
               </thead>
@@ -195,7 +195,7 @@ const OrderList = () => {
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                       $ {order.orderDetail.totalPrice}
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                    <td className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${order.orderDetail.transactions[0].status === "Recibido" ? "text-teal-500" : "text-red-500"} `}>
                       {order.orderDetail.transactions[0].status}
                     </td>
                   </tr>
