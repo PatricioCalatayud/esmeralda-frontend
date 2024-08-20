@@ -1,7 +1,7 @@
 import { signIn, signOut, getSession } from "next-auth/react";
 
 const signInWithGoogle = async() => {
-    await signIn("google",{ redirectTo: "/" })
+    await signIn("google",{  callbackUrl: "/"  })
   };
 
 const signOutWithGoogle = async() => {

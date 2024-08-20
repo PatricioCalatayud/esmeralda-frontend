@@ -1,20 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
+import { postMarketPay } from "@/helpers/MarketPay.helper";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
   locale: "es-AR",
 });
 
 const Checkout = () => {
-  const apiURL = process.env.NEXT_PUBLIC_API_URL;
-  const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
@@ -39,11 +36,9 @@ const Checkout = () => {
           unit_price: Number(item.price),
         }));
 
-        const response = await axios.post(`${apiURL}/market-pay/url-proccess`, {
-          items,
-        });
+        const response = await postMarketPay(items);
 
-        const { id } = response.data;
+        const { id } = response;
         setPreferenceId(id);
       } catch (error) {
         console.error("Error creating payment preference:", error);
@@ -101,15 +96,16 @@ const Checkout = () => {
       <div className="max-w-7xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 max-lg:order-1 p-6 max-w-4xl mx-auto w-full">
-            {preferenceId && <MercadoPagoButton preferenceId={preferenceId} />}
+            {preferenceId ? <MercadoPagoButton preferenceId={preferenceId} /> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
           </div>
 
           {/* Mis pedidos */}
-          <div className="lg:col-span-1 md:col-span-2 lg:h-auto lg:sticky lg:top-0 lg:overflow-y-auto flex flex-col">
-            <div className="flex-1 p-8 bg-green-500 rounded-t-xl sticky top-0 z-20">
-              <h2 className="text-2xl font-extrabold text-white">
+          <div className="lg:col-span-1 md:col-span-2 lg:h-auto lg:sticky lg:top-0 lg:overflow-y-auto flex flex-col  px-10 lg:px-0">
+            <div className="flex-1 p-8 bg-teal-600 rounded-t-xl sticky top-0 shadow-2xl">
+              <h2 className="text-2xl font-bold text-white w-full text-center">
                 Mis Pedidos
               </h2>
+              <hr  className="my-6"/>
               <div className="space-y-6 mt-10">
                 {cart.map((item) => (
                   <div
@@ -121,12 +117,12 @@ const Checkout = () => {
                         width={500}
                         height={500}
                         src={item.imgUrl}
-                        className="w-40 h-full rounded-xl"
+                        className="w-40 h-40 object-cover rounded-xl "
                         alt={item.description}
                       />
                     </div>
                     <div className="sm:col-span-1">
-                      <h3 className="text-base text-white font-bold">
+                      <h3 className="text-base text-white font-bold ">
                         {item.description}
                       </h3>
                       <ul className="text-xs text-white space-y-2 mt-2">
@@ -165,15 +161,24 @@ const Checkout = () => {
                 ))}
               </div>
             </div>
-            <div className="bg-green-800 p-4">
-              <h4 className="text-base text-black font-bold">
-                Envío: ${shippingCost.toFixed(2)}
+            <div className="bg-teal-800 py-4 px-8 rounded-b-xl gap-6 flex flex-col">
+              <div className="flex justify-between">
+              <h4 className="text-base text-white font-semibold">
+                Envío:
               </h4>
-            </div>
-            <div className="bg-green-800 p-4 rounded-b-xl">
-              <h4 className="text-base text-black font-bold">
-                Total: ${(totalConDescuento + shippingCost).toFixed(2)}
+              <h4 className="text-base text-white font-semibold">
+                ${shippingCost.toFixed(2)}
               </h4>
+              </div>
+              <hr />
+              <div className="flex justify-between">
+              <h4 className="text-lg text-white font-bold">
+                Total: 
+              </h4>
+              <h4 className="text-lg text-white font-bold">
+                ${(totalConDescuento + shippingCost).toFixed(2)}
+              </h4>
+              </div>
             </div>
           </div>
         </div>

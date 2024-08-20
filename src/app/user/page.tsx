@@ -2,7 +2,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { NewUser } from "@/helpers/Autenticacion.helper";
-import { IUserErrorProps, IUserProps } from "@/types/user";
+import { IUserProps } from "@/interfaces/IUser";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
 
 import { useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ const RegisterUser = () => {
     phone: "",
   };
 
-  const initialErrorState: IUserErrorProps = {
+  const initialErrorState: IUserProps = {
     name: "",
     email: "",
     password: "",
@@ -26,10 +26,10 @@ const RegisterUser = () => {
   };
 
   const [dataUser, setDataUser] = useState<IUserProps>(initialUserData);
-  const [error, setError] = useState<IUserErrorProps>(initialErrorState);
+  const [error, setError] = useState<IUserProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<Record<keyof IUserErrorProps, boolean>>({
+  const [touched, setTouched] = useState<Record<keyof IUserProps, boolean>>({
     name: false,
     email: false,
     password: false,
@@ -45,7 +45,7 @@ const RegisterUser = () => {
       [name]: value,
     }));
 
-    if (!touched[name as keyof IUserErrorProps]) {
+    if (!touched[name as keyof IUserProps]) {
       setTouched((prevTouched) => ({
         ...prevTouched,
         [name]: true,
@@ -60,7 +60,7 @@ const RegisterUser = () => {
 
     setError((prevError) => ({
       ...prevError,
-      [name]: fieldErrors[name as keyof IUserErrorProps] || "", // Asegurar que siempre se asigna un string
+      [name]: fieldErrors[name as keyof IUserProps] || "", // Asegurar que siempre se asigna un string
     }));
   };
 

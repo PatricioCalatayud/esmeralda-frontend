@@ -15,11 +15,13 @@ import Image from "next/image"; // Importación del componente Image
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { NewUser } from "@/helpers/Autenticacion.helper";
-import { IUserErrorProps, IUserProps } from "@/types/user";
+import { IUserProps } from "@/interfaces/IUser";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
 import Link from "next/link";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { IconButton } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -31,7 +33,7 @@ const RegisterUser = () => {
     phone: "",
   };
 
-  const initialErrorState: IUserErrorProps = {
+  const initialErrorState: IUserProps = {
     name: "",
     email: "",
     password: "",
@@ -39,10 +41,10 @@ const RegisterUser = () => {
   };
 
   const [dataUser, setDataUser] = useState<IUserProps>(initialUserData);
-  const [error, setError] = useState<IUserErrorProps>(initialErrorState);
+  const [error, setError] = useState<IUserProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<Record<keyof IUserErrorProps, boolean>>({
+  const [touched, setTouched] = useState<Record<keyof IUserProps, boolean>>({
     name: false,
     email: false,
     password: false,
@@ -70,7 +72,7 @@ const RegisterUser = () => {
       [name]: value,
     }));
 
-    if (!touched[name as keyof IUserErrorProps]) {
+    if (!touched[name as keyof IUserProps]) {
       setTouched((prevTouched) => ({
         ...prevTouched,
         [name]: true,
@@ -85,7 +87,7 @@ const RegisterUser = () => {
 
     setError((prevError) => ({
       ...prevError,
-      [name]: fieldErrors[name as keyof IUserErrorProps] || "", // Asegurar que siempre se asigna un string
+      [name]: fieldErrors[name as keyof IUserProps] || "", // Asegurar que siempre se asigna un string
     }));
   };
 
@@ -177,7 +179,7 @@ const RegisterUser = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.6)", // Más transparente
+              backgroundColor: "rgba(255, 255, 255, 0.7)", // Más transparente
               padding: 4,
               borderRadius: 2,
               boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -271,7 +273,7 @@ const RegisterUser = () => {
                 variant="contained"
                 sx={{
                   mt: 3,
-                  mb: 2,
+                  mb: 1,
                   backgroundColor: "teal",
                   "&:hover": {
                     backgroundColor: "darkslategray", // Color teal más oscuro en hover
@@ -281,6 +283,29 @@ const RegisterUser = () => {
               >
                 {loading ? "Registrando..." : "Registrarse"}
               </Button>
+              <Link href="/" passHref>
+                    <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 1,
+                         mb: 2,
+                         backgroundColor: "transparent",
+                         "&:hover": {
+                           backgroundColor: "gray",
+                           border: "1px solid gray",
+                           color:"white"
+                         },
+                         border: "1px solid black",
+                         boxShadow: "none",
+                         color: "black",
+                       }}
+                    >
+                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
+                      Volver al Inicio
+                    </Button>
+                  </Link>
               <Button
                 onClick={handleReset}
                 fullWidth
@@ -288,28 +313,11 @@ const RegisterUser = () => {
               >
                 Borrar Formulario
               </Button>
-              <Link href="/" passHref>
-                    <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 3,
-                         mb: 2,
-                         backgroundColor: "teal",
-                         "&:hover": {
-                           backgroundColor: "darkslategray",
-                         },
-                       }}
-                    >
-                      Volver al Inicio
-                    </Button>
-                </Link>
             </Box>
           </Box>
         </Container>
       </div>
-      <div className="absolute top-1 left-1">
+      <div className="absolute bottom-1 left-1">
         <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
       </div>
     </div><ToastContainer /></>

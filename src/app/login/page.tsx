@@ -1,6 +1,6 @@
 "use client";
 import { LoginUser } from "@/helpers/Autenticacion.helper";
-import { ILoginErrorProps, ILoginProps } from "@/types/login";
+import { ILoginErrorProps, ILoginProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
@@ -21,6 +21,10 @@ import { IconButton } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import {signInWithGoogle} from "@/utils/singGoogle";
 import { signInWithFacebook } from "@/utils/singFacebook";
+import { useAuthContext } from "@/context/auth.context";
+import { jwtDecode } from "jwt-decode";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const theme = createTheme();
 
 const Login = () => {
@@ -46,6 +50,7 @@ const Login = () => {
     password: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const{setSession} = useAuthContext();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -101,6 +106,18 @@ const Login = () => {
     try {
       const response = await LoginUser(dataUser);
 
+      if (response) {
+        const decodedToken: any = jwtDecode(response.accessToken as string);
+        setSession({
+          name: decodedToken.name,
+          email: decodedToken.email,
+          image: undefined,
+          role: decodedToken.roles[0],
+          phone: decodedToken.phone,
+        })
+      }
+      
+      
       console.log(response);
 
       if (response) {
@@ -108,7 +125,7 @@ const Login = () => {
 
         Swal.fire({
           icon: "success",
-          title: "¡Bienvenido a La Esmeralda!",
+          title: "¡Bienvenido a La Esmeralda !",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -142,6 +159,7 @@ const Login = () => {
   const isDisabled = Object.values(error).some((x) => x !== "");
 
   return (
+    
     <ThemeProvider theme={theme}>
       <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
         <video
@@ -162,7 +180,7 @@ const Login = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.6)",
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
                 padding: 4,
                 borderRadius: 2,
                 boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -238,13 +256,12 @@ const Login = () => {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a
-                      href="#"
-                      className="text-teal-600 font-semibold hover:underline"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </a>
-                  </div>
+  <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
+    
+      ¿Olvidaste tu contraseña?
+    
+  </Link>
+</div>
                 </div>
                 <Button
                   type="submit"
@@ -252,7 +269,7 @@ const Login = () => {
                   variant="contained"
                   sx={{
                     mt: 3,
-                    mb: 2,
+                    mb: 1,
                     backgroundColor: "teal",
                     "&:hover": {
                       backgroundColor: "darkslategray",
@@ -261,6 +278,30 @@ const Login = () => {
                 >
                   Iniciar sesión
                 </Button>
+                  <Link href="/" passHref>
+                  <Button
+                       type="submit"
+                       fullWidth
+                       variant="contained"
+                       sx={{
+                         mt: 1,
+                         mb: 2,
+                         backgroundColor: "transparent",
+                         "&:hover": {
+                           backgroundColor: "gray",
+                           border: "1px solid gray",
+                           color:"white"
+                         },
+                         border: "1px solid black",
+                         boxShadow: "none",
+                         color: "black",
+                       }}
+                    >
+                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
+                      Volver al Inicio
+                    </Button>
+                  </Link>
+                
                 <p className="text-sm mt-8 text-center font-semibold text-gray-800">
                   ¿No tienes cuenta?{" "}
                   <a
@@ -330,32 +371,14 @@ const Login = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="mt-4">
-                  <Link href="/" passHref>
-                    <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 3,
-                         mb: 2,
-                         backgroundColor: "teal",
-                         "&:hover": {
-                           backgroundColor: "darkslategray",
-                         },
-                       }}
-                    >
-                      Volver al Inicio
-                    </Button>
-                  </Link>
-                </div>
+                
               </Box>
             </Box>
           </Container>
         </div>
         <ToastContainer />
       </div>
-      <div className="absolute bottom-1 right-1 hidden md:block">
+      <div className="absolute bottom-1 left-1 hidden md:block">
         <Image
           src="/logoblanco.png"
           alt="Logo"

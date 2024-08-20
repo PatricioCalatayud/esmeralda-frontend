@@ -2,11 +2,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Category, IProductList } from "@/interfaces/IProductList";
-import { getCategories } from "@/helpers/categories.helper";
 import { useProductContext } from "@/context/product.context";
 import Link from "next/link";
 import { Dropdown } from "flowbite-react";
 import Image from "next/image";
+import { useCategoryContext } from "@/context/categories.context";
+import categorySpanish from "@/utils/categorySpanish";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -23,11 +24,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const { searchResults } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
-  const [categories, setCategories] = useState<Category[] | undefined>([]);
-
-  useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
+  const {categories } = useCategoryContext();
 
   useEffect(() => {
     let sortedProducts = productsList || [];
@@ -65,6 +62,8 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
+    } else if (id=== "promociones") {
+      router.push(`/promociones`);
     } else {
       router.push(`/categories/${id}`);
     }
@@ -82,10 +81,10 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     }
 
     return (
-      <h1 className="text-2xl">
+      <h1 className="text-2xl mb-4 lg:mb-0">
         <Link href="/categories">Productos</Link>
         {" / "}
-        <span className="font-bold">{category.name}</span>
+        <span className="font-bold">{categorySpanish(category.name)|| category.name} </span>
       </h1>
     );
   };
@@ -93,13 +92,13 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   return (
     <>
       {/* Título y filtro */}
-      <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white">
+      <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white ">
         {renderBreadcrumb()}
 
         <Dropdown
           arrowIcon={false}
           label={
-            <div className="flex justify-between w-[200px] md:w-[400px]" id="custom-dropdown-button">
+            <div className="flex justify-between w-[300px] md:w-[400px]" id="custom-dropdown-button">
               <span>Filtrar</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +119,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
             border: "1px solid white",
             backgroundColor: "#00695c",
             outline: 'none',
+            
           }}
+
         >
           <Dropdown.Item onClick={() => setFilterOption("price-asc")} className="md:w-[400px]">
             Ordenar por precio: Menor a Mayor
@@ -137,12 +138,13 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         </Dropdown>
       </div>
 
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row m-10">
         {/* Sidebar de categorías */}
-        <div className="w-full lg:w-1/4 p-4 lg:ml-24">
-          <h2 className="text-lg font-bold mb-4 text-gray-400">Categorías</h2>
-          <ul>
-            <li className="mb-2">
+        <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600  rounded-xl lg:mr-10 mr-0">
+          <h2 className="text-lg font-bold mb-4 text-gray-600">Categorías</h2>
+          <hr className="border-teal-600"/>
+          <ul className="mt-4 flex flex-col gap-2">
+            <li >
               <button
                 onClick={() => handleCategoryChange(null)}
                 className={`text-lg ${
@@ -153,9 +155,22 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               >
                 Todo
               </button>
+              
             </li>
+            <li>
+            <button
+                onClick={() => handleCategoryChange("promociones")}
+                className={`text-lg ${
+                  selectedCategory === "promociones"
+                    ? "font-bold text-teal-800"
+                    : "text-teal-600"
+                }`}
+              >
+                Promociones
+              </button>
+              </li>
             {categories?.map((cat) => (
-              <li key={cat.id} className="mb-2">
+              <li key={cat.id} >
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`text-lg ${
@@ -172,9 +187,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         </div>
 
         {/* Contenido principal */}
-        <div className="w-full lg:w-3/4 p-4">
+        <div className="w-full lg:w-3/4  my-10 lg:my-0">
           {filteredProducts && filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id
@@ -182,31 +197,33 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                     key={product.article_id}
-                    className="p-4 rounded-lg h-full"
+                    className=" rounded-lg h-[400px] shadow-lg hover:scale-105 "
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
-                    <div className="relative pb-56 flex justify-items-start">
+
                       <Image
                       width={500}
                         height={500}
                         src={product.imgUrl}
                         alt={product.description}
-                        className="absolute inset-0 w-46 h-full object-contain rounded-t-lg animate-fade-in-up hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        className="relative inset-0 w-full h-4/6 object-cover rounded-t-lg animate-fade-in-up  transition-transform duration-300 cursor-pointer"
                       />
-                    </div>
+                    <hr className=" bg-blue-gray-600"/>
+                    <div className="p-4 flex flex-col justify-between w-full h-2/6">
                     {productCategory && (
                       <h3 className="text-gray-500">{productCategory.name}</h3>
                     )}
                     <h2 className="text-xl font-semibold">
                       {product.description}
                     </h2>
-                    <p className="text-lg font-bold mt-2">${product.price}</p>
+                    <p className="text-lg font-bold mt-2">$ {product.price}</p>
+                    </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500">No hay productos para mostrar en esta categoría.</h1></div>
+            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500 w-full text-center">No hay productos para mostrar en esta categoría.</h1></div>
           )}
         </div>
       </div>

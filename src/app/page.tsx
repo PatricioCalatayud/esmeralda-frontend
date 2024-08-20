@@ -10,7 +10,7 @@ import Testimonials from "../components/Testimonials/Testimonials";
 
 const Home = () => {
   return (
-    <div>
+    <div className="h-min-screen">
       <Hero />
       <HeadlineCards />
       <Products />
