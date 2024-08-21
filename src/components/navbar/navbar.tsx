@@ -55,8 +55,8 @@ const Navbar = () => {
   }
 
   return (
-    <header className="relative text-gray-600 body-font">
-      <div className="relative z-10 container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between">
+    <header className="relative text-gray-600 body-font z-50">
+      <div className="relative z-20 container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between">
         <div className="flex items-center text-gray-900 mb-4 md:mb-0 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center">
             <AiOutlineMenu
@@ -134,7 +134,7 @@ const Navbar = () => {
               >
                 <Dropdown.Header>
                   <span className="block text-sm">{session.name}</span>
-                  <span className="block truncate text-sm font-medium">
+                  <span className="block truncate text-sm font-medium ">
                     {session.email}
                   </span>
                 </Dropdown.Header>
@@ -219,22 +219,6 @@ const Navbar = () => {
           >
             Promociones
           </Link>
-{/*          <Link
-            href="/mvv"
-            className={` hover:text-gray-900 ${
-              pathname === "/mvv" && "text-gray-900 font-bold"
-            }`}
-          >
-            MVV
-          </Link>
-          <Link
-            href="/faq"
-            className={` hover:text-gray-900 ${
-              pathname === "/faq" && "text-gray-900 font-bold"
-            }`}
-          >
-            F&Q
-          </Link>*/}
         </nav>
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
@@ -272,7 +256,7 @@ const Navbar = () => {
               arrowIcon={false}
               inline
               label={
-                <div className="flex  items-center gap-2">
+                <div className="flex  items-center gap-2 ">
                   {session?.image ? (
                     <Image
                       src={session?.image}
@@ -297,7 +281,7 @@ const Navbar = () => {
               }
             >
               <Dropdown.Header>
-                <span className="block truncate text-sm font-medium">
+                <span className="block truncate text-sm font-medium relative z-50">
                   {session?.email}
                 </span>
               </Dropdown.Header>
@@ -356,7 +340,7 @@ const Navbar = () => {
 
       {nav && (
         <div
-          className="bg-black/80 fixed w-full h-screen z-10 top-0 left-0"
+          className="bg-black/80 fixed w-full h-screen z-20 top-0 left-0"
           onClick={() => setNav(false)}
         ></div>
       )}

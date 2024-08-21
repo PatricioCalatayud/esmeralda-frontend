@@ -20,7 +20,7 @@ export interface Transaction {
 }
 
 export interface ProductsOrder {
-    cantidad: string;
+    quantity: string;
     product:  Product;
 }
 

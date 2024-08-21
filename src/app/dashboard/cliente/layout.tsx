@@ -9,12 +9,12 @@ import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 const links = [
   {
     name: "Perfil",
-    href: "../../dashboard/cliente/profile",
+    href: "/dashboard/cliente/profile",
     hrefActive: "/dashboard/cliente/profile",
   },
   {
     name: "Ordenes",
-    href: "../../dashboard/cliente/order",
+    href: "/dashboard/cliente/order",
     hrefActive: "/dashboard/cliente/order",
   },
 ];

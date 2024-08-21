@@ -9,19 +9,24 @@ import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 const links = [
   {
     name: "Perfil",
-    href: "../../dashboard/administrador/profile",
+    href: "/dashboard/administrador/profile",
     hrefActive: "/dashboard/administrador/profile",
   },
   {
     name: "Producto",
-    href: "../../dashboard/administrador/product",
+    href: "/dashboard/administrador/product",
     hrefActive: "/dashboard/administrador/product",
   },
   {
     name: "Ordenes",
-    href: "../../dashboard/administrador/order",
+    href: "/dashboard/administrador/order",
     hrefActive: "/dashboard/administrador/order",
   },
+  {
+    name: "Usuarios",
+    href: "/dashboard/administrador/users",
+    hrefActive: "/dashboard/administrador/users",
+  }
 ];
 
 export default function DashboardLayout({

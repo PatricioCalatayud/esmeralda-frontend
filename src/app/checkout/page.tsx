@@ -34,6 +34,8 @@ const Checkout = () => {
           description: item.category.name,
           quantity: item.quantity,
           unit_price: Number(item.price),
+          //price:Number(item.price),
+          //:item.id
         }));
 
         const response = await postMarketPay(items);

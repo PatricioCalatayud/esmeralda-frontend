@@ -46,8 +46,10 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
 }
 
 export async function putProducts(dataProduct: object,id: string, token: string | undefined) {
-  
-  try {
+  console.log(dataProduct
+  );
+  console.log(id);
+    try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
         "Content-Type": "multipart/form-data",
