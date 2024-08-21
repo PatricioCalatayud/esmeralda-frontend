@@ -20,18 +20,15 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [buttonSize, setButtonSize ] = useState()
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-  const {token} = useAuthContext()
+  const { token } = useAuthContext();
   const router = useRouter();
   const productId = params.id;
-    console.log(product);
 
-    
   useEffect(() => {
     type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
-    const categoryTranslations = (category: { id: string ; name: CategoryName | string }) => {
+    const categoryTranslations = (category: { id: string; name: CategoryName | string }) => {
       const translations: { [key in CategoryName]: string } = {
         Coffee: "Café",
         Tea: "Té",
@@ -39,29 +36,23 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         Sweetener: "Endulzante",
         Mate: "Mate",
       };
-    
+
       return {
         id: category.id,
         name: translations[category.name as CategoryName] || category.name
       };
     };
-    
-    
-    
+
     const loadProductData = async () => {
-      
       const fetchedProduct = await getProductById(productId, token);
-      console.log(fetchedProduct);
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         const translatedCategories = categoryTranslations({
-          id:fetchedProduct.category?.id,
-          name:fetchedProduct.category?.name as CategoryName || fetchedProduct.category?.name
+          id: fetchedProduct.category?.id,
+          name: fetchedProduct.category?.name as CategoryName || fetchedProduct.category?.name
         });
         setCategory(translatedCategories);
-        /*if(fetchedProduct.subproducts){
-            const sizes = fetchedProduct.subproducts.map()
-        }  */ 
+
         if (fetchedProduct.category?.name === "coffee") {
           setSelectedSize("250g");
         } else {
@@ -69,9 +60,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         }
 
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const cartItem = cart.find(
-          (item: IProductList) => item.article_id === productId
-        );
+        const cartItem = cart.find((item: any) => item.id === productId);
         if (cartItem) {
           setQuantity(cartItem.quantity);
         }
@@ -87,7 +76,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       return (
         <h1 className="text-lg font-bold animate-fade-in-up">
           <Link href="/categories">
-            <p className="hover:font-bold">Productos  </p>
+            <p className="hover:font-bold">Productos</p>
           </Link>
         </h1>
       );
@@ -99,10 +88,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           Productos
         </Link>
         {" / "}
-        <Link
-          href={`/categories/${category.id}`}
-          className="hover:font-bold hover:text-black"
-        >
+        <Link href={`/categories/${category.id}`} className="hover:font-bold hover:text-black">
           {category.name}
         </Link>
         {" / "}
@@ -117,21 +103,48 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartItemIndex = cart.findIndex(
-      (item: IProductList) => item.article_id === productId
-    );
+    const cartItemIndex = cart.findIndex((item: any) => item.id === productId);
 
     if (cartItemIndex !== -1) {
       Swal.fire({
         title: "Producto ya en el carrito",
-        text: "El producto ya se encuentra en el carrito.",
+        text: "El producto ya se encuentra en el carrito. ¿Desea actualizar la cantidad?",
         icon: "info",
         showCancelButton: true,
-        confirmButtonText: "Ir al carrito",
+        confirmButtonText: "Actualizar",
         cancelButtonText: "Aceptar",
       }).then((result: any) => {
         if (result.isConfirmed) {
-          router.push("/cart");
+          // Update the quantity in the cart
+          cart[cartItemIndex].quantity = quantity;
+          localStorage.setItem("cart", JSON.stringify(cart));
+          Swal.fire({
+            title: "Producto actualizado",
+            text: "La cantidad del producto ha sido actualizada.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Ir al carrito",
+            cancelButtonText: "Aceptar",
+          }).then(async (result: any) => {
+            if (result.isConfirmed) {
+              router.push("/cart");
+            }
+
+            const userSession = localStorage.getItem("userSession");
+
+            if (userSession) {
+              const token = JSON.parse(userSession).accessToken;
+              const decodedToken: DecodedToken = jwtDecode(token);
+              const userId = decodedToken.sub;
+
+              try {
+                await createStorageOrder({ userId, products: cart });
+                console.log("Storage order created successfully");
+              } catch (error) {
+                console.error("Error creating storage order:", error);
+              }
+            }
+          });
         }
       });
     } else {
@@ -166,9 +179,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             const userSession = localStorage.getItem("userSession");
 
             if (userSession) {
-              const token = JSON.parse(userSession).accessToken; // Corrected access to the token
+              const token = JSON.parse(userSession).accessToken;
               const decodedToken: DecodedToken = jwtDecode(token);
-              console.log("decodedToken", decodedToken);
               const userId = decodedToken.sub;
 
               try {
@@ -183,6 +195,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       });
     }
   };
+
 
   if (!isLoaded) {
     return (
