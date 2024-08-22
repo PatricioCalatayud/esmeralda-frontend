@@ -169,7 +169,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
               const token = JSON.parse(userSession).accessToken; // Corrected access to the token
               const decodedToken: DecodedToken = jwtDecode(token);
               console.log("decodedToken", decodedToken);
-              const userId = decodedToken.userId;
+              const userId = decodedToken.sub;
 
               try {
                 await createStorageOrder({ userId, products: cart });

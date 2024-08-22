@@ -1,23 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Swal from "sweetalert2";
 import { getCategories } from '@/helpers/CategoriesServices.helper';
-
 import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
-import { FaArrowLeft } from "react-icons/fa";
 import { useCategoryContext } from "@/context/categories.context";
 import { putProducts } from "@/helpers/ProductsServices.helper";
 import { useAuthContext } from "@/context/auth.context";
+import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
-  const router = useRouter();
   //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -67,14 +63,15 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       );
       // Desestructurar solo los campos que deseas actualizar
       const {
-        article_id,
         description,
         price,
         stock,
+        // revisar con el backend
         tipoGrano,
         medida,
         presentacion,
         imgUrl,
+        
         discount,
         category = {
           id: "",
@@ -84,7 +81,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       // Establecer solo los campos especificados en dataProduct
       setDataProduct((prevState) => ({
         ...prevState,
-        article_id,
         description,
         price,
         stock,
@@ -203,18 +199,13 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-start items-center px-10 dark:bg-gray-700">
-      <div className="relative p-4 bg-white rounded-lg shadow-2xl dark:bg-gray-800 sm:p-5 w-full">
-        <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Editar producto
-          </h3>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-
-
-          <div className="grid gap-4 mb-4 sm:grid-cols-2">
+    <DashboardAddModifyComponent
+    titleDashboard="Editar producto"
+  backLink = "/dashboard/administrador/product"
+  buttonSubmitText = "Actualizar"
+  handleSubmit = {handleSubmit}
+  >
+<div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div>
               <label
                 htmlFor="description"
@@ -468,26 +459,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               <span className="text-red-500">{errors.imgUrl}</span>
             )} */}
           </div>
-
-          <div className="flex items-center space-x-4 mt-4">
-            <button
-              type="submit"
-              className="w-full sm:w-auto justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-            >
-              Actualizar producto
-            </button>
-            <Link
-              href="../../dashboard/administrador/product"
-              className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-            >
-              
-              <FaArrowLeft />
-              &nbsp; Volver
-            </Link>
-          </div>
-        </form>
-      </div>
-    </div>
+  </DashboardAddModifyComponent>
   );
 };
 

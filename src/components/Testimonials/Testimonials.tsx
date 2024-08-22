@@ -94,11 +94,11 @@ const Testimonials: React.FC = () => {
         </div>
 
         {/* Testimonial cards */}
-        <div data-aos="zoom-in">
+        <div data-aos="zoom-in " className=" py-5">
           <Slider {...settings}>
             {testimonials.map((data) => (
-              <div key={data.id} className="px-4">
-                <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative">
+              <div key={data.id} className="px-4 py-4">
+                <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative border border-gray-100">
                   <div className="mb-4 flex justify-center">
                     <img
                       src={getAvatarUrl(data.user.id)}

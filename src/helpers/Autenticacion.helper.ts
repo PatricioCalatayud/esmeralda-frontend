@@ -7,7 +7,7 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 //! Funcion para iniciar sesion
 export async function LoginUser(user: ILoginProps) {
   try {
-    const res = await axios.post(`${apiURL}/users/signin`, user, {
+    const res = await axios.post(`${apiURL}/auth/signin`, user, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -35,7 +35,7 @@ export async function LoginUser(user: ILoginProps) {
 
 export async function NewUser(user: IUserProps): Promise<IUserProps | undefined> {
   try {
-    const res = await axios.post(`${apiURL}/users/signup`, user, {
+    const res = await axios.post(`${apiURL}/auth/signup`, user, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -55,6 +55,20 @@ export async function NewUser(user: IUserProps): Promise<IUserProps | undefined>
     } else {
       console.log(`Error registrando usuario: ${error.message}`);
     }
+  }
+}
+
+export async function getUsers(token: string | undefined) {
+  try {
+    const response = await axios.get(`${apiURL}/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const users: IUserProps[] = response.data;
+    return users;
+  } catch (error: any) {
+    console.log(error);
   }
 }
 
