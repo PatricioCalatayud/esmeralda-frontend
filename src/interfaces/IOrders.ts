@@ -8,10 +8,19 @@ export interface IOrders {
     orderDetail:   OrderDetail;
 }
 
+export interface IOrderCheckout {
+    address?: string | undefined;
+    userId: string | undefined;
+    products: {
+        id: string;
+        quantity: number | undefined;
+    }[];
+}
+
 export interface OrderDetail {
     deliveryDate: string;
     totalPrice:   string;
-    transactions: Transaction[];
+    transactions: Transaction;
 }
 
 export interface Transaction {
@@ -34,4 +43,5 @@ export interface Product {
 
 export interface User {
     id: string;
+    name: string;
 }

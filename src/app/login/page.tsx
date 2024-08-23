@@ -50,7 +50,7 @@ const Login = () => {
     password: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const{setSession} = useAuthContext();
+  const{setSession,setUserId,setToken} = useAuthContext();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -109,12 +109,16 @@ const Login = () => {
       if (response) {
         const decodedToken: any = jwtDecode(response.accessToken as string);
         setSession({
+          id: decodedToken.userId,
           name: decodedToken.name,
           email: decodedToken.email,
           image: undefined,
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
         })
+        setUserId(decodedToken.userId);
+        response.accessToken && setToken(response.accessToken);
+        
       }
       
       

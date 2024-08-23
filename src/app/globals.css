@@ -7,3 +7,7 @@
   --tw-ring-shadow: none !important;
   box-shadow: none !important;
 }
+.custom-modal-container {
+  --tw-bg-opacity: .6;
+  background-color: rgb(33 33 33 / var(--tw-bg-opacity)) !important;
+}

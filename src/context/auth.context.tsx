@@ -15,11 +15,12 @@ import Swal from "sweetalert2";
 interface AuthContextType {
   session: ISession | undefined;
   handleSignOut: () => void;
-  userGoogle: boolean;
   token: string | undefined;
   userId: string | undefined;
   authLoading: boolean;
   setSession: (session: ISession | undefined) => void;
+  setToken: (value: string) => void;
+  setUserId: (value: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           setUserId(decodedToken.sub);
           // seteo la sesion con el token decodificado
           setSession({
+            id: decodedToken.sub,
             name: decodedToken.name,
             email: decodedToken.email,
             image: undefined,
@@ -79,6 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (sessionGoogle) {
         console.log("Usuario:", sessionGoogle.user);
         setSession({
+          id: sessionGoogle.user?.id ?? "",
           name: sessionGoogle.user?.name ?? "",
           email: sessionGoogle.user?.email ?? "",
           image: sessionGoogle.user?.image ?? "",
@@ -114,7 +117,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ session, handleSignOut, userGoogle, token, userId, authLoading, setSession }}
+      value={{ session, handleSignOut, token, userId, authLoading, setSession, setToken,setUserId }}
     >
       {children}
     </AuthContext.Provider>
