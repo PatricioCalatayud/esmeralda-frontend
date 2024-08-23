@@ -13,7 +13,7 @@ const MercadoPagoButton: React.FC<MercadoPagoButtonProps> = ({
 
   return (
     <div>
-      <Wallet initialization={{ preferenceId, redirectMode: "modal" }} />
+      <Wallet initialization={{ preferenceId, redirectMode: "blank" }} />
     </div>
   );
 };

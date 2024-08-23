@@ -9,29 +9,30 @@ import Swal from "sweetalert2";
 
 import { getProductById } from "../../../helpers/ProductsServices.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
-import { createStorageOrder } from "@/helpers/StorageCart.helper";
-import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { useCartContext } from "@/context/cart.context";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [buttonSize, setButtonSize ] = useState()
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-  const {token} = useAuthContext()
+  const { setCartItemCount } = useCartContext();
+  const { token } = useAuthContext();
   const router = useRouter();
   const productId = params.id;
-    console.log(product);
-
-    
+  console.log(selectedPrice);
   useEffect(() => {
     type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
-    const categoryTranslations = (category: { id: string ; name: CategoryName | string }) => {
+    const categoryTranslations = (category: {
+      id: string;
+      name: CategoryName | string;
+    }) => {
       const translations: { [key in CategoryName]: string } = {
         Coffee: "Café",
         Tea: "Té",
@@ -39,39 +40,61 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         Sweetener: "Endulzante",
         Mate: "Mate",
       };
-    
+
       return {
         id: category.id,
-        name: translations[category.name as CategoryName] || category.name
+        name: translations[category.name as CategoryName] || category.name,
       };
     };
-    
-    
-    
+
     const loadProductData = async () => {
-      
       const fetchedProduct = await getProductById(productId, token);
-      console.log(fetchedProduct);
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         const translatedCategories = categoryTranslations({
-          id:fetchedProduct.category?.id,
-          name:fetchedProduct.category?.name as CategoryName || fetchedProduct.category?.name
+          id: fetchedProduct.category?.id,
+          name:
+            (fetchedProduct.category?.name as CategoryName) ||
+            fetchedProduct.category?.name,
         });
         setCategory(translatedCategories);
-        /*if(fetchedProduct.subproducts){
-            const sizes = fetchedProduct.subproducts.map()
-        }  */ 
-        if (fetchedProduct.category?.name === "coffee") {
-          setSelectedSize("250g");
+        if (
+          fetchedProduct.subproducts &&
+          fetchedProduct.subproducts.length > 0
+        ) {
+          const lowestPricedSubproduct = fetchedProduct.subproducts.reduce(
+            (lowest, current) => {
+              return current.price < lowest.price ? current : lowest;
+            }
+          );
+
+          setSelectedSize(lowestPricedSubproduct.amount);
+
+          if (Number(fetchedProduct.discount) !== 0) {
+            // Calcula el precio con el descuento aplicado correctamente
+            setSelectedPrice(
+              (
+                Number(lowestPricedSubproduct.price) *
+                (1 - Number(fetchedProduct.discount) / 100)
+              ).toFixed(2)
+            );
+          } else {
+            setSelectedPrice(lowestPricedSubproduct.price);
+          }
+        } else if (Number(fetchedProduct.discount) !== 0) {
+          // Calcula el precio con el descuento aplicado correctamente
+          setSelectedPrice(
+            (
+              Number(fetchedProduct.price) *
+              (1 - Number(fetchedProduct.discount) / 100)
+            ).toFixed(2)
+          );
         } else {
-          setSelectedSize("10 cápsulas");
+          setSelectedPrice(fetchedProduct.price);
         }
 
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const cartItem = cart.find(
-          (item: IProductList) => item.article_id === productId
-        );
+        const cartItem = cart.find((item: any) => item.id === productId);
         if (cartItem) {
           setQuantity(cartItem.quantity);
         }
@@ -87,7 +110,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       return (
         <h1 className="text-lg font-bold animate-fade-in-up">
           <Link href="/categories">
-            <p className="hover:font-bold">Productos  </p>
+            <p className="hover:font-bold">Productos</p>
           </Link>
         </h1>
       );
@@ -117,21 +140,33 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartItemIndex = cart.findIndex(
-      (item: IProductList) => item.article_id === productId
-    );
+    const cartItemIndex = cart.findIndex((item: any) => item.id === productId);
 
     if (cartItemIndex !== -1) {
       Swal.fire({
         title: "Producto ya en el carrito",
-        text: "El producto ya se encuentra en el carrito.",
+        text: "El producto ya se encuentra en el carrito. ¿Desea actualizar la cantidad?",
         icon: "info",
         showCancelButton: true,
-        confirmButtonText: "Ir al carrito",
+        confirmButtonText: "Actualizar",
         cancelButtonText: "Aceptar",
       }).then((result: any) => {
         if (result.isConfirmed) {
-          router.push("/cart");
+          // Update the quantity in the cart
+          cart[cartItemIndex].quantity = quantity;
+          localStorage.setItem("cart", JSON.stringify(cart));
+          Swal.fire({
+            title: "Producto actualizado",
+            text: "La cantidad del producto ha sido actualizada.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Ir al carrito",
+            cancelButtonText: "Aceptar",
+          }).then(async (result: any) => {
+            if (result.isConfirmed) {
+              router.push("/cart");
+            }
+          });
         }
       });
     } else {
@@ -151,6 +186,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           };
           cart.push(newCartItem);
           localStorage.setItem("cart", JSON.stringify(cart));
+          //const items = JSON.parse(cart);
+          setCartItemCount(cart.length);
           Swal.fire({
             title: "Producto agregado",
             text: "Producto agregado al carrito.",
@@ -162,25 +199,20 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             if (result.isConfirmed) {
               router.push("/cart");
             }
-
-            const userSession = localStorage.getItem("userSession");
-
-            if (userSession) {
-              const token = JSON.parse(userSession).accessToken; // Corrected access to the token
-              const decodedToken: DecodedToken = jwtDecode(token);
-              console.log("decodedToken", decodedToken);
-              const userId = decodedToken.sub;
-
-              try {
-                await createStorageOrder({ userId, products: cart });
-                console.log("Storage order created successfully");
-              } catch (error) {
-                console.error("Error creating storage order:", error);
-              }
-            }
           });
         }
       });
+    }
+  };
+
+  const handleSizeChange = (newSize: string, price: string) => {
+    setSelectedSize(newSize);
+    if (Number(product?.discount) !== 0) {
+      setSelectedPrice(
+        (Number(price) * (Number(product?.discount) / 100)).toFixed(2)
+      );
+    } else {
+      setSelectedPrice(price);
     }
   };
 
@@ -198,18 +230,12 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   }
 
   if (!product) {
-    return <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">No se encontró el producto.</p>;
+    return (
+      <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">
+        No se encontró el producto.
+      </p>
+    );
   }
-
-  const sizeOptions =
-    category?.name === "Café en Cápsulas"
-      ? ["10 cápsulas", "20 cápsulas", "50 cápsulas"]
-      : category?.name === "Máquinas"
-      ? []
-      : ["250 Gramos", "500 Gramos", "1 kg"];
-
-      console.log(product);
-  
 
   return (
     <div className="container mx-auto p-4 mt-14 mb-32">
@@ -219,27 +245,27 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         }`}
       >
         <div className="relative md:w-1/2">
-        <Image
-    width={1000}
-    height={1000}
-    priority={true}
-    src="/Logo.png"
-    alt="Logo"
-    className="absolute inset-0 w-full h-full object-contain"
-  />
-  <Image
-    width={1000}
-    height={1000}
-    priority={true}
-    src={product.imgUrl}
-    alt={product.description}
-    className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
-  />
+          <Image
+            width={1000}
+            height={1000}
+            priority={true}
+            src="/Logo.png"
+            alt="Logo"
+            className="absolute inset-0 w-full h-full object-contain"
+          />
+          <Image
+            width={1000}
+            height={1000}
+            priority={true}
+            src={product.imgUrl}
+            alt={product.description}
+            className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
+          />
         </div>
 
         <div className="md:w-1/2 mt-4 md:mt-0 animate-fade-in-up border border-gray-300 rounded-lg p-4 shadow-xl">
           {renderBreadcrumb()}
-          <hr  className="animate-fade-in-up mt-2"/>
+          <hr className="animate-fade-in-up mt-2" />
           {category && (
             <h3 className="text-gray-500 mt-4 animate-fade-in-up">
               {category.name}
@@ -248,58 +274,67 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
             {product.description}
           </h1>
-          <hr  className="animate-fade-in-up"/>
+          <hr className="animate-fade-in-up" />
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
-          {sizeOptions.length > 0 && (
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
-              {product.subproducts && product.subproducts?.length > 0  ? (product.subproducts?.map((subproduct, index) => (
+              {product.subproducts &&
+                product.subproducts?.length > 0 &&
+                product.subproducts?.map((subproduct, index) => (
                   <button
-                  key={index}
-                  className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
-                    selectedSize === subproduct.amount
-                      ? "bg-none text-black border-2 border-teal-600"
-                      : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
-                  }`}
-                >
-                  {`${subproduct.amount} ${subproduct.unit}`}
-                  
-                </button>
-              ))) :
-              (sizeOptions.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
-                    selectedSize === size
-                      ? "bg-none text-black border-2 border-teal-600"
-                      : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
-                  }`}
-                >
-                  {size}
-                </button>
-              )))}
+                    key={index}
+                    className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
+                      selectedSize === subproduct.amount
+                        ? "bg-none text-black border-2 border-teal-600"
+                        : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
+                    }`}
+                    onClick={() =>
+                      handleSizeChange(subproduct.amount, subproduct.price)
+                    }
+                  >
+                    {`${subproduct.amount} ${subproduct.unit}`}
+                  </button>
+                ))}
             </div>
-            
-          )}
-          <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-            $ {product.price}
-          </p>
-          
+            {Number(product.discount) !== 0 ? (
+              <div className="flex gap-4 flex-col">
+                <div>
+                  <p className="text-lg font-semibold text-gray-600 animate-fade-in-up line-through">
+                    ${product.price}
+                  </p>
+                  <p className="text-teal-400 text-sm font-bold">
+                    {product.discount} % de descuento
+                  </p>
+                </div>
+                <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
+                  ${selectedPrice}
+                </p>
+              </div>
+            ) : (
+              <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
+                ${selectedPrice}
+              </p>
+            )}
           </div>
           <div className="animate-fade-in-up flex flex-row items-center gap-4 my-4">
-          <IncrementProduct
-            stock={product.stock}
-            productId={product.id}
-            initialQuantity={quantity}
-            onQuantityChange={handleQuantityChange}
-          />
-          <p className="text-gray-800 text-xs text-nowrap">{product.stock} disponibles</p>
+            <IncrementProduct
+              stock={product.stock}
+              productId={product.id}
+              initialQuantity={quantity}
+              onQuantityChange={handleQuantityChange}
+            />
+            <p className="text-gray-800 text-xs text-nowrap">
+              {product.stock} disponibles
+            </p>
           </div>
           <button
             className="  py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
             onClick={handleAddToCart}
           >
-            <FontAwesomeIcon icon={faCartShopping} size="lg" style={{ marginRight: "10px" }}/>
+            <FontAwesomeIcon
+              icon={faCartShopping}
+              size="lg"
+              style={{ marginRight: "10px" }}
+            />
             Añadir al carrito
           </button>
         </div>

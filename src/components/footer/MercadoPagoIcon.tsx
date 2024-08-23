@@ -1,4 +1,4 @@
-const MercadoPagoIcon = () => {
+const MercadoPagoIcon = ({color}: {color?: string}) => {
     return (
 
           <svg
@@ -8,7 +8,7 @@ const MercadoPagoIcon = () => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <style>{`.a{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;}`}</style>
+              <style>{`.a{fill:none;stroke:${color || "#000000"};stroke-linecap:round;stroke-linejoin:round;}`}</style>
             </defs>
             <ellipse className="a" cx="24" cy="24" rx="19.5" ry="12.978" />
             <path

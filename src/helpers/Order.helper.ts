@@ -1,4 +1,4 @@
-import { IOrders } from "@/interfaces/IOrders";
+import { IOrderCheckout, IOrders } from "@/interfaces/IOrders";
 import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 export async function getOrders(userId: string, token: string | undefined) {
@@ -27,14 +27,13 @@ export async function getOrder(orderId: string, token: string | undefined) {
   }
 }
 
-export async function postOrder(order: IOrders, token: string | undefined) { 
+export async function postOrder(order: IOrderCheckout, token: string | undefined) { 
   try {
     const response = await axios.post(`${apiURL}/order`, order,{
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-    const product: IOrders = response.data;
-    return product;
+    return response;
   } catch (error: any) {
     console.log(error);
   }

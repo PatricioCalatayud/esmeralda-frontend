@@ -230,7 +230,7 @@ const Navbar = () => {
               onChange={handleSearchChange}
             />
             <div className="border-r border-gray-600 flex items-center justify-center absolute w-8">
-            <FontAwesomeIcon icon={faMagnifyingGlass} className=" text-gray-600"/>
+            <FontAwesomeIcon icon={faMagnifyingGlass} className=" text-gray-600" style={{width: "20px", height: "20px"}}/>
             </div>
           </div>
           <button
@@ -296,7 +296,7 @@ const Navbar = () => {
                   <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
                     Panel de cliente
                   </Dropdown.Item>
-                  <Dropdown.Item href="/tracking">
+                  <Dropdown.Item href="/dashboard/cliente/order">
                     <FontAwesomeIcon
                       icon={faTruck}
                       style={{ marginRight: "5px" }}
@@ -377,9 +377,9 @@ const Navbar = () => {
             {session && (
               <li className="text-xl py-4 flex">
                 <Link
-                  href="/tracking"
+                  href="/dashboard/cliente/order"
                   className={`hover:text-orange-400 gap-4 flex items-center ${
-                    pathname === "/tracking" ? "text-orange-400 font-bold" : ""
+                    pathname === "/dashboard/cliente/order" ? "text-orange-400 font-bold" : ""
                   }`}
                   onClick={handleNavLinkClick}
                 >

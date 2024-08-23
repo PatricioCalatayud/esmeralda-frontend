@@ -6,12 +6,15 @@ import MercadoPagoButton from "@/components/MercadoPago/MercadoPagoButton";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { postMarketPay } from "@/helpers/MarketPay.helper";
+import { useAuthContext } from "@/context/auth.context";
+import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 
 initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!, {
   locale: "es-AR",
 });
 
-const Checkout = () => {
+const Checkout = ({ params }: { params: { id: string } }) => {
+  const {token} = useAuthContext();
   const [cart, setCart] = useState<IProductList[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
@@ -26,29 +29,6 @@ const Checkout = () => {
       localStorage.getItem("cart") || "[]"
     ) as IProductList[];
     setCart(cartData);
-
-    const createPreference = async () => {
-      try {
-        const items = cartData.map((item) => ({
-          title: item.description,
-          description: item.category.name,
-          quantity: item.quantity,
-          unit_price: Number(item.price),
-          //price:Number(item.price),
-          //:item.id
-        }));
-
-        const response = await postMarketPay(items);
-
-        const { id } = response;
-        setPreferenceId(id);
-      } catch (error) {
-        console.error("Error creating payment preference:", error);
-      }
-    };
-
-    createPreference();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -83,22 +63,39 @@ const Checkout = () => {
   };
 
   useEffect(() => {
+    // Calcular el total con descuento y el costo de envío
+    const totalConDescuento = calcularTotalConDescuento(cart);
     const totalAmount = (totalConDescuento + shippingCost).toFixed(2);
-    localStorage.setItem("totalAmount", totalAmount);
-  }, [totalConDescuento]);
+  
+    // Crear la preferencia solo después de calcular el precio total
 
-  useEffect(() => {
-    if (allFieldsCompleted) {
-      // Lógica adicional cuando todos los campos están completos
+      createPreference(Number(totalAmount));
+    
+  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
+  const createPreference = async (totalAmount: number) => {
+    try {
+      const linkPayment = {
+        price: totalAmount,
+        orderId: params.id,
+      };
+      console.log(linkPayment);
+  
+      const response = await postMarketPay(linkPayment);
+      if (response?.status === 200 || response?.status === 201) {
+      setPreferenceId(response.data);}
+    } catch (error) {
+      console.error("Error creating payment preference:", error);
     }
-  }, [allFieldsCompleted]);
-
+  };
+  console.log(preferenceId);
   return (
     <div className="font-sans bg-white h-full mb-20">
       <div className="max-w-7xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 max-lg:order-1 p-6 max-w-4xl mx-auto w-full">
-            {preferenceId ? <MercadoPagoButton preferenceId={preferenceId} /> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
+            {preferenceId ? <a href={preferenceId}	target="_blank" className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2">Pagar con Mercado Pago <MercadoPagoIcon color="white" /></a> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
           </div>
 
           {/* Mis pedidos */}
