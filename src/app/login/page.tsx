@@ -50,7 +50,7 @@ const Login = () => {
     password: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const{setSession} = useAuthContext();
+  const{setSession,setUserId,setToken} = useAuthContext();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -116,6 +116,9 @@ const Login = () => {
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
         })
+        setUserId(decodedToken.userId);
+        response.accessToken && setToken(response.accessToken);
+        
       }
       
       

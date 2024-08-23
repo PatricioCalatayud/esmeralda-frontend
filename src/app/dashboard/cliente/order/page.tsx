@@ -86,8 +86,8 @@ console.log(orders);
     </div>
   ) : (
     <DashboardComponent
-      titleDashboard="Listado de Productos"
-      searchBar="Buscar productos"
+      titleDashboard="Listado de Ordenes"
+      searchBar="Buscar ordenes"
       handleSearchChange={handleSearchChange}
       totalPages={totalPages}
       tdTable={[
@@ -96,7 +96,7 @@ console.log(orders);
         "Productos",
         "Total pagado",
         "Estado",
-        
+        "Acciones",
       ]}
       noContent="No hay Productos disponibles"
     >
@@ -143,7 +143,9 @@ console.log(orders);
 
 
           </td>
+          {order.orderDetail.transactions.status !== "Pendiente de pago" &&
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            
           <Link
                   type="button"
                   data-drawer-target="drawer-update-product"
@@ -155,7 +157,7 @@ console.log(orders);
                   <FontAwesomeIcon icon={faTruck} />
                   Ver detalle
                 </Link>
-                </td>
+                </td>}
         </tr>
       ))}
     </DashboardComponent>

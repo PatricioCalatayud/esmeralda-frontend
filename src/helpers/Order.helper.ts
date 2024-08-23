@@ -33,8 +33,7 @@ export async function postOrder(order: IOrderCheckout, token: string | undefined
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-    const product: IOrders = response.data;
-    return product;
+    return response;
   } catch (error: any) {
     console.log(error);
   }

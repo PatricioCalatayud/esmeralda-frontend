@@ -1,6 +1,7 @@
-import { IUserProps } from "@/interfaces/IUser";
+import { IUserProps, IUserUpdateProps } from "@/interfaces/IUser";
 import { ILoginProps } from "@/interfaces/ILogin";
 import axios from "axios";
+import { ISession } from "@/interfaces/ISession";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 
@@ -65,7 +66,7 @@ export async function getUsers(token: string | undefined) {
         Authorization: `Bearer ${token}`,
       },
     });
-    const users: IUserProps[] = response.data;
+    const users: ISession[] = response.data;
     return users;
   } catch (error: any) {
     console.log(error);
@@ -85,7 +86,7 @@ export async function getUser(userId: string, token: string | undefined) {
   }
 }
 
-export async function putUser(userId: string, user: IUserProps, token: string | undefined) {
+export async function putUser(userId: string, user: IUserUpdateProps, token: string | undefined) {
   try {
     const response = await axios.put(`${apiURL}/users/${userId}`, user, {
       headers: {

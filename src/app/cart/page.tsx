@@ -17,13 +17,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { postOrder } from "@/helpers/Order.helper";
 import { Button, Modal } from "flowbite-react";
+import { useCartContext } from "@/context/cart.context";
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
   const { session, token } = useAuthContext();
-  const [openModal, setOpenModal] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
   const [addresOrder, setAddresOrder] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
+  const { setCartItemCount } = useCartContext();
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -73,6 +75,7 @@ const Cart = () => {
         updatedCart.splice(index, 1);
         setCart(updatedCart);
         localStorage.setItem("cart", JSON.stringify(updatedCart));
+        setCartItemCount(updatedCart.length);
         Swal.fire(
           "Eliminado",
           "El producto ha sido eliminado del carrito",
@@ -123,23 +126,34 @@ const Cart = () => {
       quantity: product.quantity,
     }));
     
-    /*const orderCheckout = {
+    const orderCheckout = {
       userId: session?.id,
       products,
       ...(addresOrder && { address: addresOrder }), // Condicionalmente agregar la dirección
-    };*/
-    const orderCheckout = {
-      "address": "Retira en local",
-      "products": [
-        {"id": "7fc4fb2f-f31c-421e-abe6-78d87c143cf7", "quantity": 7},
-        {"id": "0a9337e1-c86b-4b0a-bf2a-6f59e2536876", "quantity": 1},
-      ],
-      "userId": "05b394d9-969a-4bbd-b73f-346c26b8c424",
-      "discount" : 10, // Ejemplo de descuento en formato string (convertir después)
- 
-    }
+      discount: 10
+    };
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
+    if (order?.status === 200 || order?.status === 201) {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Tu pedido ha sido realizado con exito",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setTimeout(() => {
+        router.push(`/checkout/${order.data.id}`);
+      },1500)
+    } else {
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Hubo un error al realizar tu pedido",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
     console.log(order);
   };
 
@@ -319,14 +333,14 @@ const Cart = () => {
             >
               Ir a pagar
             </button>
-            <Modal show={openModal} onClose={() => setOpenModal(false)} className="p-40 custom-modal-container" >
+            <Modal show={openModal} onClose={() => setOpenModal(false)} className="px-80 py-40 custom-modal-container" >
               <Modal.Header>Detalle de envio</Modal.Header>
-              <Modal.Body>
-                <div className="flex flex-col gap-4">
-              <div>
+              <Modal.Body className="flex flex-col gap-4">
+
+              <div className="w-full h-20 gap-4 flex flex-col">
               <label
                 htmlFor="addresOrder"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                className="block text-sm font-medium text-gray-900 dark:text-white"
               >
                 Dirección de envio
               </label>
@@ -341,7 +355,7 @@ const Cart = () => {
                 disabled={isDelivery===true}
               />
               </div>
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center h-20">
                 <h4 className="block text-sm font-medium text-gray-900 dark:text-white">Retiro en local</h4>
                 <input
                   type="checkbox"
@@ -350,8 +364,6 @@ const Cart = () => {
                   onChange={(e) => setIsDelivery(e.target.checked)}
                 />
               </div>
-
-                </div>
               </Modal.Body>
               <Modal.Footer>
                 <button

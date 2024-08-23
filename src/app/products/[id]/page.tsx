@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { useCartContext } from "@/context/cart.context";
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
@@ -21,6 +22,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const {setCartItemCount} = useCartContext();
   const { token } = useAuthContext();
   const router = useRouter();
   const productId = params.id;
@@ -161,6 +163,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           };
           cart.push(newCartItem);
           localStorage.setItem("cart", JSON.stringify(cart));
+          //const items = JSON.parse(cart);
+        setCartItemCount(cart.length);
           Swal.fire({
             title: "Producto agregado",
             text: "Producto agregado al carrito.",
