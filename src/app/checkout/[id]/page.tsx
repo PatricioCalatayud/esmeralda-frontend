@@ -82,13 +82,13 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   return (
     <div className="font-sans bg-white h-full mb-20">
       <div className="max-w-7xl mx-auto w-full relative z-10">
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 max-lg:order-1 p-6 max-w-4xl mx-auto w-full">
+        <div className="grid lg:grid-cols-3 gap-6 py-6">
+          <div className="lg:col-span-2 max-lg:order-1 px-6 max-w-4xl mx-auto w-full">
             {preferenceId ? <a href={preferenceId}	target="_blank" className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2">Pagar con Mercado Pago <MercadoPagoIcon color="#ffffff" height={"32px"} width={"32px"} /></a> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
           </div>
 
           {/* Mis pedidos */}
-          <div className="lg:col-span-1 md:col-span-2 lg:h-auto lg:sticky lg:top-0 lg:overflow-y-auto flex flex-col  px-10 lg:px-0">
+          <div className="lg:col-span-1 md:col-span-1 lg:h-auto lg:sticky lg:top-0 lg:overflow-y-auto flex flex-col  px-6 lg:px-0">
             <div className="flex-1 p-8 bg-teal-600 rounded-t-xl sticky top-0 shadow-2xl">
               <h2 className="text-2xl font-bold text-white w-full text-center">
                 Mis Pedidos
