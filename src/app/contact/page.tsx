@@ -1,11 +1,25 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import {jwtDecode} from "jwt-decode"; // Asegúrate de tener instalada esta dependencia
 
 const apiURL = "http://localhost:3001/testimony";
+
+interface DecodedToken {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  sub: string;
+  roles: string[];
+  isAvailable: boolean;
+  isDeleted: boolean;
+  iat: number;
+  exp: number;
+}
 
 const Contacto: React.FC = () => {
   const [description, setDescription] = useState<string>("");
@@ -15,12 +29,48 @@ const Contacto: React.FC = () => {
 
   const router = useRouter();
 
+  useEffect(() => {
+    // Obtener el item userSession del localStorage
+    const sessionItem = localStorage.getItem("userSession");
+    console.log("Item obtenido del localStorage:", sessionItem); // Log para verificar el item completo
+    if (sessionItem) {
+      try {
+        const sessionData = JSON.parse(sessionItem); // Convertir a objeto JSON
+        const token = sessionData.accessToken; // Extraer el token
+        console.log("Token extraído:", token); // Log para verificar el token extraído
+
+        // Decodificar el token para obtener el userName y el userId (sub)
+        const decoded: DecodedToken = jwtDecode(token);
+        setUserName(decoded.name);
+        setUserId(decoded.sub);
+      } catch (error) {
+        console.error("Error decodificando el token:", error);
+      }
+    }
+  }, []);
+
   const handleCambioDeCalificacion = (calificacion: number) => {
     setPunctuation(calificacion);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const sessionItem = localStorage.getItem("userSession");
+
+    if (!sessionItem) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se encontró la sesión de usuario",
+      });
+      return;
+    }
+
+    const sessionData = JSON.parse(sessionItem);
+    const token = sessionData.accessToken;
+
+    console.log("Token enviado en la solicitud:", token); // Log para verificar el token en la solicitud
 
     const review = {
       userId, // Enviar el UUID del usuario
@@ -34,6 +84,7 @@ const Contacto: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Enviar el token en el encabezado de autorización
         },
         body: JSON.stringify(review),
       });

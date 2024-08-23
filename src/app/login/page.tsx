@@ -241,27 +241,11 @@ const Login = () => {
                   }}
                 />
                 <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="shrink-0 h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded-md"
-                    />
-                    <label
-                      htmlFor="remember-me"
-                      className="ml-3 block text-sm text-gray-800"
-                    >
-                      Recordar
-                    </label>
-                  </div>
                   <div className="text-sm">
-  <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
-    
-      ¿Olvidaste tu contraseña?
-    
-  </Link>
-</div>
+                    <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
                 </div>
                 <Button
                   type="submit"

@@ -54,7 +54,7 @@ function HeadlineCards() {
           <p className='font-bold text-xl sm:text-2xl px-2'>Donde estamos ubicados</p>
           <p className='px-2 text-center'>Nos estamos expandiendo!</p>
           <Link href='/mapa'>
-            <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Descúbrelos</button>
+            <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Descubrenos</button>
           </Link>
         </div>
         <Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/122370/pexels-photo-122370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de restaurante' />
