@@ -7,13 +7,23 @@ import { useRouter } from "next/navigation";
 import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faBagShopping, faMinus, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBagShopping,
+  faMinus,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
+import { postOrder } from "@/helpers/Order.helper";
+import { Button, Modal } from "flowbite-react";
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<IProductList[]>([]);
-  const { session } = useAuthContext();
+  const { session, token } = useAuthContext();
+  const [openModal, setOpenModal] = useState(true);
+  const [addresOrder, setAddresOrder] = useState("");
+  const [isDelivery, setIsDelivery] = useState(false);
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -31,11 +41,11 @@ const Cart = () => {
       }
       return item;
     });
-    
+
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
-  
+
   const handleDecrease = (article_id: string) => {
     const newCart = cart.map((item) => {
       if (item.id === article_id) {
@@ -44,7 +54,7 @@ const Cart = () => {
       }
       return item;
     });
-  
+
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
@@ -97,6 +107,42 @@ const Cart = () => {
   const descuento = calcularDescuento();
   const total = calcularTotal();
 
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    e.preventDefault();
+    setAddresOrder(
+ e.target.value
+    );
+  };
+  const handleCheckout = async() => {
+    const products = cart.map(product => ({
+      id: product.id,
+      quantity: product.quantity,
+    }));
+    
+    /*const orderCheckout = {
+      userId: session?.id,
+      products,
+      ...(addresOrder && { address: addresOrder }), // Condicionalmente agregar la dirección
+    };*/
+    const orderCheckout = {
+      "address": "Retira en local",
+      "products": [
+        {"id": "7fc4fb2f-f31c-421e-abe6-78d87c143cf7", "quantity": 7},
+        {"id": "0a9337e1-c86b-4b0a-bf2a-6f59e2536876", "quantity": 1},
+      ],
+      "userId": "05b394d9-969a-4bbd-b73f-346c26b8c424",
+      "discount" : 10, // Ejemplo de descuento en formato string (convertir después)
+ 
+    }
+    console.log(orderCheckout);
+    const order = await postOrder(orderCheckout, token);
+    console.log(order);
+  };
+
   if (cart.length === 0) {
     return (
       <section className="text-gray-600 body-font">
@@ -131,12 +177,11 @@ const Cart = () => {
 
   return (
     <div className="font-sans w-3/4 mx-auto  h-screen ">
-      
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
-      
         <div className="bg-white rounded-md w-full 0">
-
-          <h2 className="text-2xl font-bold text-gray-900 h-10 flex  justify-center items-center">Tus Articulos</h2>
+          <h2 className="text-2xl font-bold text-gray-900 h-10 flex  justify-center items-center">
+            Tus Articulos
+          </h2>
           <hr className=" w-full " />
           <div className="space-y-4 w-full mt-4">
             {cart.map((item, index) => (
@@ -165,108 +210,174 @@ const Cart = () => {
                     >
                       <FontAwesomeIcon icon={faTrash} />
                       Eliminar
-                      
                     </div>
                     <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-3 font-bold items-center">
-                      <button
-                        className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                        onClick={() => handleDecrease(item.id)}
-                        disabled={item.quantity === 1}
-                      >
-                        <FontAwesomeIcon icon={faMinus} style={{width: "10px", height: "10px"}}/>
-                      </button>
-                      {item.quantity || 1}
-                      <button
-                        className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                        onClick={() => handleIncrease(item.id)}
-                        disabled={item.quantity === Number(item.stock)}
-                      >
-                        <FontAwesomeIcon icon={faPlus} style={{width: "10px", height: "10px"}}/>
-                      </button>
-                      <p className="text-gray-800 text-xs text-nowrap">{item.stock} disponibles</p>
+                      <div className="flex gap-3 font-bold items-center">
+                        <button
+                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+                          onClick={() => handleDecrease(item.id)}
+                          disabled={item.quantity === 1}
+                        >
+                          <FontAwesomeIcon
+                            icon={faMinus}
+                            style={{ width: "10px", height: "10px" }}
+                          />
+                        </button>
+                        {item.quantity || 1}
+                        <button
+                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+                          onClick={() => handleIncrease(item.id)}
+                          disabled={item.quantity === Number(item.stock)}
+                        >
+                          <FontAwesomeIcon
+                            icon={faPlus}
+                            style={{ width: "10px", height: "10px" }}
+                          />
+                        </button>
+                        <p className="text-gray-800 text-xs text-nowrap">
+                          {item.stock} disponibles
+                        </p>
                       </div>
                       <div className="ml-auto">
-                  {item.discount && Number(item.discount) > 0 ? (
-                    <div>
-                      <h4 className="text-lg font-bold text-gray-800">
-                        $
-                        {(
-                          Number(item.price) *
-                          (item.quantity || 1) *
-                          (1 - Number(item.discount))
-                        ).toFixed(2)}
-                      </h4>
-                      <h4 className="text-gray-500 line-through">
-                        $
-                        {(Number(item.price) * (item.quantity || 1)).toFixed(2)}
-                      </h4>
-                    </div>
-                  ) : (
-                    <h4 className="text-lg font-bold text-gray-800">
-                      ${(Number(item.price) * (item.quantity || 1)).toFixed(2)}
-                    </h4>
-                  )}
-                </div>
+                        {item.discount && Number(item.discount) > 0 ? (
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-800">
+                              $
+                              {(
+                                Number(item.price) *
+                                (item.quantity || 1) *
+                                (1 - Number(item.discount))
+                              ).toFixed(2)}
+                            </h4>
+                            <h4 className="text-gray-500 line-through">
+                              $
+                              {(
+                                Number(item.price) * (item.quantity || 1)
+                              ).toFixed(2)}
+                            </h4>
+                          </div>
+                        ) : (
+                          <h4 className="text-lg font-bold text-gray-800">
+                            $
+                            {(
+                              Number(item.price) * (item.quantity || 1)
+                            ).toFixed(2)}
+                          </h4>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-                
               </div>
             ))}
           </div>
         </div>
 
         <div className=" rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
-          <h2 className="text-xl font-bold  h-10 flex  justify-center items-center">Resumen de compra</h2>
+          <h2 className="text-xl font-bold  h-10 flex  justify-center items-center">
+            Resumen de compra
+          </h2>
           <hr className=" w-full " />
-            <div className="flex flex-col gap-2 p-4 w-full">
-          <ul className=" mt-8 space-y-4 w-full">
-            <li className="flex flex-wrap gap-4 text-base w-full">
-              Subtotal{" "}
-              <span className="ml-auto font-medium text-lg">${subtotal.toFixed(2)}</span>
-            </li>
-            {descuento > 0 && (
-              <li className="flex flex-wrap gap-4 text-lg font-medium">
-                Descuento{" "}
-                <span className="ml-auto font-bold">
-                  -${descuento.toFixed(2)}
+          <div className="flex flex-col gap-2 p-4 w-full">
+            <ul className=" mt-8 space-y-4 w-full">
+              <li className="flex flex-wrap gap-4 text-base w-full">
+                Subtotal{" "}
+                <span className="ml-auto font-medium text-lg">
+                  ${subtotal.toFixed(2)}
                 </span>
               </li>
-            )}
-            <li className="flex flex-wrap gap-4 text-lg font-bold">
-              Total <span className="ml-auto">${total.toFixed(2)}</span>
-            </li>
-          </ul>
+              {descuento > 0 && (
+                <li className="flex flex-wrap gap-4 text-lg font-medium">
+                  Descuento{" "}
+                  <span className="ml-auto font-bold">
+                    -${descuento.toFixed(2)}
+                  </span>
+                </li>
+              )}
+              <li className="flex flex-wrap gap-4 text-lg font-bold">
+                Total <span className="ml-auto">${total.toFixed(2)}</span>
+              </li>
+            </ul>
           </div>
           <div className="mt-8 space-y-2 flex flex-col gap-2 lg:w-80 p-4 w-full">
-            <Link href="/checkout">
-              <button
+            <button
+              type="button"
+              className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
+                session && cart.length > 0
+                  ? "  bg-teal-600 text-white  hover:bg-teal-800   "
+                  : "bg-gray-300 cursor-not-allowed text-gray-500"
+              }`}
+              disabled={!session || cart.length === 0}
+              title={
+                !session
+                  ? "Necesita estar logueado para continuar con el pago"
+                  : cart.length === 0
+                  ? "El carrito está vacío"
+                  : ""
+              }
+              onClick={() => setOpenModal(true)}
+            >
+              Ir a pagar
+            </button>
+            <Modal show={openModal} onClose={() => setOpenModal(false)} className="p-40 custom-modal-container" >
+              <Modal.Header>Detalle de envio</Modal.Header>
+              <Modal.Body>
+                <div className="flex flex-col gap-4">
+              <div>
+              <label
+                htmlFor="addresOrder"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Dirección de envio
+              </label>
+              <input
+                type="text"
+                name="addresOrder"
+                id="addresOrder"
+                className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
+                placeholder="Avenida San Martin 123"
+                value={addresOrder}
+                onChange={(e) => setAddresOrder(e.target.value)}
+                disabled={isDelivery===true}
+              />
+              </div>
+              <div className="flex gap-4 items-center">
+                <h4 className="block text-sm font-medium text-gray-900 dark:text-white">Retiro en local</h4>
+                <input
+                  type="checkbox"
+                  name="isDelivery"
+                  id="isDelivery"
+                  onChange={(e) => setIsDelivery(e.target.checked)}
+                />
+              </div>
+
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <button
+                onClick={handleCheckout}
                 type="button"
-                className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
-                  session && cart.length > 0
-                    ? "  bg-teal-600 text-white  hover:bg-teal-800   "
-                    : "bg-gray-300 cursor-not-allowed text-gray-500"
-                }`}
-                disabled={!session || cart.length === 0}
+                className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                disabled={!session || cart.length === 0 || isDelivery===false && addresOrder===""}
                 title={
                   !session
                     ? "Necesita estar logueado para continuar con el pago"
                     : cart.length === 0
                     ? "El carrito está vacío"
                     : ""
-                }
-              >
-                Ir a pagar
-              </button>
-            </Link>
+                }>Ir a pagar</button>
+              </Modal.Footer>
+            </Modal>
             <Link href="/categories">
               <button
                 type="button"
                 onClick={() => router.push("/home")}
                 className="text-sm px-4 py-2.5 w-full font-semibold tracking-wide bg-gray-200 hover:bg-gray-500 text-teal-600 hover:shadow-xl hover:text-white rounded-md"
               >
-                <FontAwesomeIcon icon={faBagShopping} style={{width: "15px", height: "15px", marginRight: "5px"}}/>
+                <FontAwesomeIcon
+                  icon={faBagShopping}
+                  style={{ width: "15px", height: "15px", marginRight: "5px" }}
+                />
                 Continuar comprando
               </button>
             </Link>

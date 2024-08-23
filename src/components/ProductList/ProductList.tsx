@@ -8,6 +8,8 @@ import { Dropdown } from "flowbite-react";
 import Image from "next/image";
 import { useCategoryContext } from "@/context/categories.context";
 import categorySpanish from "@/utils/categorySpanish";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBolt } from "@fortawesome/free-solid-svg-icons";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -23,13 +25,17 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const router = useRouter();
   const { searchResults } = useProductContext();
   const [filterOption, setFilterOption] = useState<string>("");
-  const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(productsList);
-  const {categories } = useCategoryContext();
+  const [filteredProducts, setFilteredProducts] = useState<
+    IProductList[] | undefined
+  >(productsList);
+  const { categories } = useCategoryContext();
 
   useEffect(() => {
     let sortedProducts = productsList || [];
     if (searchResults !== undefined && productsList !== undefined) {
-      sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+      sortedProducts = [
+        ...(searchResults.length > 0 ? searchResults : productsList),
+      ];
     }
     if (selectedCategory) {
       sortedProducts = sortedProducts.filter(
@@ -39,20 +45,30 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
     switch (filterOption) {
       case "price-asc":
-        sortedProducts.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        sortedProducts.sort(
+          (a, b) => parseFloat(a.price) - parseFloat(b.price)
+        );
         break;
       case "price-desc":
-        sortedProducts.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        sortedProducts.sort(
+          (a, b) => parseFloat(b.price) - parseFloat(a.price)
+        );
         break;
       case "name-asc":
-        sortedProducts.sort((a, b) => a.description.localeCompare(b.description));
+        sortedProducts.sort((a, b) =>
+          a.description.localeCompare(b.description)
+        );
         break;
       case "name-desc":
-        sortedProducts.sort((a, b) => b.description.localeCompare(a.description));
+        sortedProducts.sort((a, b) =>
+          b.description.localeCompare(a.description)
+        );
         break;
       default:
         if (searchResults !== undefined && productsList !== undefined) {
-          sortedProducts = [...(searchResults.length > 0 ? searchResults : productsList)];
+          sortedProducts = [
+            ...(searchResults.length > 0 ? searchResults : productsList),
+          ];
         }
     }
 
@@ -62,7 +78,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
-    } else if (id=== "promociones") {
+    } else if (id === "promociones") {
       router.push(`/promociones`);
     } else {
       router.push(`/categories/${id}`);
@@ -84,7 +100,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       <h1 className="text-2xl mb-4 lg:mb-0">
         <Link href="/categories">Productos</Link>
         {" / "}
-        <span className="font-bold">{categorySpanish(category.name)|| category.name} </span>
+        <span className="font-bold">
+          {categorySpanish(category.name) || category.name}{" "}
+        </span>
       </h1>
     );
   };
@@ -98,7 +116,10 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <Dropdown
           arrowIcon={false}
           label={
-            <div className="flex justify-between w-[300px] md:w-[400px]" id="custom-dropdown-button">
+            <div
+              className="flex justify-between w-[300px] md:w-[400px]"
+              id="custom-dropdown-button"
+            >
               <span>Filtrar</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -118,21 +139,31 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
           style={{
             border: "1px solid white",
             backgroundColor: "#00695c",
-            outline: 'none',
-            
+            outline: "none",
           }}
-
         >
-          <Dropdown.Item onClick={() => setFilterOption("price-asc")} className="md:w-[400px]">
+          <Dropdown.Item
+            onClick={() => setFilterOption("price-asc")}
+            className="md:w-[400px]"
+          >
             Ordenar por precio: Menor a Mayor
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setFilterOption("price-desc")} className="md:w-[400px]">
+          <Dropdown.Item
+            onClick={() => setFilterOption("price-desc")}
+            className="md:w-[400px]"
+          >
             Ordenar por precio: Mayor a Menor
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setFilterOption("name-asc")} className="md:w-[400px]">
+          <Dropdown.Item
+            onClick={() => setFilterOption("name-asc")}
+            className="md:w-[400px]"
+          >
             Nombre: A-Z
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => setFilterOption("name-desc")} className="md:w-[400px]">
+          <Dropdown.Item
+            onClick={() => setFilterOption("name-desc")}
+            className="md:w-[400px]"
+          >
             Nombre: Z-A
           </Dropdown.Item>
         </Dropdown>
@@ -142,9 +173,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         {/* Sidebar de categorías */}
         <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600  rounded-xl lg:mr-10 mr-0">
           <h2 className="text-lg font-bold mb-4 text-gray-600">Categorías</h2>
-          <hr className="border-teal-600"/>
+          <hr className="border-teal-600" />
           <ul className="mt-4 flex flex-col gap-2">
-            <li >
+            <li>
               <button
                 onClick={() => handleCategoryChange(null)}
                 className={`text-lg ${
@@ -155,10 +186,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               >
                 Todo
               </button>
-              
             </li>
             <li>
-            <button
+              <button
                 onClick={() => handleCategoryChange("promociones")}
                 className={`text-lg ${
                   selectedCategory === "promociones"
@@ -168,9 +198,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               >
                 Promociones
               </button>
-              </li>
+            </li>
             {categories?.map((cat) => (
-              <li key={cat.id} >
+              <li key={cat.id}>
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`text-lg ${
@@ -197,33 +227,94 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                     key={product.article_id}
-                    className=" rounded-lg h-[400px] shadow-lg hover:scale-105 "
+                    className="relative rounded-lg h-[400px] shadow-lg hover:scale-105"
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
-
-                      <Image
+                    <Image
                       width={500}
-                        height={500}
-                        src={product.imgUrl}
-                        alt={product.description}
-                        className="relative inset-0 w-full h-4/6 object-cover rounded-t-lg animate-fade-in-up  transition-transform duration-300 cursor-pointer"
-                      />
-                    <hr className=" bg-blue-gray-600"/>
+                      height={500}
+                      src={product.imgUrl}
+                      alt={product.description}
+                      className="relative inset-0 w-full h-4/6 object-cover rounded-t-lg animate-fade-in-up  transition-transform duration-300 cursor-pointer"
+                    />
+                    <hr className=" bg-blue-gray-600" />
                     <div className="p-4 flex flex-col justify-between w-full h-2/6">
-                    {productCategory && (
-                      <h3 className="text-gray-500">{productCategory.name}</h3>
-                    )}
-                    <h2 className="text-xl font-semibold">
-                      {product.description}
-                    </h2>
-                    <p className="text-lg font-bold mt-2">$ {product.price}</p>
+                      {productCategory && (
+                        <h3 className="text-gray-500 text-sm">
+                          {productCategory.name}
+                        </h3>
+                      )}
+
+                      <h2 className="text-lg font-bold">
+                        {product.description}
+                      </h2>
+
+                      {Number(product.discount) !== 0 ? (
+                        <>
+                          <div className="absolute top-4 right-4 flex items-center gap-2">
+                            <FontAwesomeIcon
+                              icon={faBolt}
+                              style={{ color: "white" }}
+                            />
+                            <p className="text-white font-bold">Promoción</p>
+                          </div>
+                          <del className="text-sm font-medium text-gray-600">
+                            $ {product.price}
+                          </del>
+                          <div className="flex gap-4 items-center">
+                            <p className="text-lg font-bold">
+                              ${" "}
+                              {Number(product.price) -
+                                (Number(product.price) *
+                                  Number(product.discount)) /
+                                  100}
+                            </p>
+                            <p className="text-teal-400 text-sm font-bold">
+                              {product.discount} % de descuento
+                            </p>
+                          </div>
+                        </>
+                      ) : product.subproducts &&
+                        product.subproducts.length > 0 ? (
+                        <>
+                          <div className="h-7 flex items-center gap-3">
+                            {product.subproducts.map((subProduct, index) => (
+                              <p key={index} className="text-sm font-medium text-gray-500 ">
+                                {" "}
+                                {subProduct.amount} {subProduct.unit}{" "}
+                              </p>
+                            ))}
+                          </div>
+                          <div className="flex gap-4 items-center">
+                            <p className="text-lg font-medium ">Desde:</p>
+                            <p className="text-lg font-bold ">
+                              ${" "}
+                              {
+                                product.subproducts.reduce(
+                                  (lowest, current) => {
+                                    return current.price < lowest.price
+                                      ? current
+                                      : lowest;
+                                  }
+                                ).price
+                              }
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-lg font-bold ">$ {product.price}</p>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="w-full h-full flex justify-center items-center"><h1 className="text-2xl font-semibold text-gray-500 w-full text-center">No hay productos para mostrar en esta categoría.</h1></div>
+            <div className="w-full h-full flex justify-center items-center">
+              <h1 className="text-2xl font-semibold text-gray-500 w-full text-center">
+                No hay productos para mostrar en esta categoría.
+              </h1>
+            </div>
           )}
         </div>
       </div>

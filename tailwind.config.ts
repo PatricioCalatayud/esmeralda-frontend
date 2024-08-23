@@ -22,7 +22,8 @@ module.exports = withMT({
       },
       boxShadow: {
         "3xl": "0px 0px 10px #929191",
-      }
+      },
+      
     },
   },
   plugins: [require("tailwindcss-animated")],

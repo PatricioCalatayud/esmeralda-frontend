@@ -41,7 +41,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
         onPointerLeaveCapture={() => {}}
       />
     </div>
-  ) : order && order.orderDetail && order.orderDetail.transactions[0].status ? (
+  ) : order && order.orderDetail && order.orderDetail.transactions.status ? (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="mx-auto max-w-screen-2xl px-1 lg:px-2 ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">
@@ -81,7 +81,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
             <div className="w-full flex justify-start items-center py-20">
               <div className="flex gap-4">
                 <TrackingComponent1
-                  statusBack={order.orderDetail.transactions[0].status}
+                  statusBack={order.orderDetail.transactions.status}
                   height={400}
                   width={100}
                 />
@@ -90,7 +90,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                     <div key={index} className="flex gap-4">
                       <h1
                         className={`text-xl w-40 ${
-                          order.orderDetail.transactions[0].status === status
+                          order.orderDetail.transactions.status === status
                             ? "text-teal-800 font-bold"
                             : "text-gray-500 font-medium"
                         }`}
@@ -98,7 +98,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                         {status}
                       </h1>
                       <div className="w-1/2 text-center ">
-                      {status === order.orderDetail.transactions[0].status &&
+                      {status === order.orderDetail.transactions.status &&
                       status === "Recibido" ? (
                        
                           <p>

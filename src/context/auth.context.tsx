@@ -57,6 +57,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           setUserId(decodedToken.sub);
           // seteo la sesion con el token decodificado
           setSession({
+            id: decodedToken.sub,
             name: decodedToken.name,
             email: decodedToken.email,
             image: undefined,
@@ -79,6 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (sessionGoogle) {
         console.log("Usuario:", sessionGoogle.user);
         setSession({
+          id: sessionGoogle.user?.id ?? "",
           name: sessionGoogle.user?.name ?? "",
           email: sessionGoogle.user?.email ?? "",
           image: sessionGoogle.user?.image ?? "",

@@ -109,6 +109,7 @@ const Login = () => {
       if (response) {
         const decodedToken: any = jwtDecode(response.accessToken as string);
         setSession({
+          id: decodedToken.userId,
           name: decodedToken.name,
           email: decodedToken.email,
           image: undefined,

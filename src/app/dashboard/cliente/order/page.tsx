@@ -136,13 +136,12 @@ console.log(orders);
             $ {order.orderDetail.totalPrice}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            {order.orderDetail.transactions.map(
-              (transaction, transactionIndex) => (
-                <div key={transactionIndex} className={`flex items-center justify-center ${transaction.status === "Recibido" ? "text-teal-500" : "text-red-500"}`}>
-                  <p>{transaction.status}</p>
+
+                <div  className={`flex items-center justify-center ${order.orderDetail.transactions.status === "Recibido" ? "text-teal-500" : "text-red-500"}`}>
+                  <p>{order.orderDetail.transactions.status}</p>
                 </div>
-              )
-            )}
+
+
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
           <Link

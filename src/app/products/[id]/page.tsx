@@ -9,8 +9,6 @@ import Swal from "sweetalert2";
 
 import { getProductById } from "../../../helpers/ProductsServices.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
-import { createStorageOrder } from "@/helpers/StorageCart.helper";
-import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +19,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
   const { token } = useAuthContext();
   const router = useRouter();
@@ -52,12 +51,25 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           name: fetchedProduct.category?.name as CategoryName || fetchedProduct.category?.name
         });
         setCategory(translatedCategories);
+        if(fetchedProduct.subproducts && fetchedProduct.subproducts.length > 0) {
 
-        if (fetchedProduct.category?.name === "coffee") {
-          setSelectedSize("250g");
-        } else {
-          setSelectedSize("10 cápsulas");
+          const lowestPricedSubproduct = fetchedProduct?.subproducts?.reduce((lowest, current) => {
+            return current.price < lowest.price ? current : lowest;
+          });
+          setSelectedSize(lowestPricedSubproduct.amount);
+          if(Number(fetchedProduct.discount)!== 0) {
+            setSelectedPrice((Number(lowestPricedSubproduct.price) * (Number(fetchedProduct.discount) / 100)).toFixed(2));
+          }else{
+          setSelectedPrice(lowestPricedSubproduct.price);
+          }
+        
+        }else if(Number(fetchedProduct.discount)!== 0){
+            setSelectedPrice((Number(fetchedProduct.price) * (Number(fetchedProduct.discount) / 100)).toFixed(2));
+          }else{
+          setSelectedPrice(fetchedProduct.price);
         }
+        
+        
 
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
         const cartItem = cart.find((item: any) => item.id === productId);
@@ -129,21 +141,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             if (result.isConfirmed) {
               router.push("/cart");
             }
-
-            const userSession = localStorage.getItem("userSession");
-
-            if (userSession) {
-              const token = JSON.parse(userSession).accessToken;
-              const decodedToken: DecodedToken = jwtDecode(token);
-              const userId = decodedToken.sub;
-
-              try {
-                await createStorageOrder({ userId, products: cart });
-                console.log("Storage order created successfully");
-              } catch (error) {
-                console.error("Error creating storage order:", error);
-              }
-            }
           });
         }
       });
@@ -174,28 +171,21 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           }).then(async (result: any) => {
             if (result.isConfirmed) {
               router.push("/cart");
-            }
-
-            const userSession = localStorage.getItem("userSession");
-
-            if (userSession) {
-              const token = JSON.parse(userSession).accessToken;
-              const decodedToken: DecodedToken = jwtDecode(token);
-              const userId = decodedToken.sub;
-
-              try {
-                await createStorageOrder({ userId, products: cart });
-                console.log("Storage order created successfully");
-              } catch (error) {
-                console.error("Error creating storage order:", error);
-              }
-            }
+            }     
           });
         }
       });
     }
   };
 
+  const handleSizeChange = (newSize: string, price: string) => {
+
+    setSelectedSize(newSize);
+    if(Number(product?.discount)!== 0){
+      setSelectedPrice((Number(price) * (Number(product?.discount) / 100)).toFixed(2));
+    }else{
+    setSelectedPrice(price);}
+  };
 
   if (!isLoaded) {
     return (
@@ -213,17 +203,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   if (!product) {
     return <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">No se encontró el producto.</p>;
   }
-
-  const sizeOptions =
-    category?.name === "Café en Cápsulas"
-      ? ["10 cápsulas", "20 cápsulas", "50 cápsulas"]
-      : category?.name === "Máquinas"
-      ? []
-      : ["250 Gramos", "500 Gramos", "1 kg"];
-
-      console.log(product);
   
-
   return (
     <div className="container mx-auto p-4 mt-14 mb-32">
       <div
@@ -263,9 +243,9 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           </h1>
           <hr  className="animate-fade-in-up"/>
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
-          {sizeOptions.length > 0 && (
+
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
-              {product.subproducts && product.subproducts?.length > 0  ? (product.subproducts?.map((subproduct, index) => (
+              {product.subproducts && product.subproducts?.length > 0  && (product.subproducts?.map((subproduct, index) => (
                   <button
                   key={index}
                   className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
@@ -273,29 +253,17 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                       ? "bg-none text-black border-2 border-teal-600"
                       : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
                   }`}
+                  onClick={() => handleSizeChange(subproduct.amount, subproduct.price)}
                 >
                   {`${subproduct.amount} ${subproduct.unit}`}
                   
                 </button>
-              ))) :
-              (sizeOptions.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
-                    selectedSize === size
-                      ? "bg-none text-black border-2 border-teal-600"
-                      : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
-                  }`}
-                >
-                  {size}
-                </button>
-              )))}
+              ))) 
+              }
             </div>
-            
-          )}
+
           <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-            $ {product.price}
+            $ {selectedPrice}
           </p>
           
           </div>
