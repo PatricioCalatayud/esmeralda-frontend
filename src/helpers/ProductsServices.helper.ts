@@ -52,10 +52,11 @@ export async function putProducts(dataProduct: object,id: string, token: string 
     try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
-        "Content-Type": "multipart/form-data",
+
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(res);
     //const products: IProductList[] = res.data;
     //return products;
   } catch (error: any) {

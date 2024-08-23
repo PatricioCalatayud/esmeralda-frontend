@@ -13,12 +13,7 @@ export async function LoginUser(user: ILoginProps) {
         "Content-Type": "application/json",
       },
     });
-    if (res.status !== 200 && res.status !== 201) {
-      console.log(`Error al iniciar sesión : ${res.status} - ${res.data.message}`);
-    }
-    console.log(res.data);
-    const login = res.data as ILoginProps;
-    return login;
+    return res;
   } catch (error: any) {
     if (error.response) {
       console.log(`Error iniciando sesión: ${error.response.status} - ${
@@ -34,7 +29,7 @@ export async function LoginUser(user: ILoginProps) {
 }
 //! Funcion para registrar usuario
 
-export async function NewUser(user: IUserProps): Promise<IUserProps | undefined> {
+export async function NewUser(user: any) {
   try {
     const res = await axios.post(`${apiURL}/auth/signup`, user, {
       headers: {
@@ -44,10 +39,8 @@ export async function NewUser(user: IUserProps): Promise<IUserProps | undefined>
     if (res.status !== 200 && res.status !== 201) {
       console.log(`Error registrando usuario: ${res.status} - ${res.data.message}`);
     }
-    console.log(res.data);
-    const newUser = res.data as IUserProps;
 
-    return newUser;
+    return res;
   } catch (error: any) {
     if (error.response) {
       console.log(`Error registrando usuario: ${error.response.status} - ${error.response.data.message}`);

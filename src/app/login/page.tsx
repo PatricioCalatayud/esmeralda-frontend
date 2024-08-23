@@ -105,27 +105,24 @@ const Login = () => {
 
     try {
       const response = await LoginUser(dataUser);
-
+      const responseData = response?.data;
       if (response) {
-        const decodedToken: any = jwtDecode(response.accessToken as string);
+        const decodedToken: any = jwtDecode(responseData.accessToken as string);
         setSession({
-          id: decodedToken.userId,
+          id: decodedToken.sub,
           name: decodedToken.name,
           email: decodedToken.email,
           image: undefined,
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
         })
-        setUserId(decodedToken.userId);
-        response.accessToken && setToken(response.accessToken);
+        setUserId(decodedToken.sub);
+        responseData.accessToken && setToken(responseData.accessToken);
         
       }
-      
-      
-      console.log(response);
 
-      if (response) {
-        localStorage.setItem("userSession", JSON.stringify(response));
+      if (responseData) {
+        localStorage.setItem("userSession", JSON.stringify(responseData));
 
         Swal.fire({
           icon: "success",

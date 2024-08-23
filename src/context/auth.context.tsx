@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { getSessionGoogle, signOutWithGoogle } from "@/utils/singGoogle";
 import { ISession } from "@/interfaces/ISession";
 import Swal from "sweetalert2";
+import { LoginUser, NewUser } from "@/helpers/Autenticacion.helper";
 interface AuthContextType {
   session: ISession | undefined;
   handleSignOut: () => void;
@@ -76,21 +77,54 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const someFunction = async () => {
       const sessionGoogle = await getSessionGoogle();
-      console.log(sessionGoogle); // Aquí tienes acceso a la data de la sesión
-  
-      if (sessionGoogle) {
+      ;
+      if (sessionGoogle && sessionGoogle.user) {
+        const user = {
+          email: sessionGoogle.user.email as string,
+        }
+        const reponseLogin = await LoginUser(user)
+        console.log(reponseLogin);
+        if (reponseLogin && (reponseLogin.status === 200 || reponseLogin.status === 201)) {
         console.log("Usuario:", sessionGoogle.user);
+
+      const token = reponseLogin.data.accessToken;
+      const decodedToken: any = jwtDecode(token);
+
+      setToken(token);
+
         setSession({
-          id: sessionGoogle.user?.id ?? "",
-          name: sessionGoogle.user?.name ?? "",
-          email: sessionGoogle.user?.email ?? "",
+          id: decodedToken.sub,
+          name: decodedToken.name,
+          email: decodedToken.email,
           image: sessionGoogle.user?.image ?? "",
-          role: "user",
+          role: decodedToken.roles[0],
           phone: undefined,
         }),
         setUserGoogle(true);
       } else {
-        console.log("No hay sesión activa");
+        const newUser = {
+          email: sessionGoogle.user.email as string,
+          name: sessionGoogle.user.name as string,
+        }
+        const response = await NewUser(newUser);
+        if (response && (response.status === 200 || response.status === 201)) {
+          const token = response.data.accessToken;
+          const decodedToken: any = jwtDecode(token);
+          setToken(token);
+          setSession({
+            id: decodedToken.sub,
+            name: decodedToken.name,
+            email: decodedToken.email,
+            image: sessionGoogle.user?.image ?? "",
+            role: decodedToken.roles[0],
+            phone: undefined,
+          }),
+          setUserGoogle(true);
+        }
+
+      }
+      } else {
+        console.log("No hay sesión de Google activa");
       }
       setAuthLoading(false);
     };
@@ -102,18 +136,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const handleSignOut = () => {
     if (userGoogle === true) {
       signOutWithGoogle();
-      //setUserGoogle(false);
-      console.log("Cerrando sesión");
     } else {
       localStorage.removeItem("userSession");
       localStorage.removeItem("cart");
-      //setUserSession(false);
       setSession(undefined);
     }
     Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
     router.push("/");
   };
-  console.log(session);
 
   return (
     <AuthContext.Provider

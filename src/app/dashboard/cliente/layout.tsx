@@ -27,7 +27,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { session, authLoading } = useAuthContext();
 
-  console.log(pathname);
   //! Obtener token de usuario-Session
   useEffect(() => {
     if (!authLoading) {

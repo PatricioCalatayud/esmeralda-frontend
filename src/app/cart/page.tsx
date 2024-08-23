@@ -110,16 +110,6 @@ const Cart = () => {
   const descuento = calcularDescuento();
   const total = calcularTotal();
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    e.preventDefault();
-    setAddresOrder(
- e.target.value
-    );
-  };
   const handleCheckout = async() => {
     const products = cart.map(product => ({
       id: product.id,
@@ -129,7 +119,7 @@ const Cart = () => {
     const orderCheckout = {
       userId: session?.id,
       products,
-      ...(addresOrder && { address: addresOrder }), // Condicionalmente agregar la dirección
+      ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10
     };
     console.log(orderCheckout);
