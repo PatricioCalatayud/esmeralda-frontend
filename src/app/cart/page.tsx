@@ -16,7 +16,7 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { postOrder } from "@/helpers/Order.helper";
-import { Button, Modal } from "flowbite-react";
+import {Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
 const Cart = () => {
   const router = useRouter();
@@ -26,6 +26,7 @@ const Cart = () => {
   const [addresOrder, setAddresOrder] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
+  const [selectedPrice, setSelectedPrice] = useState<string>("");
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -93,13 +94,12 @@ const Cart = () => {
 
   const calcularDescuento = () => {
     return cart.reduce((acc, item) => {
-      return (
-        acc +
-        (item.quantity || 1) * (Number(item.price) * Number(item.discount || 0))
-      );
+      // Aplicar descuento como un porcentaje del precio
+      const descuentoPorProducto = (item.quantity || 1) * (Number(item.price) * (Number(item.discount || 0) / 100));
+      return acc + descuentoPorProducto;
     }, 0);
   };
-
+  
   const calcularTotal = () => {
     const subtotal = calcularSubtotal();
     const descuento = calcularDescuento();
@@ -216,7 +216,7 @@ const Cart = () => {
                   </div>
                   <div className="flex flex-col gap-3 w-full">
                     <h3 className="text-base font-bold text-gray-800 text-nowrap">
-                      {item.description} ({item.size})
+                      {item.description}
                     </h3>
                     <div
                       onClick={() => removeFromCart(index)}
@@ -253,32 +253,27 @@ const Cart = () => {
                         </p>
                       </div>
                       <div className="ml-auto">
-                        {item.discount && Number(item.discount) > 0 ? (
-                          <div>
-                            <h4 className="text-lg font-bold text-gray-800">
-                              $
-                              {(
-                                Number(item.price) *
-                                (item.quantity || 1) *
-                                (1 - Number(item.discount))
-                              ).toFixed(2)}
-                            </h4>
-                            <h4 className="text-gray-500 line-through">
-                              $
-                              {(
-                                Number(item.price) * (item.quantity || 1)
-                              ).toFixed(2)}
-                            </h4>
-                          </div>
-                        ) : (
-                          <h4 className="text-lg font-bold text-gray-800">
-                            $
-                            {(
-                              Number(item.price) * (item.quantity || 1)
-                            ).toFixed(2)}
-                          </h4>
-                        )}
-                      </div>
+  {item.discount && Number(item.discount) > 0 ? (
+    <div>
+      <h4 className="text-lg font-bold text-gray-800">
+        ${(
+          Number(item.price) * (item.quantity || 1) * (1 - Number(item.discount) / 100)
+        ).toFixed(2)}
+      </h4>
+      <h4 className="text-sm text-gray-500 line-through">
+        ${(
+          Number(item.price) * (item.quantity || 1)
+        ).toFixed(2)}
+      </h4>
+    </div>
+  ) : (
+    <h4 className="text-lg font-bold text-gray-800">
+      ${(
+        Number(item.price) * (item.quantity || 1)
+      ).toFixed(2)}
+    </h4>
+  )}
+</div>
                     </div>
                   </div>
                 </div>

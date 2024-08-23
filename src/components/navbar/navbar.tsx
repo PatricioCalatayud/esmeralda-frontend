@@ -230,7 +230,7 @@ const Navbar = () => {
               onChange={handleSearchChange}
             />
             <div className="border-r border-gray-600 flex items-center justify-center absolute w-8">
-            <FontAwesomeIcon icon={faMagnifyingGlass} className=" text-gray-600"/>
+            <FontAwesomeIcon icon={faMagnifyingGlass} className=" text-gray-600" style={{width: "20px", height: "20px"}}/>
             </div>
           </div>
           <button

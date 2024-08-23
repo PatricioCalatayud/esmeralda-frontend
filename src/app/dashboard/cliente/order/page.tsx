@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [orders, setOrders] = useState<IOrders[] | undefined>([]);
   const { session, token, userId, authLoading } = useAuthContext();
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedPrice, setSelectedPrice] = useState<string>("");
 console.log(orders);
   useEffect(() => {
     if (!authLoading) {
@@ -46,11 +47,6 @@ console.log(orders);
       listOrders(userId);
     }
   }, [userId, token]);
-
-  function formatDate(dateString: string) {
-    const date = new Date(dateString);
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -143,9 +139,9 @@ console.log(orders);
 
 
           </td>
-          {order.orderDetail.transactions.status !== "Pendiente de pago" &&
+          
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            
+          {order.orderDetail.transactions.status !== "Pendiente de pago" && 
           <Link
                   type="button"
                   data-drawer-target="drawer-update-product"
@@ -157,9 +153,9 @@ console.log(orders);
                   <FontAwesomeIcon icon={faTruck} />
                   Ver detalle
                 </Link>
-                </td>}
+                 }</td>
         </tr>
-      ))}
+     ))}
     </DashboardComponent>
   );
 };
