@@ -84,7 +84,7 @@ const OrderList = () => {
       return orders;
     } else {
       return orders.filter((order) =>
-        order.id.toLowerCase().includes(searchTerm.toLowerCase())
+        order.user.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
   };
@@ -119,7 +119,7 @@ const OrderList = () => {
   ) : (
     <DashboardComponent
       titleDashboard="Listado de Ordenes"
-      searchBar="Buscar Ordenes"
+      searchBar="Buscar cliente"
       handleSearchChange={handleSearchChange}
       totalPages={totalPages}
       tdTable={[
@@ -141,7 +141,7 @@ const OrderList = () => {
             scope="row"
             className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-            <div className="flex items-center">{order.id}</div>
+            <div className="flex items-center">{order.user.name}</div>
           </th>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             <div className="flex justify-center items-center">
@@ -163,12 +163,12 @@ const OrderList = () => {
           </td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
-              order.orderDetail.transactions[0].status === "Recibido"
+              order.orderDetail.transactions.status === "Recibido"
                 ? "text-teal-500"
                 : "text-red-500"
             } `}
           >
-            {order.orderDetail.transactions[0].status === "Recibido" ? (
+            {order.orderDetail.transactions.status === "Recibido" ? (
               <select
                 id="status"
                 name="status"
@@ -182,7 +182,7 @@ const OrderList = () => {
                 <option value={"Entregado"}>Entregado</option>
               </select>
             ) : (
-              order.orderDetail.transactions[0].status
+              order.orderDetail.transactions.status
             )}
           </td>
         </tr>

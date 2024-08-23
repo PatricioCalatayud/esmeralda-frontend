@@ -256,7 +256,7 @@ const ProductList = () => {
                   data-drawer-show="drawer-update-product"
                   aria-controls="drawer-update-product"
                   className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                  href={`../../dashboard/administrador/product/${product.id}`}
+                  href={`/dashboard/administrador/product/${product.id}`}
                 >
                   <FontAwesomeIcon icon={faPen} />
                 </Link>

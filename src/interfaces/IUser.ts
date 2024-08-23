@@ -4,3 +4,9 @@ export interface IUserProps {
   password: string;
   phone: string;
 }
+export interface IUserUpdateProps {
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+}
