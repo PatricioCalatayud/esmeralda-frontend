@@ -4,8 +4,13 @@ export interface ILoginProps {
   accessToken?: string;
 
 }
+export interface ILogin {
+  email: string;
+  password: string;
+  accessToken?: string;
 
+}
 export interface ILoginErrorProps {
   email: string;
-  password?: string | undefined;
+  password: string;
 }

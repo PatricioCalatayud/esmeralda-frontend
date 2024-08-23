@@ -1,6 +1,6 @@
 "use client";
 import { LoginUser } from "@/helpers/Autenticacion.helper";
-import { ILoginErrorProps, ILoginProps } from "@/interfaces/ILogin";
+import { ILogin, ILoginErrorProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
@@ -30,7 +30,7 @@ const theme = createTheme();
 const Login = () => {
   const Router = useRouter();
 
-  const initialUserData: ILoginProps = {
+  const initialUserData: ILogin = {
     email: "",
     password: "",
   };
@@ -39,7 +39,7 @@ const Login = () => {
     password: "",
   };
 
-  const [dataUser, setDataUser] = useState<ILoginProps>(initialUserData);
+  const [dataUser, setDataUser] = useState<ILogin>(initialUserData);
   const [error, setError] = useState<ILoginErrorProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

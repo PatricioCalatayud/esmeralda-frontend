@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -9,8 +9,6 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import InputAdornment from '@mui/material/InputAdornment';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Swal from "sweetalert2";
 import Image from "next/image"; // Importación del componente Image
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';

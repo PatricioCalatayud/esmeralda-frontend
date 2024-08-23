@@ -1,8 +1,5 @@
 import { getProducts } from "@/helpers/ProductsServices.helper";
 import ProductList from "@/components/ProductList/ProductList";
-import { useProductContext } from "@/context/product.context";
-
-
 
 export default async  function PromotionsPage() {
 
