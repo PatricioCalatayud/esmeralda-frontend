@@ -1,11 +1,18 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, CssBaseline, TextField, Typography, Container, Box, Avatar } from "@mui/material";
+import {
+  Button,
+  CssBaseline,
+  TextField,
+  Typography,
+  Container,
+  Box,
+  Avatar,
+} from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { useState } from "react";
 
 const theme = createTheme();
 
@@ -15,19 +22,46 @@ const ForgotPassword: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Aquí iría la lógica para manejar la solicitud de restablecimiento de contraseña
-    Swal.fire({
-      icon: "success",
-      title: "¡Correo enviado!",
-      text: "Revisa tu correo electrónico para restablecer tu contraseña.",
-      showConfirmButton: false,
-      timer: 1500,
-    });
 
-    setTimeout(() => {
-      Router.push("/login");
-    }, 1500);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log("Response status:", response.status); // Verifica el estado de la respuesta
+
+      if (response.ok) {
+        console.log("Response is OK, triggering Swal..."); // Depuración
+        Swal.fire({
+          icon: "success",
+          title: "¡Correo enviado!",
+          text: "Revisa tu correo electrónico para restablecer tu contraseña.",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        setTimeout(() => {
+          Router.push("/login");
+        }, 1500);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo enviar el correo. Por favor, intenta de nuevo.",
+        });
+      }
+    } catch (error) {
+      console.error("Error during fetch:", error); // Verifica si hay errores en la petición
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Ocurrió un error inesperado. Por favor, intenta de nuevo.",
+      });
+    }
   };
 
   // Ocultar Navbar y Footer
@@ -99,21 +133,21 @@ const ForgotPassword: React.FC = () => {
                   Enviar Enlace de Restablecimiento
                 </Button>
                 <Button
-  fullWidth
-  variant="text"
-  sx={{
-    mt: 3,
-    mb: 2,
-    backgroundColor: "teal", // Cambiado a backgroundColor
-    color: "white", // Establece el color del texto a blanco
-    "&:hover": {
-      backgroundColor: "darkslategray",
-    },
-  }}
-  onClick={() => Router.push("/login")}
->
-  Volver a Iniciar Sesión
-</Button>
+                  fullWidth
+                  variant="text"
+                  sx={{
+                    mt: 3,
+                    mb: 2,
+                    backgroundColor: "teal",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "darkslategray",
+                    },
+                  }}
+                  onClick={() => Router.push("/login")}
+                >
+                  Volver a Iniciar Sesión
+                </Button>
               </Box>
             </Box>
           </Container>

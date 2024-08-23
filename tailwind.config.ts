@@ -1,7 +1,3 @@
-// import type { Config } from "tailwindcss";
-
-import shadows from "@mui/material/styles/shadows";
-
 const withMT = require("@material-tailwind/react/utils/withMT");
 
 module.exports = withMT({
@@ -14,6 +10,10 @@ module.exports = withMT({
     extend: {
       colors: {
         primary: "#00796b",
+        'blue-gray': '#607d8b',
+        'slate': '#54617a',
+        'prim-blue': '#0073ff',
+        'red-500': '#ff4568', // Añadimos el color para el botón
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -23,9 +23,12 @@ module.exports = withMT({
       boxShadow: {
         "3xl": "0px 0px 10px #929191",
       },
-      
+      fontFamily: {
+        'roboto': ['Roboto', 'sans-serif'],
+        'bariol': ['bariolregular', 'sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'], // Añadimos la fuente Poppins
+      },
     },
   },
   plugins: [require("tailwindcss-animated")],
 });
-// export default config;
