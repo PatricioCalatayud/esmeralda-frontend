@@ -14,16 +14,19 @@ const Users = () => {
     const [users, setUsers] = useState<ISession[] | undefined>([]);
     const {token} = useAuthContext();
     const [roleUser, setRoleUser] = useState("");
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const ORDERS_PER_PAGE = 5;
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     useEffect(() => {
         const fetchUsers = async () =>{
             console.log("llegue aca?");
-            const response = await getUsers(token);
+            const limit = ORDERS_PER_PAGE;
+            const page = currentPage;
+            const response = await getUsers(token, page, limit);
             console.log(response);
             setUsers(response);
-
+            if (response) setTotalPages(Math.ceil(response.length / ORDERS_PER_PAGE));
         }
         fetchUsers()
         setLoading(false);
@@ -61,6 +64,7 @@ const Users = () => {
       searchBar="Buscar Usuario"
       handleSearchChange={handleSearchChange}
       totalPages={totalPages}
+
       tdTable={[
         "Nombre",
         "Telefono",
@@ -69,6 +73,7 @@ const Users = () => {
         "Acciones",
       ]}
       noContent="No hay Usuarios disponibles"
+      setCurrentPage={setCurrentPage}
         >
             {users?.map((user: ISession, index) => (
                 <tr

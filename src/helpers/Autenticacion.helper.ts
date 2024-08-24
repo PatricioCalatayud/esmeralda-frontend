@@ -52,13 +52,18 @@ export async function NewUser(user: any) {
   }
 }
 
-export async function getUsers(token: string | undefined) {
+export async function getUsers(token: string | undefined, page?: number, limit?: number) {
   try {
     const response = await axios.get(`${apiURL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: {
+        page,  // Pasar el número de página
+        limit, // Pasar el límite de resultados por página
+      },
     });
+    console.log(response);
     const users: ISession[] = response.data;
     return users;
   } catch (error: any) {
@@ -86,8 +91,8 @@ export async function putUser(userId: string, user: IUserUpdateProps, token: str
         Authorization: `Bearer ${token}`,
       },
     });
-    const updatedUser: IUserProps = response.data; // Renombrar a 'updatedUser'
-    return updatedUser;
+
+    return response;
   } catch (error: any) {
     console.log(error);
   }

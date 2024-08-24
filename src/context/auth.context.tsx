@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           email: decodedToken.email,
           image: sessionGoogle.user?.image ?? "",
           role: decodedToken.roles[0],
-          phone: undefined,
+          phone: decodedToken.phone,
         }),
         setUserGoogle(true);
       } else {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             email: decodedToken.email,
             image: sessionGoogle.user?.image ?? "",
             role: decodedToken.roles[0],
-            phone: undefined,
+            phone: decodedToken.phon,
           }),
           setUserGoogle(true);
         }
