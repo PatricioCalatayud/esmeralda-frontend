@@ -28,7 +28,7 @@ const DashboardComponent = ({
   totalPages,
   handleSearchChange,
   setCurrentPage,
-  currentPage
+  currentPage , 
 }: IDashboardInterface) => {
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
@@ -111,7 +111,7 @@ const DashboardComponent = ({
               count={totalPages}
               page={currentPage}
 
-
+              onChange={(_, page) => setCurrentPage && setCurrentPage(page)}
             />
           </div>
         </div>
