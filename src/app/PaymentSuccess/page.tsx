@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 const PaymentSuccess: React.FC = () => {
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
   const [orderDetails, setOrderDetails] = useState<{
     date: string;
     time: string;
@@ -11,8 +10,13 @@ const PaymentSuccess: React.FC = () => {
   } | null>(null);
 
   useEffect(() => {
-    const orderId = searchParams.get('orderId');
+    setSearchParams(new URLSearchParams(window.location.search));
+  }, []);
 
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const orderId = searchParams.get('orderId');
     console.log("Order ID from URL:", orderId);  // Para verificar que el orderId se esté capturando correctamente
 
     if (orderId) {
