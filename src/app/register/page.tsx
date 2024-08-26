@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -8,20 +8,19 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import InputAdornment from '@mui/material/InputAdornment';
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Swal from "sweetalert2";
-import Image from "next/image"; // Importación del componente Image
+import InputAdornment from "@mui/material/InputAdornment";
+import { IconButton } from "@mui/material";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
+import Link from "next/link";
 import { NewUser } from "@/helpers/Autenticacion.helper";
 import { IUserProps } from "@/interfaces/IUser";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
-import Link from "next/link";
-import { MdVisibility, MdVisibilityOff } from "react-icons/md";
-import { IconButton } from "@mui/material";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -50,18 +49,18 @@ const RegisterUser = () => {
     password: false,
     phone: false,
   });
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
+
   const handleReset = (): void => {
     setDataUser(initialUserData);
     setError(initialErrorState);
   };
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -89,6 +88,48 @@ const RegisterUser = () => {
       ...prevError,
       [name]: fieldErrors[name as keyof IUserProps] || "", // Asegurar que siempre se asigna un string
     }));
+  };
+
+  const validateRegisterUserForm = (data: IUserProps): IUserProps => {
+    const errors: IUserProps = {
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+    };
+
+    // Validación del nombre
+    if (!data.name) {
+      errors.name = "El nombre es obligatorio";
+    } else if (!/^[a-zA-ZÀ-ÿ\s]{1,40}$/.test(data.name)) {
+      errors.name = "El nombre solo puede contener letras y espacios";
+    }
+
+    // Validación del email
+    if (!data.email) {
+      errors.email = "El email es obligatorio";
+    } else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(data.email)) {
+      errors.email = "El email no es válido";
+    }
+
+    // Validación de la contraseña
+    if (!data.password) {
+      errors.password = "La contraseña es obligatoria";
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/.test(data.password)
+    ) {
+      errors.password =
+        "La contraseña debe tener entre 8 y 15 caracteres, incluyendo al menos una mayúscula, una minúscula y un número";
+    }
+
+    // Validación del teléfono
+    if (!data.phone) {
+      errors.phone = "El teléfono es obligatorio";
+    } else if (!/^\d{7,14}$/.test(data.phone)) {
+      errors.phone = "El teléfono debe tener entre 7 y 14 dígitos";
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,17 +180,31 @@ const RegisterUser = () => {
       }, 3000);
     } catch (error: any) {
       if (error.response) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `Error al registrar el usuario: ${error.response.data.message}`,
+        });
         setSubmitError(
           `Error al registrar el usuario: ${error.response.data.message}`
         );
       } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al registrar el usuario: No se recibió respuesta del servidor.",
+        });
         setSubmitError(
           "Error al registrar el usuario: No se recibió respuesta del servidor."
         );
       } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `Error al registrar el usuario: ${error.message}`,
+        });
         setSubmitError(`Error al registrar el usuario: ${error.message}`);
       }
-      toast.error("Error al registrar el usuario");
     } finally {
       setLoading(false);
     }
@@ -157,171 +212,183 @@ const RegisterUser = () => {
 
   const isDisabled = Object.values(error).some((x) => x !== "");
 
-
   return (
-   
-      <><div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
-      <video
-        autoPlay
-        loop
-        muted
-        className="absolute top-0 left-0 w-full h-full object-cover"
-      >
-        <source src="/back.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div className="relative z-10 font-sans max-w-7xl mx-auto">
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <Box
-            sx={{
-              marginTop: 8,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.7)", // Más transparente
-              padding: 4,
-              borderRadius: 2,
-              boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
-            }}
-          >
-            <Avatar sx={{ m: 1, bgcolor: "teal" }}></Avatar>
-            <Typography component="h1" variant="h5" color="teal">
-              Registro
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 3 }}
-            >
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="name"
-                label="Nombre y Apellido"
-                name="name"
-                autoComplete="name"
-                autoFocus
-                value={dataUser.name}
-                onChange={handleChange}
-                error={!!error.name}
-                helperText={error.name}
-                InputLabelProps={{ style: { color: 'teal' } }} // Color teal
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                autoComplete="email"
-                value={dataUser.email}
-                onChange={handleChange}
-                error={!!error.email}
-                helperText={error.email}
-                InputLabelProps={{ style: { color: 'teal' } }} // Color teal
-              />
-              <TextField
-  margin="normal"
-  required
-  fullWidth
-  id="password"
-  type={showPassword ? 'text' : 'password'}
-  label="Contraseña"
-  name="password"
-  autoComplete="new-password"
-  value={dataUser.password}
-  onChange={handleChange}
-  error={!!error.password}
-  helperText={error.password}
-  InputLabelProps={{ style: { color: 'teal' } }} // Color teal
-  InputProps={{
-    endAdornment: (
-      <InputAdornment position="end">
-        <IconButton
-          aria-label="toggle password visibility"
-          onClick={handleClickShowPassword}
-          onMouseDown={handleMouseDownPassword}
-          edge="end"
+    <>
+      <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute top-0 left-0 w-full h-full object-cover"
         >
-          {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
-        </IconButton>
-      </InputAdornment>
-    ),
-  }}
-/>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="phone"
-                label="Teléfono"
-                name="phone"
-                autoComplete="phone"
-                value={dataUser.phone}
-                onChange={handleChange}
-                error={!!error.phone}
-                helperText={error.phone}
-                InputLabelProps={{ style: { color: 'teal' } }} // Color teal
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 3,
-                  mb: 1,
-                  backgroundColor: "teal",
-                  "&:hover": {
-                    backgroundColor: "darkslategray", // Color teal más oscuro en hover
-                  },
-                }}
-                disabled={isDisabled || loading}
+          <source src="/back.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="relative z-10 font-sans max-w-7xl mx-auto">
+          <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Box
+              sx={{
+                marginTop: 8,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.7)", // Más transparente
+                padding: 4,
+                borderRadius: 2,
+                boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
+              }}
+            >
+              <Avatar sx={{ m: 1, bgcolor: "teal" }}></Avatar>
+              <Typography component="h1" variant="h5" color="teal">
+                Registro
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 3 }}
               >
-                {loading ? "Registrando..." : "Registrarse"}
-              </Button>
-              <Link href="/" passHref>
-                    <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 1,
-                         mb: 2,
-                         backgroundColor: "transparent",
-                         "&:hover": {
-                           backgroundColor: "gray",
-                           border: "1px solid gray",
-                           color:"white"
-                         },
-                         border: "1px solid black",
-                         boxShadow: "none",
-                         color: "black",
-                       }}
-                    >
-                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
-                      Volver al Inicio
-                    </Button>
-                  </Link>
-              <Button
-                onClick={handleReset}
-                fullWidth
-                sx={{ mt: 1, mb: 2, borderColor: "teal", color: "teal" }}
-              >
-                Borrar Formulario
-              </Button>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="name"
+                  label="Nombre y Apellido"
+                  name="name"
+                  autoComplete="name"
+                  autoFocus
+                  value={dataUser.name}
+                  onChange={handleChange}
+                  error={!!error.name}
+                  helperText={error.name}
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  autoComplete="email"
+                  value={dataUser.email}
+                  onChange={handleChange}
+                  error={!!error.email}
+                  helperText={error.email}
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  label="Contraseña"
+                  name="password"
+                  autoComplete="new-password"
+                  value={dataUser.password}
+                  onChange={handleChange}
+                  error={!!error.password}
+                  helperText={error.password}
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <MdVisibilityOff />
+                          ) : (
+                            <MdVisibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="phone"
+                  label="Teléfono"
+                  name="phone"
+                  autoComplete="phone"
+                  value={dataUser.phone}
+                  onChange={handleChange}
+                  error={!!error.phone}
+                  helperText={error.phone}
+                  InputLabelProps={{ style: { color: "teal" } }} // Color teal
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    mt: 3,
+                    mb: 1,
+                    backgroundColor: "teal",
+                    "&:hover": {
+                      backgroundColor: "darkslategray", // Color teal más oscuro en hover
+                    },
+                  }}
+                  disabled={isDisabled || loading}
+                >
+                  {loading ? "Registrando..." : "Registrarse"}
+                </Button>
+                <Link href="/" passHref>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      mt: 1,
+                      mb: 2,
+                      backgroundColor: "transparent",
+                      "&:hover": {
+                        backgroundColor: "gray",
+                        border: "1px solid gray",
+                        color: "white",
+                      },
+                      border: "1px solid black",
+                      boxShadow: "none",
+                      color: "black",
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faHouse}
+                      style={{
+                        marginRight: "10px",
+                        width: "20px",
+                        height: "20px",
+                      }}
+                    />
+                    Volver al Inicio
+                  </Button>
+                </Link>
+                <Button
+                  onClick={handleReset}
+                  fullWidth
+                  sx={{ mt: 1, mb: 2, borderColor: "teal", color: "teal" }}
+                >
+                  Borrar Formulario
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        </Container>
+          </Container>
+        </div>
+        <div className="absolute bottom-1 left-1">
+          <Image src="/logoblanco.png" alt="Logo" width={300} height={300} />{" "}
+          {/* Ajusta el tamaño según sea necesario */}
+        </div>
       </div>
-      <div className="absolute bottom-1 left-1">
-        <Image src="/logoblanco.png" alt="Logo" width={300} height={300} /> {/* Ajusta el tamaño según sea necesario */}
-      </div>
-    </div><ToastContainer /></>
-   
+      <ToastContainer />
+    </>
   );
 };
 

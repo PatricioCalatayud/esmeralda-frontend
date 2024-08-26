@@ -1,5 +1,5 @@
 "use client";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
@@ -32,9 +32,14 @@ const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { searchResults: searchProductResults, searchProducts } =
     useProductContext();
-  const { session, handleSignOut } = useAuthContext();
-  const { cartItemCount } = useCartContext();
-  const hideNavbar = pathname === "/login" || pathname === "/register" || pathname === "/forgotPassword" || pathname === "/resetPassword";
+  const { session, handleSignOut: signOut } = useAuthContext();
+  const { cartItemCount, setCartItemCount } = useCartContext(); // Importando setCartItemCount
+
+  const hideNavbar =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgotPassword" ||
+    pathname === "/resetPassword";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -48,6 +53,17 @@ const Navbar = () => {
 
   const handleNavLinkClick = () => {
     setNav(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(); // Cerrar sesión
+      setCartItemCount(0); // Reiniciar contador de carrito a 0
+      localStorage.removeItem("cart"); // (Opcional) Limpiar el carrito en localStorage
+      router.push("/login"); // Redirigir al login
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   if (hideNavbar) {
@@ -86,7 +102,7 @@ const Navbar = () => {
                 onChange={handleSearchChange}
               />
               <AiOutlineSearch
-                style={{width: "20px", height: "20px"}}
+                style={{ width: "20px", height: "20px" }}
                 className="absolute left-2 text-gray-600"
               />
             </div>
@@ -140,16 +156,29 @@ const Navbar = () => {
                 </Dropdown.Header>
                 {session?.role === "Administrador" ? (
                   <Dropdown.Item href="/dashboard/administrador/profile">
-                    <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
+                    <FontAwesomeIcon
+                      icon={faScrewdriverWrench}
+                      style={{ marginRight: "5px" }}
+                    />
                     Panel de Administrador
                   </Dropdown.Item>
                 ) : (
                   <Dropdown.Item href="/dashboard/cliente/profile">
-                    <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
+                    <FontAwesomeIcon
+                      icon={faScrewdriverWrench}
+                      style={{ marginRight: "5px" }}
+                    />
                     Panel de Cliente
                   </Dropdown.Item>
                 )}
-                <Dropdown.Item onClick={handleSignOut}><FontAwesomeIcon icon={faXmark} style={{ marginRight: "5px" }} size="xl"/>Salir</Dropdown.Item>
+                <Dropdown.Item onClick={handleSignOut}>
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    style={{ marginRight: "5px" }}
+                    size="xl"
+                  />
+                  Salir
+                </Dropdown.Item>
               </Dropdown>
             )}
           </div>
@@ -168,28 +197,39 @@ const Navbar = () => {
             inline
             label={
               <div
-
                 className={` hover:text-gray-900   ${
-                  (pathname === "/sobrenosotros" || pathname === "/mvv" || pathname === "/faq") && "text-gray-900 font-bold"
+                  (pathname === "/sobrenosotros" ||
+                    pathname === "/mvv" ||
+                    pathname === "/faq") &&
+                  "text-gray-900 font-bold"
                 }`}
               >
                 Nosotros
               </div>
             }
           >
-            <Dropdown.Item href="/sobrenosotros" className={` hover:text-gray-900   ${
-                  pathname === "/sobrenosotros"  && "text-gray-900 font-bold"
-                }`}>
+            <Dropdown.Item
+              href="/sobrenosotros"
+              className={` hover:text-gray-900   ${
+                pathname === "/sobrenosotros" && "text-gray-900 font-bold"
+              }`}
+            >
               Sobre la Esmeralda
             </Dropdown.Item>
-            <Dropdown.Item href="/mvv" className={` hover:text-gray-900   ${
-                  pathname === "/mvv"  && "text-gray-900 font-bold"
-                }`}>
+            <Dropdown.Item
+              href="/mvv"
+              className={` hover:text-gray-900   ${
+                pathname === "/mvv" && "text-gray-900 font-bold"
+              }`}
+            >
               Mision Vision Valores
             </Dropdown.Item>
-            <Dropdown.Item href="/faq" className={` hover:text-gray-900   ${
-                  pathname === "/faq"  && "text-gray-900 font-bold"
-                }`}>
+            <Dropdown.Item
+              href="/faq"
+              className={` hover:text-gray-900   ${
+                pathname === "/faq" && "text-gray-900 font-bold"
+              }`}
+            >
               Preguntas Frecuentes
             </Dropdown.Item>
           </Dropdown>
@@ -230,7 +270,11 @@ const Navbar = () => {
               onChange={handleSearchChange}
             />
             <div className="border-r border-gray-600 flex items-center justify-center absolute w-8">
-            <FontAwesomeIcon icon={faMagnifyingGlass} className=" text-gray-600" style={{width: "20px", height: "20px"}}/>
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                className=" text-gray-600"
+                style={{ width: "20px", height: "20px" }}
+              />
             </div>
           </div>
           <button
@@ -287,13 +331,19 @@ const Navbar = () => {
               </Dropdown.Header>
               {session?.role === "Administrador" ? (
                 <Dropdown.Item href="/dashboard/administrador/profile">
-                  <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
+                  <FontAwesomeIcon
+                    icon={faScrewdriverWrench}
+                    style={{ marginRight: "5px" }}
+                  />
                   Panel de Administrador
                 </Dropdown.Item>
               ) : (
                 <div className="flex flex-col">
                   <Dropdown.Item href="/dashboard/cliente/profile">
-                  <FontAwesomeIcon icon={faScrewdriverWrench} style={{ marginRight: "5px" }}/>
+                    <FontAwesomeIcon
+                      icon={faScrewdriverWrench}
+                      style={{ marginRight: "5px" }}
+                    />
                     Panel de cliente
                   </Dropdown.Item>
                   <Dropdown.Item href="/dashboard/cliente/order">
@@ -305,10 +355,15 @@ const Navbar = () => {
                   </Dropdown.Item>
                 </div>
               )}
-              
+
               <Dropdown.Item onClick={handleSignOut}>
-              <FontAwesomeIcon icon={faXmark} style={{ marginRight: "5px" }} size="xl"/>
-                Salir</Dropdown.Item>
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  style={{ marginRight: "5px" }}
+                  size="xl"
+                />
+                Salir
+              </Dropdown.Item>
             </Dropdown>
           )}
         </div>
@@ -335,7 +390,7 @@ const Navbar = () => {
                 </div>
               </Link>
             ))}
-            </div>
+          </div>
         )}
 
       {nav && (
@@ -379,7 +434,9 @@ const Navbar = () => {
                 <Link
                   href="/dashboard/cliente/order"
                   className={`hover:text-orange-400 gap-4 flex items-center ${
-                    pathname === "/dashboard/cliente/order" ? "text-orange-400 font-bold" : ""
+                    pathname === "/dashboard/cliente/order"
+                      ? "text-orange-400 font-bold"
+                      : ""
                   }`}
                   onClick={handleNavLinkClick}
                 >
@@ -393,7 +450,9 @@ const Navbar = () => {
               <Link
                 href="/categories"
                 className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/categories" ? "text-orange-400 font-bold" : ""
+                  pathname === "/categories"
+                    ? "text-orange-400 font-bold"
+                    : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
@@ -405,7 +464,9 @@ const Navbar = () => {
               <Link
                 href="/promociones"
                 className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/promociones" ? "text-orange-400 font-bold" : ""
+                  pathname === "/promociones"
+                    ? "text-orange-400 font-bold"
+                    : ""
                 }`}
                 onClick={handleNavLinkClick}
               >

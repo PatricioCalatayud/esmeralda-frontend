@@ -11,7 +11,6 @@ import {
   Avatar,
   InputAdornment,
   IconButton,
-  FormHelperText,
   CircularProgress,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -101,7 +100,7 @@ const ResetPasswordForm: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           padding: 4,
           borderRadius: 2,
           boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -174,9 +173,9 @@ const ResetPasswordForm: React.FC = () => {
             }}
           />
           {passwordMismatch && (
-            <FormHelperText error>
+            <Typography color="error" variant="body2">
               Las contraseñas no coinciden
-            </FormHelperText>
+            </Typography>
           )}
           <Button
             type="submit"
@@ -221,25 +220,29 @@ const ResetPasswordForm: React.FC = () => {
 const ResetPassword: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <div className="relative flex justify-center items-center font-sans min-h-screen p-4 bg-gray-100">
-        <Suspense
-          fallback={
-            <CircularProgress
-              size={60}
-              color="primary"
-              sx={{ position: "absolute", top: "50%", left: "50%" }}
-            />
-          }
+      <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute top-0 left-0 w-full h-full object-cover"
         >
-          <ResetPasswordForm />
-        </Suspense>
-        <div className="absolute bottom-4 left-4 hidden md:block">
+          <source src="/roaster.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="relative z-10 font-sans max-w-7xl mx-auto">
+          <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <ResetPasswordForm />
+          </Container>
+        </div>
+        <div className="absolute bottom-1 left-1 hidden md:block">
           <Image
             src="/logoblanco.png"
             alt="Logo"
-            width={150}
-            height={150}
-            className="w-[150px] h-[150px]"
+            width={300}
+            height={300}
+            className="w-[300px] h-[300px]"
           />
         </div>
       </div>
