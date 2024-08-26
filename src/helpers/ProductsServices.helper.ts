@@ -11,7 +11,8 @@ export async function getProducts(page?: number, limit?: number) {
         limit, // Pasar el límite de resultados por página
       },
     });
-    const products: IProductList[] = res.data;
+    console.log(res.data.data)
+    const products: IProductList[] = res.data.data;
     return products;
   } catch (error: any) {
     console.log(error);

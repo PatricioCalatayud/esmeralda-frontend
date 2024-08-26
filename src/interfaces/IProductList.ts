@@ -26,6 +26,7 @@ id: number
 price: string
 stock: number
 unit: string
+isAvailable: boolean
 }
 
 export interface Category {

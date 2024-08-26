@@ -24,6 +24,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 }) => {
   const router = useRouter();
   const { searchResults } = useProductContext();
+  console.log(searchResults);
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<
     IProductList[] | undefined
@@ -32,6 +33,8 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
   useEffect(() => {
     let sortedProducts = productsList || [];
+    console.log(productsList);
+    console.log(searchResults);
     if (searchResults !== undefined && productsList !== undefined) {
       sortedProducts = [
         ...(searchResults.length > 0 ? searchResults : productsList),
@@ -71,8 +74,14 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
           ];
         }
     }
-
-    setFilteredProducts(sortedProducts.filter(product => product.isAvailable));
+    console.log(sortedProducts);
+    setFilteredProducts(
+      sortedProducts.filter(product => {
+        // Cambia la validación para reflejar el tipo correcto
+        const subproduct = product.subproducts?.[0] as { isAvailable: boolean } | undefined;
+        return subproduct?.isAvailable === true;
+      })
+    );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
   const handleCategoryChange = (id: string | null) => {
@@ -249,7 +258,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                         {product.description}
                       </h2>
 
-                      {Number(product.discount) !== 0 ? (
+                      {/*Number(product.discount) !== 0 ? (
                         <>
                           <div className="absolute top-4 right-4 flex items-center gap-2">
                             <FontAwesomeIcon
@@ -274,7 +283,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                             </p>
                           </div>
                         </>
-                      ) : product.subproducts &&
+                      ) :*/ product.subproducts &&
                         product.subproducts.length > 0 ? (
                         <>
                           <div className="h-7 flex items-center gap-3">
