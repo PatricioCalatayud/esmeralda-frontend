@@ -16,7 +16,7 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { postOrder } from "@/helpers/Order.helper";
-import {Modal } from "flowbite-react";
+import { Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
 const Cart = () => {
   const router = useRouter();
@@ -95,11 +95,13 @@ const Cart = () => {
   const calcularDescuento = () => {
     return cart.reduce((acc, item) => {
       // Aplicar descuento como un porcentaje del precio
-      const descuentoPorProducto = (item.quantity || 1) * (Number(item.price) * (Number(item.discount || 0) / 100));
+      const descuentoPorProducto =
+        (item.quantity || 1) *
+        (Number(item.price) * (Number(item.discount || 0) / 100));
       return acc + descuentoPorProducto;
     }, 0);
   };
-  
+
   const calcularTotal = () => {
     const subtotal = calcularSubtotal();
     const descuento = calcularDescuento();
@@ -110,29 +112,18 @@ const Cart = () => {
   const descuento = calcularDescuento();
   const total = calcularTotal();
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    e.preventDefault();
-    setAddresOrder(
- e.target.value
-    );
-  };
-  const handleCheckout = async() => {
-    const products = cart.map(product => ({
+  const handleCheckout = async () => {
+    const products = cart.map((product) => ({
       id: product.id,
       quantity: product.quantity,
     }));
-    
+
     const orderCheckout = {
       userId: session?.id,
       products,
-      ...(addresOrder && { address: addresOrder }), // Condicionalmente agregar la dirección
-      discount: 10
+      ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
+      discount: 10,
     };
-    console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
     if (order?.status === 200 || order?.status === 201) {
       Swal.fire({
@@ -142,9 +133,10 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+
       setTimeout(() => {
         router.push(`/checkout/${order.data.id}`);
-      },1500)
+      }, 1500);
     } else {
       Swal.fire({
         position: "top-end",
@@ -154,7 +146,6 @@ const Cart = () => {
         timer: 1500,
       });
     }
-    console.log(order);
   };
 
   if (cart.length === 0) {
@@ -253,27 +244,32 @@ const Cart = () => {
                         </p>
                       </div>
                       <div className="ml-auto">
-  {item.discount && Number(item.discount) > 0 ? (
-    <div>
-      <h4 className="text-lg font-bold text-gray-800">
-        ${(
-          Number(item.price) * (item.quantity || 1) * (1 - Number(item.discount) / 100)
-        ).toFixed(2)}
-      </h4>
-      <h4 className="text-sm text-gray-500 line-through">
-        ${(
-          Number(item.price) * (item.quantity || 1)
-        ).toFixed(2)}
-      </h4>
-    </div>
-  ) : (
-    <h4 className="text-lg font-bold text-gray-800">
-      ${(
-        Number(item.price) * (item.quantity || 1)
-      ).toFixed(2)}
-    </h4>
-  )}
-</div>
+                        {item.discount && Number(item.discount) > 0 ? (
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-800">
+                              $
+                              {(
+                                Number(item.price) *
+                                (item.quantity || 1) *
+                                (1 - Number(item.discount) / 100)
+                              ).toFixed(2)}
+                            </h4>
+                            <h4 className="text-sm text-gray-500 line-through">
+                              $
+                              {(
+                                Number(item.price) * (item.quantity || 1)
+                              ).toFixed(2)}
+                            </h4>
+                          </div>
+                        ) : (
+                          <h4 className="text-lg font-bold text-gray-800">
+                            $
+                            {(
+                              Number(item.price) * (item.quantity || 1)
+                            ).toFixed(2)}
+                          </h4>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -328,51 +324,63 @@ const Cart = () => {
             >
               Ir a pagar
             </button>
-            <Modal show={openModal} onClose={() => setOpenModal(false)} className="px-80 py-40 custom-modal-container" >
+            <Modal
+              show={openModal}
+              onClose={() => setOpenModal(false)}
+              className="px-80 py-40 custom-modal-container"
+            >
               <Modal.Header>Detalle de envio</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
-
-              <div className="w-full h-20 gap-4 flex flex-col">
-              <label
-                htmlFor="addresOrder"
-                className="block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Dirección de envio
-              </label>
-              <input
-                type="text"
-                name="addresOrder"
-                id="addresOrder"
-                className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-                placeholder="Avenida San Martin 123"
-                value={addresOrder}
-                onChange={(e) => setAddresOrder(e.target.value)}
-                disabled={isDelivery===true}
-              />
-              </div>
-              <div className="flex gap-4 items-center h-20">
-                <h4 className="block text-sm font-medium text-gray-900 dark:text-white">Retiro en local</h4>
-                <input
-                  type="checkbox"
-                  name="isDelivery"
-                  id="isDelivery"
-                  onChange={(e) => setIsDelivery(e.target.checked)}
-                />
-              </div>
+                <div className="w-full h-20 gap-4 flex flex-col">
+                  <label
+                    htmlFor="addresOrder"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Dirección de envio
+                  </label>
+                  <input
+                    type="text"
+                    name="addresOrder"
+                    id="addresOrder"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
+                    placeholder="Avenida San Martin 123"
+                    value={addresOrder}
+                    onChange={(e) => setAddresOrder(e.target.value)}
+                    disabled={isDelivery === true}
+                  />
+                </div>
+                <div className="flex gap-4 items-center h-20">
+                  <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+                    Retiro en local
+                  </h4>
+                  <input
+                    type="checkbox"
+                    name="isDelivery"
+                    id="isDelivery"
+                    onChange={(e) => setIsDelivery(e.target.checked)}
+                  />
+                </div>
               </Modal.Body>
               <Modal.Footer>
                 <button
-                onClick={handleCheckout}
-                type="button"
-                className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
-                disabled={!session || cart.length === 0 || isDelivery===false && addresOrder===""}
-                title={
-                  !session
-                    ? "Necesita estar logueado para continuar con el pago"
-                    : cart.length === 0
-                    ? "El carrito está vacío"
-                    : ""
-                }>Ir a pagar</button>
+                  onClick={handleCheckout}
+                  type="button"
+                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                  disabled={
+                    !session ||
+                    cart.length === 0 ||
+                    (isDelivery === false && addresOrder === "")
+                  }
+                  title={
+                    !session
+                      ? "Necesita estar logueado para continuar con el pago"
+                      : cart.length === 0
+                      ? "El carrito está vacío"
+                      : ""
+                  }
+                >
+                  Ir a pagar
+                </button>
               </Modal.Footer>
             </Modal>
             <Link href="/categories">

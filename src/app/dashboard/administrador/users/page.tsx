@@ -14,20 +14,46 @@ const Users = () => {
     const [users, setUsers] = useState<ISession[] | undefined>([]);
     const {token} = useAuthContext();
     const [roleUser, setRoleUser] = useState("");
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const USER_PER_PAGE = 8;
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
+    console.log(totalPages);
     useEffect(() => {
         const fetchUsers = async () =>{
             console.log("llegue aca?");
+            const limit = USER_PER_PAGE;
+            const page = currentPage;
             const response = await getUsers(token);
             console.log(response);
             setUsers(response);
-
+            if (response) setTotalPages(Math.ceil(response.length / USER_PER_PAGE));
+            
         }
         fetchUsers()
         setLoading(false);
     }, []);
+    const onPageChange = (page: number) => setCurrentPage(page);
+
+    const getCurrentPageUsers = () => {
+        const filteredUsers = filterUsers();
+        const startIndex = (currentPage - 1) * USER_PER_PAGE;
+        const endIndex = startIndex + USER_PER_PAGE;
+        return filteredUsers?.slice(startIndex, endIndex);
+      };
+
+      //! Función para filtrar los productos
+  const filterUsers = () => {
+    if (searchTerm === "") {
+      return users; // Si el campo de búsqueda está vacío, mostrar todos los productos
+    } else {
+      return users?.filter((user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+  };
+
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value); // Actualizar el estado del término de búsqueda
         setCurrentPage(1); // Reiniciar la página actual al cambiar el término de búsqueda
@@ -57,10 +83,12 @@ const Users = () => {
     />
   </div> :
         <DashboardComponent 
+        setCurrentPage={onPageChange}
         titleDashboard="Listado de Usuarios"
       searchBar="Buscar Usuario"
       handleSearchChange={handleSearchChange}
       totalPages={totalPages}
+
       tdTable={[
         "Nombre",
         "Telefono",
@@ -69,8 +97,9 @@ const Users = () => {
         "Acciones",
       ]}
       noContent="No hay Usuarios disponibles"
+
         >
-            {users?.map((user: ISession, index) => (
+            {getCurrentPageUsers() ?.map((user: ISession, index) => (
                 <tr
                     key={index}
                     className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"

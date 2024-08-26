@@ -27,7 +27,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const { session, authLoading } = useAuthContext();
 
-  console.log(pathname);
   //! Obtener token de usuario-Session
   useEffect(() => {
     if (!authLoading) {
@@ -40,10 +39,10 @@ export default function DashboardLayout({
 
   return (
     <>
-      <div className="flex flex-row min-h-screen dark:bg-gray-700 justify-center w-full">
+      <div className="flex lg:flex-row min-h-screen dark:bg-gray-700 justify-center w-full flex-col">
         {/* Barra lateral */}
-        <div className="bg-teal-800 backdrop:w-36 md:w-80 m-4 rounded-2xl shadow-2xl">
-          <div className="p-1 md:p-4">
+        <div className="bg-teal-800 backdrop:w-36 lg:w-80 m-4 rounded-2xl shadow-2xl">
+          <div className="p-4">
             <p className="text-xl text-white font-semibold mb-4 flex items-center text-center p-2">
               <FontAwesomeIcon
                 icon={faScrewdriverWrench}

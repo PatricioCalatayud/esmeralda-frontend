@@ -11,12 +11,12 @@ import { useAuthContext } from "@/context/auth.context";
 import { useProductContext } from "@/context/product.context";
 import {
   deleteProducts,
+  getProducts,
   putProducts,
 } from "../../../../helpers/ProductsServices.helper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "@material-tailwind/react";
-import { set } from "date-fns";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 
 const ProductList = () => {
@@ -24,17 +24,24 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const PRODUCTS_PER_PAGE = 10; // Cantidad de productos por página
+  const PRODUCTS_PER_PAGE = 7; // Cantidad de productos por página
   const { allProducts } = useProductContext();
   const [products, setProducts] = useState<IProductList[] | undefined>([]);
   const [loading, setLoading] = useState(true);
 
   //! Obtener los productos
   useEffect(() => {
-    if (allProducts)
-      setTotalPages(Math.ceil(allProducts.length / PRODUCTS_PER_PAGE));
-    setProducts(allProducts);
+    const fetchProducts = async () => {
+      const products = await getProducts();
+      if (products) {
+        setTotalPages(Math.ceil(products.length / PRODUCTS_PER_PAGE));
+    setProducts(products);
     setLoading(false);
+      }
+      
+    }
+
+    fetchProducts();
   }, [allProducts]);
 
   //! Función para calcular los productos a mostrar en la página actual
@@ -196,6 +203,7 @@ const ProductList = () => {
     </div>
   ) : (
     <DashboardComponent
+    setCurrentPage={onPageChange}
       titleDashboard="Listado de Productos"
       searchBar="Buscar productos"
       handleSearchChange={handleSearchChange}

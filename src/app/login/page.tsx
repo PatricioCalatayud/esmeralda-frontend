@@ -1,6 +1,6 @@
 "use client";
 import { LoginUser } from "@/helpers/Autenticacion.helper";
-import { ILoginErrorProps, ILoginProps } from "@/interfaces/ILogin";
+import { ILogin, ILoginErrorProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
@@ -30,7 +30,7 @@ const theme = createTheme();
 const Login = () => {
   const Router = useRouter();
 
-  const initialUserData: ILoginProps = {
+  const initialUserData: ILogin = {
     email: "",
     password: "",
   };
@@ -39,7 +39,7 @@ const Login = () => {
     password: "",
   };
 
-  const [dataUser, setDataUser] = useState<ILoginProps>(initialUserData);
+  const [dataUser, setDataUser] = useState<ILogin>(initialUserData);
   const [error, setError] = useState<ILoginErrorProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -105,27 +105,24 @@ const Login = () => {
 
     try {
       const response = await LoginUser(dataUser);
-
+      const responseData = response?.data;
       if (response) {
-        const decodedToken: any = jwtDecode(response.accessToken as string);
+        const decodedToken: any = jwtDecode(responseData.accessToken as string);
         setSession({
-          id: decodedToken.userId,
+          id: decodedToken.sub,
           name: decodedToken.name,
           email: decodedToken.email,
           image: undefined,
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
         })
-        setUserId(decodedToken.userId);
-        response.accessToken && setToken(response.accessToken);
+        setUserId(decodedToken.sub);
+        responseData.accessToken && setToken(responseData.accessToken);
         
       }
-      
-      
-      console.log(response);
 
-      if (response) {
-        localStorage.setItem("userSession", JSON.stringify(response));
+      if (responseData) {
+        localStorage.setItem("userSession", JSON.stringify(responseData));
 
         Swal.fire({
           icon: "success",
