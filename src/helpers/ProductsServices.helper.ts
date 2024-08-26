@@ -3,9 +3,14 @@ import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 
-export async function getProducts() {
+export async function getProducts(page?: number, limit?: number) {
   try {
-    const res = await axios.get(`${apiURL}/products`);
+    const res = await axios.get(`${apiURL}/products`,{
+      params: {
+        page,  // Pasar el número de página
+        limit, // Pasar el límite de resultados por página
+      },
+    });
     const products: IProductList[] = res.data;
     return products;
   } catch (error: any) {
@@ -52,10 +57,11 @@ export async function putProducts(dataProduct: object,id: string, token: string 
     try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
-        "Content-Type": "multipart/form-data",
+
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log(res);
     //const products: IProductList[] = res.data;
     //return products;
   } catch (error: any) {

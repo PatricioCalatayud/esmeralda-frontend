@@ -6,7 +6,6 @@ import { Spinner } from "@material-tailwind/react";
 import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
-
 import { getProductById } from "../../../helpers/ProductsServices.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
@@ -26,7 +25,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const { token } = useAuthContext();
   const router = useRouter();
   const productId = params.id;
-  console.log(selectedPrice);
+
   useEffect(() => {
     type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
     const categoryTranslations = (category: {

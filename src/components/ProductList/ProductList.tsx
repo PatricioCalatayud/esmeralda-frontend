@@ -37,7 +37,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         ...(searchResults.length > 0 ? searchResults : productsList),
       ];
     }
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== "promociones") {
       sortedProducts = sortedProducts.filter(
         (product) => product.category.id === selectedCategory
       );
@@ -72,7 +72,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         }
     }
 
-    setFilteredProducts(sortedProducts);
+    setFilteredProducts(sortedProducts.filter(product => product.isAvailable));
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
   const handleCategoryChange = (id: string | null) => {
