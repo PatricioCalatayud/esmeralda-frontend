@@ -35,7 +35,7 @@ export async function getOrders(userId: string, token: string | undefined , page
     }
   }
 // verificar
-export async function getOrder(orderId: string, token: string | null ) {
+export async function getOrder(orderId: string, token: string | undefined ) {
   try {
     const response = await axios.get(`${apiURL}/order/${orderId}`,{
       headers: {
