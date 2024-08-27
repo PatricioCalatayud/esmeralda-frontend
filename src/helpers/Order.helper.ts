@@ -1,11 +1,32 @@
 import { IOrderCheckout, IOrders } from "@/interfaces/IOrders";
 import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
-export async function getOrders(userId: string, token: string | undefined) {
+
+export async function getAllOrders( token: string | undefined , page?: number, limit?: number) {
+  try {
+    const response = await axios.get(`${apiURL}/order`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,  // Pasar el número de página
+        limit, // Pasar el límite de resultados por página
+      },});
+    const products: IOrders[] = response.data.data;
+    return products;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+export async function getOrders(userId: string, token: string | undefined , page?: number, limit?: number) {
     try {
       const response = await axios.get(`${apiURL}/order/user/${userId}`,{
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page,  // Pasar el número de página
+          limit, // Pasar el límite de resultados por página
         },});
       const products: IOrders[] = response.data;
       return products;
@@ -14,12 +35,14 @@ export async function getOrders(userId: string, token: string | undefined) {
     }
   }
 // verificar
-export async function getOrder(orderId: string, token: string | undefined) {
+export async function getOrder(orderId: string, token: string | undefined ) {
   try {
     const response = await axios.get(`${apiURL}/order/${orderId}`,{
       headers: {
         Authorization: `Bearer ${token}`,
-      },});
+      },
+
+    });
     const product: IOrders = response.data;
     return product;
   } catch (error: any) {

@@ -26,7 +26,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [searchResults, setSearchResults] = useState<IProductList[] | undefined>([]);
   const [productsPromotions, setProductsPromotions] = useState<IProductList[] | undefined>([]);
   const [productLoading, setProductLoading] = useState(true);
-  console.log(allProducts);
+
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();
@@ -43,6 +43,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
   }, []);
 
   const searchProducts = (searchTerm: string) => {
+    console.log(searchTerm);
     if (!searchTerm) {
       setSearchResults([]);
       return;
@@ -50,6 +51,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     const results = allProducts?.filter((product) =>
       product.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    console.log(results);
     setSearchResults(results);
   };
 

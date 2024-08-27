@@ -14,6 +14,8 @@ interface IDashboardInterface {
   noContent: string;
   totalPages: number;
   handleSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setCurrentPage?: (page: number) => void;
+  currentPage?: number
 }
 const DashboardComponent = ({
   titleDashboard,
@@ -25,6 +27,8 @@ const DashboardComponent = ({
   buttonTopRightLink,
   totalPages,
   handleSearchChange,
+  setCurrentPage,
+  currentPage , 
 }: IDashboardInterface) => {
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
@@ -105,7 +109,9 @@ const DashboardComponent = ({
           <div className="flex overflow-x-auto sm:justify-center py-5 ">
             <Pagination
               count={totalPages}
+              page={currentPage}
 
+              onChange={(_, page) => setCurrentPage && setCurrentPage(page)}
             />
           </div>
         </div>

@@ -6,7 +6,6 @@ import { Spinner } from "@material-tailwind/react";
 import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
-
 import { getProductById } from "../../../helpers/ProductsServices.helper";
 import { Category, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
@@ -26,7 +25,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const { token } = useAuthContext();
   const router = useRouter();
   const productId = params.id;
-  console.log(selectedPrice);
+
   useEffect(() => {
     type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
     const categoryTranslations = (category: {
@@ -49,6 +48,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
     const loadProductData = async () => {
       const fetchedProduct = await getProductById(productId, token);
+      console.log(fetchedProduct);
       if (fetchedProduct) {
         setProduct(fetchedProduct);
         const translatedCategories = categoryTranslations({
@@ -295,7 +295,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                   </button>
                 ))}
             </div>
-            {Number(product.discount) !== 0 ? (
+            {/*Number(product.discount) !== 0 ? (
               <div className="flex gap-4 flex-col">
                 <div>
                   <p className="text-lg font-semibold text-gray-600 animate-fade-in-up line-through">
@@ -309,7 +309,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                   ${selectedPrice}
                 </p>
               </div>
-            ) : (
+            ) : */(
               <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
                 ${selectedPrice}
               </p>

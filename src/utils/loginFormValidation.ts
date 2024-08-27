@@ -1,7 +1,7 @@
 import { ILoginErrorProps, ILoginProps } from "@/interfaces/ILogin";
 
-export function validateLoginForm(values: ILoginProps): ILoginErrorProps {
-  let errors: ILoginProps = {
+export function validateLoginForm(values: ILoginErrorProps): ILoginErrorProps {
+  let errors: ILoginErrorProps = {
     email: "",
     password: "",
   };

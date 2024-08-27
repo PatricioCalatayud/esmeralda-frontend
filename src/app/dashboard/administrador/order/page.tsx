@@ -1,17 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { IProductList } from "@/interfaces/IProductList";
 import { IOrders } from "@/interfaces/IOrders";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
-import { putOrder } from "@/helpers/Order.helper";
-
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 
 const OrderList = () => {
   const router = useRouter();
@@ -20,7 +16,7 @@ const OrderList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [token, setToken] = useState<string | null>(null);
-  const ORDERS_PER_PAGE = 10;
+  const ORDERS_PER_PAGE = 5;
   const [loading, setLoading] = useState(true);
   const [dataStatus, setDataStatus] = useState("");
 
@@ -48,26 +44,25 @@ const OrderList = () => {
   //! Obtener las Ordenes
   useEffect(() => {
     async function fetchOrders() {
-      try {
-        const response = await axios.get(`${apiURL}/order`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const orders = response.data;
-        console.log("orders", orders);
+      const limit = ORDERS_PER_PAGE;
+      const page = currentPage;
+      if (token) {
+        const response = await getAllOrders(token );
+        if (response) {
+        const orders = response;
+
         setOrders(orders);
         setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        Swal.fire("¡Error!", "No se pudieron obtener las órdenes", "error");
+        setLoading(false);}
       }
+        
     }
     if (token) {
       fetchOrders();
     }
   }, [token]);
+  const onPageChange = (page: number) => setCurrentPage(page);
+
 
   //! Función para calcular las ordenes a mostrar en la página actual
   const getCurrentPageOrders = () => {
@@ -109,8 +104,6 @@ const OrderList = () => {
     setCurrentPage(1);
   };
 
-  const onPageChange = (page: number) => setCurrentPage(page);
-
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
@@ -118,6 +111,7 @@ const OrderList = () => {
     </div>
   ) : (
     <DashboardComponent
+    setCurrentPage={onPageChange}
       titleDashboard="Listado de Ordenes"
       searchBar="Buscar cliente"
       handleSearchChange={handleSearchChange}
@@ -141,34 +135,34 @@ const OrderList = () => {
             scope="row"
             className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-            <div className="flex items-center w-full justify-center">{order.user.name}</div>
+            <div className="flex items-center w-full justify-center">{order.user?.name}</div>
           </th>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             <div className="flex justify-center items-center">
-              {format(new Date(order.date), "dd'-'MM'-'yyyy", {
+              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", {
                 locale: es,
               })}
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {order.orderDetail.totalPrice}
+            {order.orderDetail?.totalPrice}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", {
+            {order.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", {
               locale: es,
             })}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            $ {order.orderDetail.totalPrice}
+            $ {order.orderDetail?.totalPrice}
           </td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
-              order.orderDetail.transactions.status === "Recibido"
+              order.orderDetail?.transactions.status === "Recibido"
                 ? "text-teal-500"
                 : "text-red-500"
             } `}
           >
-            {order.orderDetail.transactions.status === "Recibido" ? (
+            {order.orderDetail?.transactions.status === "Recibido" ? (
               <select
                 id="status"
                 name="status"
@@ -182,7 +176,7 @@ const OrderList = () => {
                 <option value={"Entregado"}>Entregado</option>
               </select>
             ) : (
-              order.orderDetail.transactions.status
+              order.orderDetail?.transactions?.status
             )}
           </td>
         </tr>
