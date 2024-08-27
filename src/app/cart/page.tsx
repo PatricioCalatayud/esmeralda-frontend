@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IProductList } from "@/interfaces/IProductList";
+import { ICart, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
   faBagShopping,
   faMinus,
@@ -18,15 +17,18 @@ import {
 import { postOrder } from "@/helpers/Order.helper";
 import { Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
+
 const Cart = () => {
   const router = useRouter();
-  const [cart, setCart] = useState<IProductList[]>([]);
+  const [cart, setCart] = useState<ICart[]>([]);
   const { session, token } = useAuthContext();
   const [openModal, setOpenModal] = useState(false);
   const [addresOrder, setAddresOrder] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
+
+  //! Obtiene los datos del carro
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -36,9 +38,10 @@ const Cart = () => {
     fetchCart();
   }, []);
 
+  //! Función para aumentar la cantidad
   const handleIncrease = (article_id: string) => {
     const newCart = cart.map((item) => {
-      if (item.id === article_id) {
+      if (item.idSubProduct === article_id) {
         // Crea una nueva instancia del objeto para garantizar la inmutabilidad
         return { ...item, quantity: (item.quantity || 1) + 1 };
       }
@@ -49,9 +52,10 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
+  //! Función para disminuir la cantidad
   const handleDecrease = (article_id: string) => {
     const newCart = cart.map((item) => {
-      if (item.id === article_id) {
+      if (item.idSubProduct === article_id) {
         // Crea una nueva instancia del objeto para garantizar la inmutabilidad
         return { ...item, quantity: Math.max((item.quantity || 1) - 1, 1) };
       }
@@ -62,6 +66,7 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
+  //! Función para eliminar el articulo
   const removeFromCart = (index: number) => {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -86,12 +91,14 @@ const Cart = () => {
     });
   };
 
+  //! Función para calcular el subtotal
   const calcularSubtotal = () => {
     return cart.reduce((acc, item) => {
       return acc + (item.quantity || 1) * Number(item.price);
     }, 0);
   };
 
+  //! Función para calcular el descuento
   const calcularDescuento = () => {
     return cart.reduce((acc, item) => {
       // Aplicar descuento como un porcentaje del precio
@@ -102,6 +109,7 @@ const Cart = () => {
     }, 0);
   };
 
+  //! Función para calcular el total
   const calcularTotal = () => {
     const subtotal = calcularSubtotal();
     const descuento = calcularDescuento();
@@ -112,9 +120,11 @@ const Cart = () => {
   const descuento = calcularDescuento();
   const total = calcularTotal();
 
+  //! Función para realizar la orden
   const handleCheckout = async () => {
     const products = cart.map((product) => ({
-      id: product.id,
+      productId: product.idProduct,
+      subproductId: product.idSubProduct ,
       quantity: product.quantity,
     }));
 
@@ -124,7 +134,10 @@ const Cart = () => {
       ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10,
     };
+    console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
+    console.log(order);
+    /*
     if (order?.status === 200 || order?.status === 201) {
       Swal.fire({
         position: "top-end",
@@ -145,9 +158,10 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-    }
+    }*/
   };
 
+//! Renderizado si no hay elementos en el carrito
   if (cart.length === 0) {
     return (
       <section className="text-gray-600 body-font">
@@ -180,6 +194,8 @@ const Cart = () => {
     );
   }
 
+  //! Renderizado si hay elementos en el carrito
+
   return (
     <div className="font-sans w-3/4 mx-auto  h-screen ">
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
@@ -191,7 +207,7 @@ const Cart = () => {
           <div className="space-y-4 w-full mt-4">
             {cart.map((item, index) => (
               <div
-                key={item.article_id}
+                key={index}
                 className="grid sm:flex items-center gap-4 border border-gray-400 rounded-2xl px-4 py-2 w-full shadow-xl"
               >
                 <div className="sm:col-span-2 flex items-center gap-4 w-full">
@@ -220,7 +236,7 @@ const Cart = () => {
                       <div className="flex gap-3 font-bold items-center">
                         <button
                           className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleDecrease(item.id)}
+                          onClick={() => handleDecrease(item.idSubProduct)}
                           disabled={item.quantity === 1}
                         >
                           <FontAwesomeIcon
@@ -231,7 +247,7 @@ const Cart = () => {
                         {item.quantity || 1}
                         <button
                           className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleIncrease(item.id)}
+                          onClick={() => handleIncrease(item.idSubProduct)}
                           disabled={item.quantity === Number(item.stock)}
                         >
                           <FontAwesomeIcon

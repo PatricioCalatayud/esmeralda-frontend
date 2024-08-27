@@ -12,7 +12,8 @@ export interface IOrderCheckout {
     address?: string | undefined;
     userId: string | undefined;
     products: {
-        id: string;
+        productId: string;
+        subproductId: string;
         quantity: number | undefined;
     }[];
 }

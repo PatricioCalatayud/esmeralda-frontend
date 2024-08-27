@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IProductList } from "@/interfaces/IProductList";
+import { ICart, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { postMarketPay } from "@/helpers/MarketPay.helper";
 import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
-  const [cart, setCart] = useState<IProductList[]>([]);
+  const [cart, setCart] = useState<ICart[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
     email: "",
@@ -19,7 +19,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const cartData = JSON.parse(
       localStorage.getItem("cart") || "[]"
-    ) as IProductList[];
+    ) as ICart[];
     setCart(cartData);
   }, []);
 
@@ -95,9 +95,9 @@ const Checkout = ({ params }: { params: { id: string } }) => {
               </h2>
               <hr  className="my-6"/>
               <div className="space-y-6 mt-10">
-                {cart.map((item) => (
+                {cart.map((item, index) => (
                   <div
-                    key={item.article_id}
+                    key={index}
                     className="grid sm:grid-cols-2 items-start gap-6"
                   >
                     <div className="max-w-[190px] shrink-0 rounded-md">
@@ -114,9 +114,9 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                         {item.description}
                       </h3>
                       <ul className="text-xs text-white space-y-2 mt-2">
-                        {item.subproducts && item.subproducts.length !== 0 && <li className="flex flex-wrap gap-4">
-                          Tamaño <span className="ml-auto">{item.subproducts[0].amount}{item.subproducts[0].unit}</span>
-                        </li>}
+                        <li className="flex flex-wrap gap-4">
+                          Tamaño <span className="ml-auto">{item.size}{item.unit}</span>
+                        </li>
                         <li className="flex flex-wrap gap-4">
                           Cantidad{" "}
                           <span className="ml-auto">{item.quantity || 1}</span>

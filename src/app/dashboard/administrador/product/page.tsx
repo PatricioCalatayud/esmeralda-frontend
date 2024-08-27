@@ -246,7 +246,7 @@ const ProductList = () => {
               {product.description}
             </div>
           </th>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+          {/*<td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             {product.stock}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
@@ -254,7 +254,7 @@ const ProductList = () => {
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             {product.discount} %
-          </td>
+          </td>*/}
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
             <div className="flex items-center space-x-4 justify-center">
               <Tooltip content="Editar">
@@ -282,7 +282,7 @@ const ProductList = () => {
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
             <div className="flex items-center justify-center space-x-4">
-              <input
+              {/*<input
                 type="checkbox"
                 checked={product.isAvailable}
                 onChange={() =>
@@ -291,7 +291,7 @@ const ProductList = () => {
                     : handleEnableProduct(product.id)
                 }
                 className="w-5 h-5"
-              />
+              />*/}
             </div>
           </td>
         </tr>
