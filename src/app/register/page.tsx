@@ -22,6 +22,8 @@ import Link from "next/link";
 import { NewUser } from "@/helpers/Autenticacion.helper";
 import { IUserProps } from "@/interfaces/IUser";
 import { validateRegisterUserForm } from "@/utils/userFormValidation";
+import axios from "axios";
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -139,7 +141,7 @@ const RegisterUser = () => {
     const errors = validateRegisterUserForm(dataUser);
     setError(errors);
 
-    // Marcar todos los campos como tocados para mostrar errores
+    // Mark all fields as touched to show errors
     setTouched({
       name: true,
       email: true,
@@ -147,64 +149,52 @@ const RegisterUser = () => {
       phone: true,
     });
 
-    // Si hay errores, no proceder con el envío
+    // If there are errors, don't proceed with the submission
     if (Object.values(errors).some((x) => x !== "")) {
       return;
     }
 
     setLoading(true);
-    setSubmitError(null);
 
     try {
-      await NewUser(dataUser);
-      toast.success("Usuario registrado correctamente", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
+      const response = await axios.post(`${apiURL}/auth/signup`, dataUser, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-
-      setDataUser(initialUserData); // Limpiar campos del formulario
-      setTouched({
-        name: false,
-        email: false,
-        password: false,
-        phone: false,
-      });
-
-      setTimeout(() => {
-        Router.push("/login");
-      }, 3000);
-    } catch (error: any) {
-      if (error.response) {
+  
+      if (response.status === 200 || response.status === 201) {
         Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Error al registrar el usuario: ${error.response.data.message}`,
+          icon: 'success',
+          title: '¡Registro exitoso!',
+          text: 'Tu cuenta se ha creado correctamente.',
         });
-        setSubmitError(
-          `Error al registrar el usuario: ${error.response.data.message}`
-        );
-      } else if (error.request) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Error al registrar el usuario: No se recibió respuesta del servidor.",
-        });
-        setSubmitError(
-          "Error al registrar el usuario: No se recibió respuesta del servidor."
-        );
+  
+        // Redirigir al usuario o realizar otras acciones después del registro exitoso
+        Router.push('/login');
       } else {
+        // Manejar respuestas no exitosas del servidor
         Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: `Error al registrar el usuario: ${error.message}`,
+          icon: 'error',
+          title: 'Error al registrar',
+          text: response.data.message || 'Ha ocurrido un error inesperado.',
         });
-        setSubmitError(`Error al registrar el usuario: ${error.message}`);
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error) && error.response) {
+        // Manejar errores de Axios con respuesta del servidor
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al registrar',
+          text: error.response.data.message || 'Ha ocurrido un error inesperado.',
+        });
+      } else {
+        // Manejar otros tipos de errores
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al registrar',
+          text: 'Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.',
+        });
       }
     } finally {
       setLoading(false);
