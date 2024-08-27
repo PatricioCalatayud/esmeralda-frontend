@@ -64,7 +64,7 @@ export async function getUsers(token: string | undefined, page?: number, limit?:
       },
     });
     console.log(response);
-    const users: ISession[] = response.data;
+    const users: ISession[] = response.data.data;
     return users;
   } catch (error: any) {
     console.log(error);
