@@ -105,6 +105,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const newUser = {
           email: sessionGoogle.user.email as string,
           name: sessionGoogle.user.name as string,
+          password: "", // Add a password property
+          phone: "", // Add a phone property
         }
         const response = await NewUser(newUser);
         if (response && (response.status === 200 || response.status === 201)) {
