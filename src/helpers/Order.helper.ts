@@ -28,7 +28,7 @@ export async function getOrders(userId: string, token: string | undefined , page
           page,  // Pasar el número de página
           limit, // Pasar el límite de resultados por página
         },});
-      const products: IOrders[] = response.data;
+      const products: IOrders[] = response.data.data;
       return products;
     } catch (error: any) {
       console.log(error);

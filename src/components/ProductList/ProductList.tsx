@@ -31,10 +31,12 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   >(productsList);
   const { categories } = useCategoryContext();
 
+   //! Función traer los productos y filtrarlos
   useEffect(() => {
     let sortedProducts = productsList || [];
     console.log(productsList);
     console.log(searchResults);
+    console.log(selectedCategory);
     if (searchResults !== undefined && productsList !== undefined) {
       sortedProducts = [
         ...(searchResults.length > 0 ? searchResults : productsList),
@@ -45,18 +47,23 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         (product) => product.category.id === selectedCategory
       );
     }
+    console.log(sortedProducts);
 
     switch (filterOption) {
       case "price-asc":
-        sortedProducts.sort(
-          (a, b) => parseFloat(a.price) - parseFloat(b.price)
-        );
-        break;
-      case "price-desc":
-        sortedProducts.sort(
-          (a, b) => parseFloat(b.price) - parseFloat(a.price)
-        );
-        break;
+    sortedProducts.sort((a, b) => {
+      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
+      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
+      return priceA - priceB;
+    });
+    break;
+  case "price-desc":
+    sortedProducts.sort((a, b) => {
+      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
+      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
+      return priceB - priceA;
+    });
+    break;
       case "name-asc":
         sortedProducts.sort((a, b) =>
           a.description.localeCompare(b.description)
@@ -84,6 +91,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
+   //! Función para redirigir al usuario a la categoría seleccionada
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
@@ -94,6 +102,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     }
   };
 
+  //! Función para renderizar los headers de cada categoría
   const renderBreadcrumb = () => {
     if (!category) {
       return (
@@ -229,13 +238,13 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <div className="w-full lg:w-3/4  my-10 lg:my-0">
           {filteredProducts && filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => {
+              {filteredProducts.map((product, index) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id
                 );
                 return (
                   <div
-                    key={product.article_id}
+                    key={index}
                     className="relative rounded-lg h-[400px] shadow-lg hover:scale-105"
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
@@ -310,9 +319,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                             </p>
                           </div>
                         </>
-                      ) : (
-                        <p className="text-lg font-bold ">$ {product.price}</p>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 );
