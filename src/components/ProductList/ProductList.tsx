@@ -245,7 +245,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                     key={index}
-                    className="relative rounded-lg h-[400px] shadow-lg hover:scale-105"
+                    className="relative rounded-lg h-[480px] shadow-lg hover:scale-105"
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
                     <Image
@@ -267,32 +267,23 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                         {product.description}
                       </h2>
 
-                      {/*Number(product.discount) !== 0 ? (
-                        <>
-                          <div className="absolute top-4 right-4 flex items-center gap-2">
-                            <FontAwesomeIcon
-                              icon={faBolt}
-                              style={{ color: "white" }}
-                            />
-                            <p className="text-white font-bold">Promoción</p>
-                          </div>
-                          <del className="text-sm font-medium text-gray-600">
-                            $ {product.price}
-                          </del>
-                          <div className="flex gap-4 items-center">
-                            <p className="text-lg font-bold">
-                              ${" "}
-                              {Number(product.price) -
-                                (Number(product.price) *
-                                  Number(product.discount)) /
-                                  100}
-                            </p>
-                            <p className="text-teal-400 text-sm font-bold">
-                              {product.discount} % de descuento
-                            </p>
-                          </div>
-                        </>
-                      ) :*/ product.subproducts &&
+                      {product.subproducts &&
+  product.subproducts
+    .filter((subproduct) => subproduct.discount > 0)
+    .map((subproduct) => (
+      <div key={subproduct.id}>
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <FontAwesomeIcon icon={faBolt} style={{ color: "white" }} />
+          <p className="text-white font-bold">Promoción</p>
+        </div>
+          <p className="text-teal-400 text-sm font-bold">
+          {subproduct.discount} % de descuento x {subproduct.amount} {subproduct.unit}
+          </p>
+      </div>
+    ))}
+
+                        
+                     { product.subproducts &&
                         product.subproducts.length > 0 ? (
                         <>
                           <div className="h-7 flex items-center gap-3">

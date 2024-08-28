@@ -137,7 +137,7 @@ const Cart = () => {
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
     console.log(order);
-    /*
+    
     if (order?.status === 200 || order?.status === 201) {
       Swal.fire({
         position: "top-end",
@@ -158,7 +158,7 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-    }*/
+    }
   };
 
 //! Renderizado si no hay elementos en el carrito
@@ -221,10 +221,13 @@ const Cart = () => {
                       alt={item.description}
                     />
                   </div>
-                  <div className="flex flex-col gap-3 w-full">
-                    <h3 className="text-base font-bold text-gray-800 text-nowrap">
+                  <div className="flex flex-col gap-3 w-full ">
+                    <div className="flex gap-4">
+                    <h3 className="text-base font-bold text-gray-800 text-nowrap ">
                       {item.description}
                     </h3>
+                    <p className="text-base font-bold text-gray-800 text-nowrap ">({item.size} {item.unit})</p>
+                    </div>
                     <div
                       onClick={() => removeFromCart(index)}
                       className="flex items-center text-sm font-semibold text-red-500 cursor-pointer gap-2"
