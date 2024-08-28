@@ -36,8 +36,8 @@ console.log(orders);
     const listOrders = async (userId: string) => {
       try {
         const data = await getOrders(userId, token);
-        if(data ){
-        setOrders(data);}
+
+        setOrders(data);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }

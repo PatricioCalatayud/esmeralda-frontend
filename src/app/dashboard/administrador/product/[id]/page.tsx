@@ -48,8 +48,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     tipoGrano: "",
     medida: "",
     categoryID: "",
-    
-    /*category: {
+    /*
+    category: {
       id: "",
       name: "",
     },*/
@@ -61,7 +61,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const productData = await fetch(`${apiURL}/products/${params.id}`).then(
         (res) => res.json()
       );
-      console.log(productData);
       // Desestructurar solo los campos que deseas actualizar
       const {
         description,
@@ -218,42 +217,18 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 type="text"
                 name="description"
                 id="description"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Ingresa el nombre del producto"
-                //value={dataProduct.amount}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Nombre del producto"
+                value={dataProduct.description}
                 onChange={handleChange}
               />
               {errors.description && (
                 <span className="text-red-500">{errors.description}</span>
               )}
             </div>
+
             <div>
-            <label
-                htmlFor="presentacion"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Presentación
-              </label>
-            <select
-                  id="presentacion"
-                  name="presentacion"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.presentacion}
-                  defaultValue={dataProduct.presentacion}
-                  onChange={handleChange}
-                >
-                  <option value="">--Seleccione--</option>
-                  <option value="molido">Molido</option>
-                  <option value="grano">Grano</option>
-                  <option value="capsulas">Cápsulas</option>
-                </select>
-                {errors.presentacion && (
-                  <span className="text-red-500">{errors.presentacion}</span>
-                )}
-                </div>
-                <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
-            <div>
-            <label
+              <label
                 htmlFor="category"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
@@ -261,24 +236,24 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               </label>
               <select
                 id="category"
-                name="categoryID"
+                name="category"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 value={dataProduct.categoryID}
                 onChange={handleChange}
               >
                 <option value="">--Seleccione--</option>
-                {categories?.map((category: Category) => (
+                {categories?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
                 ))}
               </select>
-              {errors.categoryID && (
-                <span className="text-red-500">{errors.categoryID}</span>
-              )}
+              {/*errors.category.id && (
+                <span className="text-red-500">{errors.category.id}</span>
+              )*/}
             </div>
 
-            
+            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
               <div>
                 <label
                   htmlFor="presentacion"
@@ -330,6 +305,98 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   <span className="text-red-500">{errors.tipoGrano}</span>
                 )} */}
                 </div>
+
+                <div>
+                  <label
+                    htmlFor="medida"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Medida
+                  </label>
+                  <select
+                    id="medida"
+                    name="medida"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    value={dataProduct.medida}
+                    onChange={handleChange}
+                  >
+                    <option value="">--Seleccione--</option>
+                    <option value="kilo">Kilo</option>
+                  <option value="unidades">Unidades</option>
+                  <option value="sobre">Sobres</option>
+                  <option value="caja">Caja</option>
+                  </select>
+                  {/* {errors.medida && (
+                    <span className="text-red-500">{errors.medida}</span>
+                  )} */}
+                  </div>
+
+             
+              
+
+            </div>
+
+            <div>
+              <label
+                htmlFor="price"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Precio
+              </label>
+              <input
+                type="number"
+                name="price"
+                id="price"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="0.00"
+                value={dataProduct.price}
+                onChange={handleChange}
+              />
+              {errors.price && (
+                <span className="text-red-500">{errors.price}</span>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="stock"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Stock
+              </label>
+              <input
+                type="number"
+                name="stock"
+                id="stock"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="0.00"
+                value={dataProduct.stock}
+                onChange={handleChange}
+              />
+              {errors.stock && (
+                <span className="text-red-500">{errors.stock}</span>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="discount"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Descuento
+              </label>
+              <input
+                type="number"
+                name="discount"
+                id="discount"
+                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="12"
+                value={dataProduct.discount}
+                onChange={handleChange}
+              />
+              {errors.discount && (
+                <span className="text-red-500">{errors.discount}</span>
+              )}
             </div>
           </div>
 
@@ -391,7 +458,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
             {/* {errors.imgUrl && (
               <span className="text-red-500">{errors.imgUrl}</span>
             )} */}
-            <hr className="col-span-full my-10" />
           </div>
   </DashboardAddModifyComponent>
   );

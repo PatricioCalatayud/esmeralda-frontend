@@ -30,11 +30,10 @@ export default function RootLayout({
         <link rel="icon" href="/cafe.ico" />
       </head>
       <body className={`${inter.className} h-min-screen`}>
-      <CartProvider>
         <AuthProvider>
           <CategoryProvider>
             <ProductProvider>
-              
+              <CartProvider>
                 <Navbar />
                 {children}
                 <div className="fixed bottom-6 right-6 z-50">
@@ -45,11 +44,10 @@ export default function RootLayout({
                 </Link>
               </div>
                 <Footer />
-              
+              </CartProvider>
             </ProductProvider>
           </CategoryProvider>
         </AuthProvider>
-        </CartProvider>
       </body>
     </html>
   );
