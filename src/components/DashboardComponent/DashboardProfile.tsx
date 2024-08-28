@@ -10,17 +10,20 @@ import Swal from "sweetalert2";
 
 const DashboardProfile = ({ session }: { session?: ISession }) => {
   const { token } = useAuthContext();
+  const {setSession} = useAuthContext();
   const [phone, setPhone] = useState<string>(session?.phone || ""); // Inicializa con el valor de sesión o vacío
   const [edit, setEdit] = useState<boolean>(false);
   const handleEditPhone = async () => {
     const response = await putUser(session?.id as string, { phone: phone }, token);
+    console.log(response);
+    
     if (response && (response.status === 200 || response.status === 201)) {
       Swal.fire({
         icon: "success",
         title: "¡Éxito!",
         text: "Se ha actualizado tu teléfono correctamente",
       });
-      window.location.reload()
+      setSession(response.data);
     } else {
       Swal.fire({
         icon: "error",

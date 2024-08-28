@@ -5,9 +5,7 @@ import { Spinner } from "@material-tailwind/react";
 import Swal from "sweetalert2";
 import { getUsers, putUser } from "@/helpers/Autenticacion.helper";
 import { useAuthContext } from "@/context/auth.context";
-import { IUserProps } from "@/interfaces/IUser";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+
 import { ISession } from "@/interfaces/ISession";
 const Users = () => {
     const [loading, setLoading] = useState(true);
@@ -18,7 +16,7 @@ const Users = () => {
     const USER_PER_PAGE = 8;
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
-    console.log(totalPages);
+
     useEffect(() => {
         const fetchUsers = async () =>{
             console.log("llegue aca?");
@@ -32,7 +30,7 @@ const Users = () => {
         }
         fetchUsers()
         setLoading(false);
-    }, []);
+    }, [roleUser,token]);
     const onPageChange = (page: number) => setCurrentPage(page);
 
     const getCurrentPageUsers = () => {
@@ -60,14 +58,21 @@ const Users = () => {
       };
       const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, id: string) => {
         const newRole = e.target.value;
-        setRoleUser(newRole);
+        ;
         try {
             const user = {
                 role: newRole
             }
           const response = await putUser(id,user, token as string);
-          console.log("response", response);
-          Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
+
+         if (response?.status === 200 || response?.status === 201) {
+          setRoleUser(newRole)
+          Swal.fire("¡Éxito!", "El estado del usuario ha sido actualizado.", "success");
+
+         } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
+         }
+          
         } catch (error) {
           console.error("Error updating order:", error);
           Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
