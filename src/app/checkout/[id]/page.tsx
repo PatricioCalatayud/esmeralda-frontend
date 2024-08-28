@@ -5,6 +5,10 @@ import { ICart, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { postMarketPay } from "@/helpers/MarketPay.helper";
 import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
+import { useAuthContext } from "@/context/auth.context";
+import { Spinner } from "@material-tailwind/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDown, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [cart, setCart] = useState<ICart[]>([]);
@@ -15,6 +19,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [allFieldsCompleted, setAllFieldsCompleted] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string>("");
+  const { session, authLoading } = useAuthContext();
 
   useEffect(() => {
     const cartData = JSON.parse(
@@ -83,9 +88,17 @@ const Checkout = ({ params }: { params: { id: string } }) => {
     <div className="font-sans bg-white h-full mb-20">
       <div className="max-w-7xl mx-auto w-full relative z-10">
         <div className="grid lg:grid-cols-3 gap-6 py-6">
-          <div className="lg:col-span-2 max-lg:order-1 px-6 max-w-4xl mx-auto w-full">
+          {authLoading ? <div className="flex px-6  mx-auto lg:col-span-2  w-full justify-center"><Spinner
+        color="teal"
+        className="h-12 w-12"
+        onPointerEnterCapture={() => {}}
+        onPointerLeaveCapture={() => {}}
+      /></div>: session?.role === "Cliente" ? <div className="flex px-6  mx-auto lg:col-span-2  w-full items-center flex-col gap-4">
+        <button className="flex justify-center items-center bg-teal-600 hover:bg-teal-800 text-white gap-2 font-semibold rounded-xl py-2 w-full">Agregar a cuenta corriente</button>
+        <button className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2 w-full">Pago con transferencia bancaria <FontAwesomeIcon icon={faChevronDown}/></button>
+      </div> :<div className="lg:col-span-2 max-lg:order-1 px-6 max-w-4xl mx-auto w-full">
             {preferenceId ? <a href={preferenceId}	target="_blank" className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2">Pagar con Mercado Pago <MercadoPagoIcon color="#ffffff" height={"32px"} width={"32px"} /></a> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
-          </div>
+          </div>}
 
           {/* Mis pedidos */}
           <div className="lg:col-span-1 md:col-span-1 lg:h-auto lg:sticky lg:top-0 lg:overflow-y-auto flex flex-col  px-6 lg:px-0">
@@ -138,7 +151,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                             Descuento
                             {descuento > 0 &&
                             <span className="ml-auto">
-                            - ${descuento.toFixed(2)}
+                            - ${item.price * (item.quantity || 1) * (item.discount / 100)}
                             </span>}
                           </li>
                         
@@ -155,6 +168,23 @@ const Checkout = ({ params }: { params: { id: string } }) => {
               </h4>
               <h4 className="text-base text-white font-semibold">
                 ${shippingCost.toFixed(2)}
+              </h4>
+              </div>
+              <hr />
+              <div className="flex justify-between">
+              <h4 className="text-md text-white font-semibold">
+                Subtotal: 
+              </h4>
+              <h4 className="text-md text-white font-semibold">
+                ${(subtotal).toFixed(2)}
+              </h4>
+              </div>
+              <div className="flex justify-between">
+              <h4 className="text-md text-white font-semibold">
+                Descuento: 
+              </h4>
+              <h4 className="text-md text-white font-semibold">
+                -${(descuento).toFixed(2)}
               </h4>
               </div>
               <hr />
