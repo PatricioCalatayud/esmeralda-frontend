@@ -48,7 +48,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   };
 
   const calcularTotal = () => {
-    const subtotal = calcularSubtotal();
+
     const descuento = calcularDescuento();
     return subtotal - descuento;
   };
@@ -115,7 +115,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                       </h3>
                       <ul className="text-xs text-white space-y-2 mt-2">
                         <li className="flex flex-wrap gap-4">
-                          Tamaño <span className="ml-auto">{item.size}{item.unit}</span>
+                          Tamaño <span className="ml-auto">{item.size} {item.unit}</span>
                         </li>
                         <li className="flex flex-wrap gap-4">
                           Cantidad{" "}
@@ -124,21 +124,22 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                         <li className="flex flex-wrap gap-4">
                           Producto{" "}
                           <span className="ml-auto">
-                            ${Number(item.price).toFixed(2)}
+                            ${Number(item.price)}
                           </span>
                         </li>
                         <li className="flex flex-wrap gap-4">
                           Subtotal
-                          <span className="ml-auto">
-                            -${subtotal.toFixed(2)}
+                          <span className="ml-auto font-bold">
+                            ${item.price * (item.quantity || 1)}
                           </span>
                         </li>
                         
                           <li className="flex flex-wrap gap-4">
                             Descuento
+                            {descuento > 0 &&
                             <span className="ml-auto">
-                            -${descuento.toFixed(2)}
-                            </span>
+                            - ${descuento.toFixed(2)}
+                            </span>}
                           </li>
                         
                       </ul>

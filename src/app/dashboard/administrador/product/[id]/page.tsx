@@ -48,8 +48,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     tipoGrano: "",
     medida: "",
     categoryID: "",
-    /*
-    category: {
+    
+    /*category: {
       id: "",
       name: "",
     },*/
@@ -61,6 +61,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const productData = await fetch(`${apiURL}/products/${params.id}`).then(
         (res) => res.json()
       );
+      console.log(productData);
       // Desestructurar solo los campos que deseas actualizar
       const {
         description,
@@ -213,18 +214,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               >
                 Producto
               </label>
-              <input
-                type="text"
-                name="description"
-                id="description"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Nombre del producto"
-                value={dataProduct.description}
-                onChange={handleChange}
-              />
-              {errors.description && (
-                <span className="text-red-500">{errors.description}</span>
-              )}
+              <p>{dataProduct.description}</p>
             </div>
 
             <div>
@@ -234,23 +224,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
               >
                 Categorías
               </label>
-              <select
-                id="category"
-                name="category"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                value={dataProduct.categoryID}
-                onChange={handleChange}
-              >
-                <option value="">--Seleccione--</option>
-                {categories?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {/*errors.category.id && (
-                <span className="text-red-500">{errors.category.id}</span>
-              )*/}
+              <p>{/*dataProduct.category.name*/}</p>
             </div>
 
             <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
@@ -305,6 +279,26 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   <span className="text-red-500">{errors.tipoGrano}</span>
                 )} */}
                 </div>
+                <div>
+              <label
+                htmlFor="price"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Cantidad
+              </label>
+              <input
+                type="number"
+                name="price"
+                id="price"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="0.00"
+                //value={dataProduct.amount}
+                onChange={handleChange}
+              />
+              {errors.price && (
+                <span className="text-red-500">{errors.price}</span>
+              )}
+            </div>
 
                 <div>
                   <label
