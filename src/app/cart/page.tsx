@@ -265,6 +265,15 @@ const Cart = () => {
                       <div className="ml-auto">
                         {item.discount && Number(item.discount) > 0 ? (
                           <div>
+                            <h4 className="text-sm text-gray-500 line-through">
+                              $
+                              {(
+                                Number(item.price) * (item.quantity || 1)
+                              ).toFixed(2)}
+                            </h4>
+                            <h4 className="text-sm text-teal-600 font-bold">
+                              % {Number(item.discount)} de descuento
+                            </h4>
                             <h4 className="text-lg font-bold text-gray-800">
                               $
                               {(
@@ -273,13 +282,7 @@ const Cart = () => {
                                 (1 - Number(item.discount) / 100)
                               ).toFixed(2)}
                             </h4>
-                            <h4 className="text-sm text-gray-500 line-through">
-                              $
-                              {(
-                                Number(item.price) * (item.quantity || 1)
-                              ).toFixed(2)}
-                            </h4>
-                          </div>
+                            </div>
                         ) : (
                           <h4 className="text-lg font-bold text-gray-800">
                             $

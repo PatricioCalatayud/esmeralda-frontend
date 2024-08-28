@@ -15,7 +15,13 @@ import {
   putProducts,
 } from "../../../../helpers/ProductsServices.helper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPen, faPlug, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faPen,
+  faPlug,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 
@@ -29,6 +35,7 @@ const ProductList = () => {
   const [products, setProducts] = useState<IProductList[] | undefined>([]);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(0);
+  const [addSubproduct, setAddSubproduct] = useState<{ id: string }>();
 
   //! Obtener los productos
   useEffect(() => {
@@ -36,11 +43,10 @@ const ProductList = () => {
       const products = await getProducts();
       if (products) {
         setTotalPages(Math.ceil(products.length / PRODUCTS_PER_PAGE));
-    setProducts(products);
-    setLoading(false);
+        setProducts(products);
+        setLoading(false);
       }
-      
-    }
+    };
 
     fetchProducts();
   }, [allProducts]);
@@ -192,9 +198,7 @@ const ProductList = () => {
       );
     }
   };
- const handleEditProduct = (e: any, id: string) => {
-
- };
+  const handleEditProduct = (e: any, id: string) => {};
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
@@ -207,7 +211,7 @@ const ProductList = () => {
     </div>
   ) : (
     <DashboardComponent
-    setCurrentPage={onPageChange}
+      setCurrentPage={onPageChange}
       titleDashboard="Listado de Productos"
       searchBar="Buscar productos"
       handleSearchChange={handleSearchChange}
@@ -224,9 +228,9 @@ const ProductList = () => {
       noContent="No hay Productos disponibles"
       buttonTopRight={
         <>
-            <RiAddLargeFill />
-            Agregar Producto
-            </>
+          <RiAddLargeFill />
+          Agregar Producto
+        </>
       }
       buttonTopRightLink="../../dashboard/administrador/productAdd"
     >
@@ -237,9 +241,9 @@ const ProductList = () => {
         >
           <th
             scope="row"
-            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white w-1/2"
           >
-            <div className="flex items-center ">
+            <div className="flex items-center justify-between w-full">
               <Image
                 width={500}
                 height={500}
@@ -249,106 +253,226 @@ const ProductList = () => {
                 className="h-12 w-12 mr-3 rounded-lg"
               />
               {product.description}
-            </div>
-          </th>
-
-          
-
-            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center" >
-            {product.subproducts.map((subproduct, index) => (
-              String(edit) !== String(subproduct.id) ? (<p key={index} className="h-10 flex items-center justify-center">
-            {subproduct.stock}
-            </p>) : (<input key={index} className="h-10 rounded-md p-2 w-14 border border-gray-600" type="text" placeholder={String(subproduct.stock)} onChange={(e) => handleEditProduct(e, String(subproduct.id))}/>)
-                      ))}
-          </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center " >
-            {product.subproducts.map((subproduct, index) => (
-              String(edit) !== String(subproduct.id) ? (<p key={index} className="h-10 flex items-center  justify-center">
-            {subproduct.amount} {subproduct.unit}
-            </p>) : (<div key={index} className="flex justify-center items-center gap-2"> <input className="h-10 rounded-md p-2 w-14 border border-gray-600" type="text" placeholder={subproduct.amount} onChange={(e) => handleEditProduct(e, String(subproduct.id))}/><select
-                id="status"
-                name="status"
-                className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full "
-                onChange={(e) => handleEditProduct(e, String(subproduct.id))}
-              >
-                <option value="">Unidad</option>
-                <option value={"Kilo"}>Kilo</option>
-                <option value={"Gramos"}>Gramos</option>
-                <option value={"Unidad"}>Unidad</option>
-                <option value={"Sobres"}>Sobres</option>
-              </select> </div>)
-                      ))}
-          </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center " >
-          {product.subproducts.map((subproduct, index) => (
-            String(edit) !== String(subproduct.id) ?
-            (<p key={index} className="h-10 flex items-center  justify-center">
-            $ {subproduct.price}
-            </p>) : (<input key={index} className="h-10  rounded-md p-2 w-20 border border-gray-600" type="text" placeholder={`$ ${subproduct.price}`} onChange={(e) => handleEditProduct(e, String(subproduct.id))}/>)
-          ))}
-          </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center " >
-          {product.subproducts.map((subproduct, index) => (
-             String(edit) !== String(subproduct.id) ?
-            (<p key={index} className="h-10 flex items-center  justify-center">
-            {subproduct.discount} %
-            </p>) : (<input key={index} className="h-10 rounded-md p-2 w-20 border border-gray-600" type="text" placeholder={`${subproduct.discount} %`} onChange={(e) => handleEditProduct(e, String(subproduct.id))}/>)
-          ))}
-          </td>
-
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            <div className="flex items-center space-x-4 justify-center">
-              <div className="flex flex-col gap-2">
-            {product.subproducts.map((subproduct, index) => (
-                  edit === subproduct.id ? (
-                    <Tooltip content="Correcto" key={index}>
-                  <button
-                    type="button"
-                    onClick={() => setEdit(0)}
-                    className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                  >
-                    <FontAwesomeIcon icon={faCheck} />
-                  </button>
-                </Tooltip>
-                  ): (<span className="h-8" key={index}/>)
-                ))}
-                </div>
-              <div className="flex flex-col gap-2">
-                
-            {product.subproducts.map((subproduct, index) => (
-              
-              
-              <Tooltip content="Editar" key={index}>
-                <div
-
+              <Tooltip content="Editar">
+                <Link
+                  href={`/dashboard/administrador/product/${product.id}`}
                   data-drawer-target="drawer-update-product"
                   data-drawer-show="drawer-update-product"
                   aria-controls="drawer-update-product"
                   className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-
-                  onClick={() =>{
-                    if (edit === subproduct.id) {
-                      setEdit(0);
-                    } else {
-                      setEdit(subproduct.id);
-                    }
-                  }}
-                  
                 >
                   <FontAwesomeIcon icon={faPen} />
-                </div>
-              </Tooltip>
-            ))}
-            </div>
-            <Tooltip content="Agregar Subproducto">
-                <Link
-                href={`/dashboard/administrador/product/${product.id}`}
-                  type="button"
-                  className="flex items-center text-gray-400 hover:text-white border border-gray-800 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
-                >
-                  <FontAwesomeIcon icon={faPlus} />
                 </Link>
               </Tooltip>
+            </div>
+          </th>
+
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center ">
+            <div className="flex flex-col gap-1 ">
+            {product.subproducts.map((subproduct, index) =>
+              String(edit) !== String(subproduct.id) ? (
+                <p
+                  key={index}
+                  className="h-10 flex items-center justify-center w-full"
+                >
+                  {subproduct.stock}
+                </p>
+              ) : (
+                <input
+                  key={index}
+                  className="h-10 rounded-md p-2 w-full border border-gray-600"
+                  type="text"
+                  placeholder={String(subproduct.stock)}
+                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                />
+              )
+            )}
+            {addSubproduct?.id === product.id && (
+              <input
+                className="h-10 rounded-md p-2 w-full border border-gray-600"
+                type="text"
+                placeholder="0"
+              />
+            )}
+            </div>
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <div className="flex flex-col gap-1">
+            {product.subproducts.map((subproduct, index) =>
+              String(edit) !== String(subproduct.id) ? (
+                <p
+                  key={index}
+                  className="h-10 flex items-center  justify-center w-full"
+                >
+                  {subproduct.amount} {subproduct.unit}
+                </p>
+              ) : (
+                <div
+                  key={index}
+                  className="flex justify-center items-center gap-2"
+                >
+                  {" "}
+                  <input
+                    className="h-10 rounded-md p-2 w-1/2 border border-gray-600"
+                    type="text"
+                    placeholder={subproduct.amount}
+                    onChange={(e) =>
+                      handleEditProduct(e, String(subproduct.id))
+                    }
+                  />
+                  <select
+                    id="status"
+                    name="status"
+                    className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
+                    onChange={(e) =>
+                      handleEditProduct(e, String(subproduct.id))
+                    }
+                  >
+                    <option value="">Unidad</option>
+                    <option value={"Kilo"}>Kilo</option>
+                    <option value={"Gramos"}>Gramos</option>
+                    <option value={"Unidad"}>Unidad</option>
+                    <option value={"Sobres"}>Sobres</option>
+                  </select>{" "}
+                </div>
+              )
+            )}
+            {addSubproduct?.id === product.id && (
+              <div className="flex justify-center items-center gap-2">
+                {" "}
+                <input
+                  className="h-10 rounded-md p-2 w-1/2  border border-gray-600"
+                  type="text"
+                  placeholder="0"
+                />
+                <select
+                  id="status"
+                  name="status"
+                  className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
+                >
+                  <option value="">Unidad</option>
+                  <option value={"Kilo"}>Kilo</option>
+                  <option value={"Gramos"}>Gramos</option>
+                  <option value={"Unidad"}>Unidad</option>
+                  <option value={"Sobres"}>Sobres</option>
+                </select>{" "}
+              </div>
+            )}
+            </div>
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <div className="flex flex-col gap-1">
+            {product.subproducts.map((subproduct, index) =>
+              String(edit) !== String(subproduct.id) ? (
+                <p
+                  key={index}
+                  className="h-10 flex items-center  justify-center w-full"
+                >
+                  $ {subproduct.price}
+                </p>
+              ) : (
+                <input
+                  key={index}
+                  className="h-10  rounded-md p-2 w-full border border-gray-600"
+                  type="text"
+                  placeholder={`$ ${subproduct.price}`}
+                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                />
+              )
+            )}
+            {addSubproduct?.id === product.id && (
+              <input
+                className="h-10 rounded-md p-2 w-full border border-gray-600"
+                type="text"
+                placeholder="0"
+              />
+            )}
+            </div>
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <div className="flex flex-col gap-1">
+            {product.subproducts.map((subproduct, index) =>
+              String(edit) !== String(subproduct.id) ? (
+                <p
+                  key={index}
+                  className="h-10 flex items-center  justify-center w-full"
+                >
+                  {subproduct.discount} %
+                </p>
+              ) : (
+                <input
+                  key={index}
+                  className="h-10 rounded-md p-2 w-full border border-gray-600"
+                  type="text"
+                  placeholder={`${subproduct.discount} %`}
+                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                />
+              )
+            )}
+            {addSubproduct?.id === product.id && (
+              <input
+                className="h-10 rounded-md p-2 w-full border border-gray-600"
+                type="text"
+                placeholder="0"
+              />
+            )}
+            </div>
+          </td>
+
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white w-full">
+            <div className="flex items-center space-x-4 justify-center ">
+              <div className="flex flex-col gap-3">
+                {product.subproducts.map((subproduct, index) =>
+                  edit === subproduct.id ? (
+                    <Tooltip content="Correcto" key={index}>
+                      <button
+                        type="button"
+                        onClick={() => setEdit(0)}
+                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                      >
+                        <FontAwesomeIcon icon={faCheck} />
+                      </button>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip content="Editar" key={index}>
+                      <div
+                        data-drawer-target="drawer-update-product"
+                        data-drawer-show="drawer-update-product"
+                        aria-controls="drawer-update-product"
+                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600  rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                        onClick={() => {
+                          if (edit === subproduct.id) {
+                            setEdit(0);
+                          } else {
+                            setEdit(subproduct.id);
+                          }
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faPen} />
+                      </div>
+                    </Tooltip>
+                  )
+                )}
+ {addSubproduct?.id !== product.id ?
+                <Tooltip content="Agregar Subproducto">
+                  <button
+                    onClick={() => setAddSubproduct({ id: product.id })}
+                    type="button"
+                    className="flex items-center text-gray-600 hover:text-white  hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
+                  >
+                    <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                </Tooltip> : <Tooltip content="Agregar Subproducto">
+                  <button
+                    onClick={() => setAddSubproduct({ id: "." })}
+                    type="button"
+                    className="flex items-center text-gray-600 hover:text-white  hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
+                  >
+                    <FontAwesomeIcon icon={faCheck} />
+                  </button>
+                </Tooltip>}
+              </div>
+
               <Tooltip content="Eliminar">
                 <button
                   type="button"
@@ -361,21 +485,23 @@ const ProductList = () => {
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            <div className="flex flex-col items-center justify-center gap-2">
-               {product.subproducts.map((subproduct, index) => (
+            <div className="flex flex-col items-center justify-center gap-3">
+              {product.subproducts.map((subproduct, index) => (
                 <input
-                key={index}
-                type="checkbox"
-                checked={subproduct.isAvailable}
-                onChange={() =>
-                  subproduct.isAvailable
-                    ? handleDisableProduct(product.id, String(subproduct.id))
-                    : handleEnableProduct(product.id, String(subproduct.id))
-                }
-                className="w-5 h-5"
-              />
+                  key={index}
+                  type="checkbox"
+                  checked={subproduct.isAvailable}
+                  onChange={() =>
+                    subproduct.isAvailable
+                      ? handleDisableProduct(product.id, String(subproduct.id))
+                      : handleEnableProduct(product.id, String(subproduct.id))
+                  }
+                  className="w-5 h-5 m-1"
+                />
               ))}
+              <div className="h-5"/>
             </div>
+            
           </td>
         </tr>
       ))}
