@@ -86,8 +86,9 @@ const OrderList = () => {
 
   //! Función para manejar el cambio en el estado de la orden
   const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, id: string) => {
-    const newStatus = e.target.value;
-    setDataStatus(newStatus);
+
+    const newStatus = {status: e.target.value}
+    console.log(newStatus);
     try {
       const response = await putOrder(id, newStatus, token as string);
       console.log("response", response);
@@ -118,8 +119,8 @@ const OrderList = () => {
       totalPages={totalPages}
       tdTable={[
         "Cliente",
-        "Fecha",
-        "Precio",
+        "Fecha de pedido",
+        "Precio total",
         "Fecha de entrega",
         "Total",
         "Estado",
@@ -145,7 +146,7 @@ const OrderList = () => {
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {order.orderDetail?.totalPrice}
+          $ {order.orderDetail?.totalPrice}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             {order.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", {
@@ -153,7 +154,7 @@ const OrderList = () => {
             })}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            $ {order.orderDetail?.totalPrice}
+            {order.status}
           </td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
@@ -162,22 +163,22 @@ const OrderList = () => {
                 : "text-red-500"
             } `}
           >
-            {order.orderDetail?.transactions.status === "Recibido" ? (
+
               <select
                 id="status"
                 name="status"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 onChange={(e) => handleChange(e, order.id)}
+                defaultValue={order.orderDetail?.transactions.status }
               >
                 <option value="">--Seleccione--</option>
+                <option value={"Pendiente de pago"}>Pendiente de pago</option>
                 <option value={"Recibido"}>Recibido</option>
                 <option value={"Empaquetado"}>Empaquetado</option>
                 <option value={"Transito"}>Transito</option>
                 <option value={"Entregado"}>Entregado</option>
               </select>
-            ) : (
-              order.orderDetail?.transactions?.status
-            )}
+
           </td>
         </tr>
       ))}

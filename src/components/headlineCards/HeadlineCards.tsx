@@ -15,8 +15,6 @@ function HeadlineCards() {
   useEffect(() => {
   if (!categoriesLoading) { 
     const accessoriesCategory = categories?.find(category => category.name.toLowerCase() === 'accesorio');
-    console.log(categories);
-    console.log(accessoriesCategory);
     if (accessoriesCategory) {
       setAccessoriesCategoryId(accessoriesCategory.id);
     }

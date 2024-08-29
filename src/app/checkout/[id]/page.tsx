@@ -151,7 +151,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                             Descuento
                             {descuento > 0 &&
                             <span className="ml-auto">
-                            - ${item.price * (item.quantity || 1) * (item.discount / 100)}
+                            - ${(item.price * (item.quantity || 1) * (item.discount / 100)).toFixed(2)}
                             </span>}
                           </li>
                         

@@ -6,6 +6,7 @@ export interface IOrders {
     user:          User;
     productsOrder: ProductsOrder[];
     orderDetail:   OrderDetail;
+    status:    string;
 }
 
 export interface IOrderCheckout {
@@ -22,6 +23,8 @@ export interface OrderDetail {
     deliveryDate: string;
     totalPrice:   string;
     transactions: Transaction;
+    addressDelivery: string;
+
 }
 
 export interface Transaction {
@@ -31,15 +34,24 @@ export interface Transaction {
 
 export interface ProductsOrder {
     quantity: string;
-    product:  Product;
+    subproduct: SubproductOder;
 }
+export interface SubproductOder {
+    amount: number;
+    discount: number;
+    id: string;
+    isAvailable: boolean;
+    price: number;
+    product: Product;
+    stock: number;
+    unit: string;
 
+}
 export interface Product {
     id:          string;
     description: string;
     imgUrl:      string;
-    price:       string;
-    discount:    string;
+
 }
 
 export interface User {
