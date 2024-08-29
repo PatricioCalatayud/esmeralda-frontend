@@ -38,7 +38,7 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
             return !isNaN(discount) && discount > 0; // Verifica que es un número y que es mayor a 0
           })
         );
-        console.log(productsWithDiscount);
+
         setProductsPromotions(productsWithDiscount);
       }
       

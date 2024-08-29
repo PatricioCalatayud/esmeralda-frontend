@@ -56,17 +56,20 @@ const Tracking = ({ params }: { params: { id: string } }) => {
             <div className="w-full flex items-center flex-col">
               <div className="w-full flex flex-col gap-4 items-center">
                 <h2 className="text-xl font-medium ">Tu pedido:</h2>
-                {order.productsOrder.map((productOrder, productIndex) => (
+                {order.productsOrder.map((product, productIndex) => (
                   <div key={productIndex} className="mb-2 text-start">
                     <Image
                       width={500}
                       height={500}
                       priority={true}
-                      src={productOrder.product?.imgUrl}
-                      alt={productOrder.product?.description}
+                      src={product.subproduct?.product.imgUrl}
+                      alt={product.subproduct?.product.description}
                       className="w-10 h-10 inline-block mr-2 rounded-full"
                     />
-                    <span>{productOrder.product?.description}</span>
+                    <div className="flex flex-col">
+                    <span>{product.subproduct?.product.description}</span>
+                    <span>{product.subproduct?.amount}</span>
+                    </div>
                   </div>
                 ))}
               </div>
