@@ -350,7 +350,7 @@ handleSubmit = {handleSubmit}
                   alt="Imagen del producto"
                   width={500} // debes especificar un ancho
                   height={300} // y una altura
-                  className="max-w-44 h-auto"
+                  className="max-w-44 h-auto "
                 />
               </div>
             )}
