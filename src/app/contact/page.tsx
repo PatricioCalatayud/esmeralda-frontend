@@ -4,50 +4,15 @@ import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import {jwtDecode} from "jwt-decode"; // Asegúrate de tener instalada esta dependencia
-
-const apiURL = "http://localhost:3001/testimony";
-
-interface DecodedToken {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  sub: string;
-  roles: string[];
-  isAvailable: boolean;
-  isDeleted: boolean;
-  iat: number;
-  exp: number;
-}
+import { useAuthContext } from "@/context/auth.context";
+import { CreateTestimony } from "@/helpers/Testimony.helper";
 
 const Contacto: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [punctuation, setPunctuation] = useState<number>(0);
-  const [userName, setUserName] = useState<string>("");
-  const [userId, setUserId] = useState<string>("");
 
+  const{token, session} = useAuthContext();
   const router = useRouter();
-
-  useEffect(() => {
-    // Obtener el item userSession del localStorage
-    const sessionItem = localStorage.getItem("userSession");
-    console.log("Item obtenido del localStorage:", sessionItem); // Log para verificar el item completo
-    if (sessionItem) {
-      try {
-        const sessionData = JSON.parse(sessionItem); // Convertir a objeto JSON
-        const token = sessionData.accessToken; // Extraer el token
-        console.log("Token extraído:", token); // Log para verificar el token extraído
-
-        // Decodificar el token para obtener el userName y el userId (sub)
-        const decoded: DecodedToken = jwtDecode(token);
-        setUserName(decoded.name);
-        setUserId(decoded.sub);
-      } catch (error) {
-        console.error("Error decodificando el token:", error);
-      }
-    }
-  }, []);
 
   const handleCambioDeCalificacion = (calificacion: number) => {
     setPunctuation(calificacion);
@@ -56,9 +21,7 @@ const Contacto: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const sessionItem = localStorage.getItem("userSession");
-
-    if (!sessionItem) {
+    if (!session) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -67,11 +30,8 @@ const Contacto: React.FC = () => {
       return;
     }
 
-    const sessionData = JSON.parse(sessionItem);
-    const token = sessionData.accessToken;
-
-    console.log("Token enviado en la solicitud:", token); // Log para verificar el token en la solicitud
-
+    const userId = session?.id; // Obtener el UUID del usuario desde la sesión
+    const userName = session?.name; // Obtener el nombre del usuario desde la sesión
     const review = {
       userId, // Enviar el UUID del usuario
       userName, // También enviar el nombre del usuario
@@ -80,21 +40,9 @@ const Contacto: React.FC = () => {
     };
 
     try {
-      const res = await fetch(apiURL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Enviar el token en el encabezado de autorización
-        },
-        body: JSON.stringify(review),
-      });
+      const res = await CreateTestimony(review, token);
 
-      if (!res.ok) {
-        const errorDetails = await res.json();
-        throw new Error(
-          `Error creando review: ${res.status} - ${errorDetails.message}`
-        );
-      }
+      if (res && ( res.status === 200 || res.status === 201)) {
 
       Swal.fire({
         icon: "success",
@@ -105,6 +53,8 @@ const Contacto: React.FC = () => {
       setDescription("");
       setPunctuation(0);
       router.push("/");
+    }
+
     } catch (error: any) {
       console.error("Error creando review:", error);
       Swal.fire({
