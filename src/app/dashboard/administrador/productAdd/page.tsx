@@ -23,8 +23,8 @@ const InsertProduct = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {token} = useAuthContext();
   const {categories, categoriesLoading} = useCategoryContext();
-  const [subproducts, setSubproducts] = useState<{ amount: string, unit: string, price: string, stock: string  }[]>([
-    {  amount: "", unit: "", price:"", stock:"" }
+  const [subproducts, setSubproducts] = useState<{ amount: string, unit: string, price: string, stock: string, discount:string  }[]>([
+    {  amount: "", unit: "", price:"", stock:"", discount:"" }
   ]);
 
   //! Estado para almacenar los datos del producto
@@ -85,18 +85,6 @@ const InsertProduct = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    /*const formData ={
-      description: dataProduct.description,
-      averageRating: 0,
-      imgUrl: "https://example.com/premium-coffee.png",
-      presentacion: dataProduct.presentacion,
-      tipoGrano: dataProduct.tipoGrano,
-      categoryID: dataProduct.categoryID,
-      subproducts: subproducts,
-
-    }
-    console.log(formData);
-*/
 const formData = new FormData();
 formData.append("description", dataProduct.description);
 formData.append("averageRating", "0"); // o puedes utilizar `0` directamente si el backend lo soporta
@@ -116,32 +104,20 @@ subproducts.forEach((subproduct, index) => {
     formData.append(`subproducts[${index}][unit]`, subproduct.unit);
     formData.append(`subproducts[${index}][stock]`, subproduct.stock);
     formData.append(`subproducts[${index}][price]`, subproduct.price);
+    formData.append(`subproducts[${index}][discount]`, subproduct.discount);
     // Añadir más campos según sea necesario
 });
   
 
-
-    /*const formData = new FormData();
-    formData.append("description", dataProduct.description);
-    formData.append("categoryID", dataProduct.categoryID);
-    formData.append("presentacion", dataProduct.presentacion || "");
-    formData.append("tipoGrano", dataProduct.tipoGrano || "");
-    
-    if (imageFile) {
-      formData.append("file", imageFile);
-    }
-  
-    formData.append("subproducts", JSON.stringify(subproducts));
-*/
     //! Mostrar alerta de carga mientras se procesa la solicitud
-    /*Swal.fire({
+    Swal.fire({
       title: "Agregando producto...",
       text: "Por favor espera.",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
-    });*/
+    });
 
       const response = await postProducts(formData, token);
 
@@ -151,7 +127,7 @@ subproducts.forEach((subproduct, index) => {
           title: "¡Agregado!",
           text: "El producto ha sido agregado con éxito.",
         }).then(() => {
-          //router.push("../../dashboard/administrador/product");
+          router.push("../../dashboard/administrador/product");
         });
       
       // Mostrar alerta de éxito
@@ -166,7 +142,7 @@ subproducts.forEach((subproduct, index) => {
     }
   };
   const handleAddSubproduct = () => {
-    setSubproducts([...subproducts, {  amount: "", unit: "", price:"", stock:"" }]);
+    setSubproducts([...subproducts, {  amount: "", unit: "", price:"", stock:"", discount:"" }]);
   };
 
   const handleSubproductChange = (index: number, e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -197,9 +173,10 @@ subproducts.forEach((subproduct, index) => {
     />
   </div> :
   <DashboardAddModifyComponent
+  disabled={errors ? true : false}
   titleDashboard="Agregar un nuevo producto"
 backLink = "/dashboard/administrador/product"
-buttonSubmitText = "Actualizar"
+buttonSubmitText = "Agregar producto"
 handleSubmit = {handleSubmit}
 >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -464,7 +441,7 @@ handleSubmit = {handleSubmit}
               </div>
               <div>
                 <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Precio Final</p>
-                <p className="h-10 flex items-center">$ {dataProduct.price}</p>
+                <p className="h-10 flex items-center">  $ {(Number(product.price) - (Number(product.price) * Number(product.discount) / 100)).toFixed(2)}</p>
               </div>
               <hr  className="col-span-full "/>
             </div>

@@ -318,7 +318,7 @@ const ProductList = () => {
                   className="h-10 rounded-md p-2 w-full border border-gray-600"
                   type="text"
                   name="stock"
-                  value={String(subproduct.stock)}
+                  defaultValue={String(subproduct.stock)}
                   placeholder={String(subproduct.stock)}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
                 />

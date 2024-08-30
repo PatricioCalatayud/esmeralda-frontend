@@ -8,6 +8,7 @@ interface IDashboardAddModifyInterface {
   children: React.ReactNode;
   backLink: string;
   buttonSubmitText: string;
+  disabled?: boolean
 
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
@@ -17,6 +18,7 @@ const DashboardAddModifyComponent = ({
   backLink,
   buttonSubmitText,
   handleSubmit,
+  disabled,
 }: IDashboardAddModifyInterface) => {
   return (
 <div className="min-h-screen flex flex-col justify-start items-center px-10 dark:bg-gray-700">
@@ -34,13 +36,14 @@ const DashboardAddModifyComponent = ({
           <div className="flex items-center space-x-4 mt-4">
             <button
               type="submit"
-              className="w-full sm:w-auto justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            disabled={disabled===true}
             >
               {buttonSubmitText}
             </button>
             <Link
               href={backLink}
-              className="w-full justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+              className="w-full  justify-center sm:w-auto text-red-500 inline-flex items-center hover:bg-gray-100 bg-white  focus:ring-4 focus:outline-none focus:ring-primary-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
             >
               
               <FaArrowLeft />

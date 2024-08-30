@@ -149,7 +149,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         title: "¡Actualizado!",
         text: "El producto ha sido actualizado con éxito.",
       }).then(() => {
-        router.push("../administrador/product");
+        router.push("/dashboard/administrador/product");
       });
     }else {
       // Mostrar alerta de error
@@ -242,10 +242,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   value={dataProduct.presentacion}
                   onChange={handleChange}
                 >
-                  <option value="">--Seleccione--</option>
-                  <option value="molido">Molido</option>
-                  <option value="grano">Grano</option>
-                  <option value="capsulas">Cápsulas</option>
+                <option value="">--Seleccione--</option>
+                  <option value="Molido">Molido</option>
+                  <option value="Grano">Grano</option>
+                  <option value="Capsulas">Cápsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
@@ -267,13 +267,13 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="santos">Santos</option>
-                  <option value="colombiano">Colombiano</option>
-                  <option value="torrado">Torrado</option>
-                  <option value="rio de oro">Rio de Oro</option>
-                  <option value="descafeino">Descafeinado</option>
-                  <option value="blend-premium">Blend</option>
-                  <option value="mezcla-baja calidad">Mezcla</option>
+                  <option value="Santos">Santos</option>
+                  <option value="Colombiano">Colombiano</option>
+                  <option value="Torrado">Torrado</option>
+                  <option value="Rio de oro">Rio de Oro</option>
+                  <option value="Descafeino">Descafeinado</option>
+                  <option value="Blend-premium">Blend</option>
+                  <option value="Mezcla baja calidad">Mezcla</option>
                 </select>
                 {/* {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
