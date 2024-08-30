@@ -46,15 +46,7 @@ const Products = () => {
               <div className="product-item text-center">
                 
                 <h3 className="font-bold h-14 flex items-center justify-center">{product.description}</h3>
-                <p className="text-lg text-gray-800">Desde ${
-                                product.subproducts?.reduce(
-                                  (lowest, current) => {
-                                    return current.price < lowest.price
-                                      ? current
-                                      : lowest;
-                                  }
-                                ).price
-                              }</p>
+                <p className="text-lg text-gray-800">${product.price}</p>
                 <div className="flex items-center gap-1"></div>
 
                 <Rating name="read-only" value={5} readOnly />
