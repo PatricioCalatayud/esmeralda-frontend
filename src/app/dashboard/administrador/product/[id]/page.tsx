@@ -198,6 +198,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
             <div>
               <label
+              <label
                 htmlFor="category"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
