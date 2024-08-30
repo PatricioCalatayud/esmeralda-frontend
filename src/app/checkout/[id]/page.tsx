@@ -8,7 +8,7 @@ import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowDown, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import {  faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [cart, setCart] = useState<ICart[]>([]);
@@ -64,6 +64,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     const createPreference = async (total: number) => {
+      if(cart.length !== 0){
       try {
         const linkPayment = {
           price: total,
@@ -78,7 +79,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
         console.error("Error creating payment preference:", error);
       }
     };
-
+}
       createPreference(Number(total));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]);

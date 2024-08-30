@@ -22,6 +22,10 @@ const nextConfig = {
           {
             protocol: 'https',
             hostname: 'api.dicebear.com',
+          },
+          {
+            protocol: 'https',
+            hostname: 'example.com',
           }
         ],
         domains: ['www.cafelaesmeralda.com.ar'],

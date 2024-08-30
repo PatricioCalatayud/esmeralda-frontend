@@ -42,50 +42,53 @@ export interface Category {
 }
 
 export interface IProductResponse {
-  article_id: string;
   description: string;
-  imgUrl: string;
-  price: string;
-  stock: string;
-  discount: string;
-  presentacion?: string;
-  tipoGrano?: string;
-  medida?: string;
   categoryID: string;
+  presentacion: string;
+  tipoGrano: string;
+  file?: File;
+  amount?: string;
+  unit?: string;
+  stock?: string;
+  price?: string;
+  discount?: string;
 }
 
 export interface IProductErrorResponse {
-  article_id: string;
   description: string;
-  imgUrl: string;
-  price: string;
-  stock: string;
-  discount: string;
-  presentacion?: string;
-  tipoGrano?: string;
-  medida?: string;
   categoryID: string;
+  presentacion: string;
+  tipoGrano: string;
+  file?: string;
+  amount?: string;
+  unit?: string;
+  stock?: string;
+  price?: string;
+  discount?: string;
 }
 
 export interface IProductUpdate {
   description: string;
-  price: string;
-  stock: string;
-  discount: string;
+  categoryID: string;
   presentacion: string;
   tipoGrano: string;
-  medida: string;
-  categoryID: string;
   file?: File;
+  amount?: string;
+  unit?: string;
+  stock?: string;
+  price?: string;
+  discount?: string;
 }
 
 export interface IProductErrorUpdate {
   description: string;
-  price: string;
-  stock: string;
-  discount: string;
+  categoryID: string;
   presentacion: string;
   tipoGrano: string;
-  medida: string;
-  categoryID: string;
+  file?: string;
+  amount?: string;
+  unit?: string;
+  stock?: string;
+  price?: string;
+  discount?: string;
 }

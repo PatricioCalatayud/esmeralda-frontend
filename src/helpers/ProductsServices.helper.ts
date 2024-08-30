@@ -24,11 +24,12 @@ export async function getProductById(id: string, token: string | undefined) {
   try {
           const res = await axios.get(`${apiURL}/products/${id}`, {
             headers: {
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             }, 
           });
           console.log(res)
-          const product: IProductList = res.data;
+          const product = res.data;
           return product;
   } catch (error: any) {
     console.log(error);
@@ -36,7 +37,7 @@ export async function getProductById(id: string, token: string | undefined) {
 }
 
 export async function postProducts(dataProduct: any, token: string | undefined) {
-  
+  console.log(token);
   try {
     const res = await axios.post(`${apiURL}/products`, dataProduct, {
       headers: {
@@ -44,8 +45,7 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
         Authorization: `Bearer ${token}`,
       },
     });
-    //const products: IProductList[] = res.data;
-    //return products;
+    return res;
   } catch (error: any) {
     console.log(error);
   }
@@ -58,13 +58,12 @@ export async function putProducts(dataProduct: object,id: string, token: string 
     try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
-
+        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
       },
     });
     console.log(res);
-    //const products: IProductList[] = res.data;
-    //return products;
+    return res;
   } catch (error: any) {
     /*throw new Error(error);*/
     console.log(error);

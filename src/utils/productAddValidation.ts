@@ -7,27 +7,25 @@ export function productAddValidation(
   product: IProductResponse
 ): IProductErrorResponse {
   const errors: IProductErrorResponse = {
-    article_id: "",
     description: "",
-    imgUrl: "",
-    price: "",
-    stock: "",
-    discount: "",
+    categoryID: "",
     presentacion: "",
     tipoGrano: "",
-    medida: "",
-    categoryID: "",
+    file: undefined,
+    amount: "",
+    unit: "",
+    stock: "",
+    price: "",
+    discount: "",
   };
-  if (!product.article_id) {
-    errors.article_id = "El código de artículo es obligatorio";
-  }
+ 
 
   if (!product.description) {
     errors.description = "La descripción es obligatoria";
   }
 
-  if (!product.imgUrl) {
-    errors.imgUrl = "La imagen es obligatoria";
+  if (!product.file) {
+    errors.file = "La imagen es obligatoria";
   }
 
   if (!product.price) {
@@ -50,10 +48,13 @@ export function productAddValidation(
     errors.tipoGrano = "El tipo de grano es obligatorio";
   }
 
-  if (!product.medida) {
-    errors.medida = "La medida es obligatoria";
+  if (!product.amount) {
+    errors.amount = "La medida es obligatoria";
   }
 
+  if (!product.unit) {
+    errors.unit = "La unidad es obligatoria";
+  }
   if (!product.categoryID) {
     errors.categoryID = "La categoría es obligatoria";
   }

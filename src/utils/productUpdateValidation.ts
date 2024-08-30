@@ -7,44 +7,25 @@ import {
     product: IProductUpdate
   ): IProductErrorUpdate {
     const errors: IProductErrorUpdate = {
-      //article_id: "",
       description: "",
-      //imgUrl: "",
-      price: "",
-      stock: "",
-      discount: "",
+      file: "",
       presentacion: "",
       tipoGrano: "",
-      medida: "",
       categoryID: "",
-      /*category: {
-        id: "",
-        name: "",
-      },*/
-        
+
     };
-    /*if (!product.article_id) {
-      errors.article_id = "El código de artículo es obligatorio";
+
+    if (!product.file) {
+      errors.file = "La imagen es obligatoria";
     }
   
     if (!product.description) {
       errors.description = "La descripción es obligatoria";
     }
   
-    if (!product.imgUrl) {
-      errors.imgUrl = "La imagen es obligatoria";
-    }*/
-  
-    if (!product.price) {
-      errors.price = "El precio es obligatorio";
-    }
-  
-    if (!product.stock) {
-      errors.stock = "El stock es obligatorio";
-    }
-  
-    if (!product.discount) {
-      errors.discount = "El descuento es obligatorio";
+
+    if (!product.categoryID) {
+      errors.categoryID = "La categoría es obligatoria";
     }
   
     if (!product.presentacion) {
@@ -55,13 +36,7 @@ import {
       errors.tipoGrano = "El tipo de grano es obligatorio";
     }
   
-    if (!product.medida) {
-      errors.medida = "La medida es obligatoria";
-    }
-  
-    /*if (!product.category.id) {
-      errors.category.id = "La categoría es obligatoria";
-    }*/
+
     return errors;
   }
   
