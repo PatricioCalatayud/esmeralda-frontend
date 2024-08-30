@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { Category, IProductErrorResponse, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
+import { Category, IProductErrorResponse, IProductResponse, IProductUpdate, ISubProductUpdate } from "@/interfaces/IProductList";
 
 import { productAddValidation } from "@/utils/productAddValidation";
-
+import {validateSubproduct} from "@/utils/subproductsUpdateValidation"
 import { useAuthContext } from "@/context/auth.context";
 import { postProducts } from "../../../../helpers/ProductsServices.helper";
 import { Spinner } from "@material-tailwind/react";
@@ -23,8 +23,12 @@ const InsertProduct = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {token} = useAuthContext();
   const {categories, categoriesLoading} = useCategoryContext();
-  const [subproducts, setSubproducts] = useState<{ amount: string, unit: string, price: string, stock: string, discount:string  }[]>([
-    {  amount: "", unit: "", price:"", stock:"", discount:"" }
+  const [subproducts, setSubproducts] = useState<ISubProductUpdate[]>([
+    {  amount: "", 
+      unit: "", 
+      price:"", 
+      stock:"", 
+      discount:"" }
   ]);
 
   //! Estado para almacenar los datos del producto
@@ -34,11 +38,6 @@ const InsertProduct = () => {
     presentacion: "",
     tipoGrano: "",
 
-    amount: "",
-    unit: "",
-    stock: "",
-    price: "",
-    discount: "",
   });
 
   //! Estado para almacenar los errores
@@ -47,15 +46,12 @@ const InsertProduct = () => {
     categoryID: "",
     presentacion: "",
     tipoGrano: "",
-    file : "",
-    amount: "",
-    unit: "",
-    stock: "",
-    price: "",
-    discount: "",
+    imgUrl : "",
   });
 
-
+  const [errorsSubproducts, setErrorsSubproducts] = useState<{amount: string; unit: string; stock: string; price: string; discount: string }[]>([
+    { amount: "", unit: "", stock: "", price: "", discount: "" }
+  ]);
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
     e.preventDefault();
@@ -154,14 +150,47 @@ subproducts.forEach((subproduct, index) => {
     );
 
     setSubproducts(updatedSubproducts);
-    console.log(subproducts);
+
   };
 
   //!Validar formulario
   useEffect(() => {
+    // Validar los datos del producto
     const validationErrors = productAddValidation(dataProduct);
+
+    // Validar cada subproducto
+    const validationResults = subproducts.map((subproduct) => (
+        validateSubproduct(subproduct) // Debe devolver un objeto de errores si hay errores
+    ));
+    console.log(validationResults);
+    // Filtrar subproductos inválidos
+    const invalidSubproducts = validationResults.filter(result => Object.keys(result).length > 0);
+
+    if (invalidSubproducts.length > 0) {
+        console.log("Subproductos inválidos:", invalidSubproducts);
+    } else {
+        console.log("Todos los subproductos son válidos.");
+    }
+
+    // Actualizar los errores de subproductos en el estado
+    setErrorsSubproducts(validationResults);
+
+    // Actualizar los errores del producto en el estado
     setErrors(validationErrors);
-  }, [dataProduct]);
+}, [dataProduct, subproducts]);
+console.log("Errores de producto:", errors);
+console.log("Errores de subproductos:", errorsSubproducts);
+//console.log(errorsSubproducts[0].errors.discount);
+
+
+const areAllFieldsEmpty = (errorsSubproducts: Array<{ [key: string]: string }>): boolean => {
+  return errorsSubproducts.every(subproduct => {
+    return Object.values(subproduct).every(value => value === "");
+  });
+};
+
+
+const allFieldsEmpty = areAllFieldsEmpty(errorsSubproducts);
 
   return (
     categoriesLoading ? <div className="flex items-center justify-center h-screen">
@@ -173,7 +202,7 @@ subproducts.forEach((subproduct, index) => {
     />
   </div> :
   <DashboardAddModifyComponent
-  disabled={errors ? true : false}
+  disabled={ ((errors.description === "" && errors.categoryID === "" && errors.imgUrl === "" && errors.presentacion === "" && errors.tipoGrano === "") && allFieldsEmpty) ? false : true}
   titleDashboard="Agregar un nuevo producto"
 backLink = "/dashboard/administrador/product"
 buttonSubmitText = "Agregar producto"
@@ -275,7 +304,7 @@ handleSubmit = {handleSubmit}
                   <option value="Blend-premium">Blend</option>
                   <option value="Mezcla baja calidad">Mezcla</option>
                 </select>
-                {errors.discount && (
+                {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
                 )}
               </div>
@@ -311,8 +340,8 @@ handleSubmit = {handleSubmit}
                 />
               </label>
             </div>
-            {errors.file && (
-                  <span className="text-red-500">{errors.file}</span>
+            {errors.imgUrl && (
+                  <span className="text-red-500">{errors.imgUrl}</span>
                 )}
             {imageFile && (
               <div className="mt-4 flex justify-center">
@@ -331,13 +360,15 @@ handleSubmit = {handleSubmit}
  {/* Subproductos */}
          { subproducts.map((product, index) => (
            
-         
+        
             <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3" key={index}>
+
             <div>
                 <label
                   htmlFor="amount"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
+                  
                   Cantidad por unidad
                 </label>
                 <input
@@ -349,13 +380,14 @@ handleSubmit = {handleSubmit}
 
                   onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.amount && (
-                  <span className="text-red-500">{errors.amount}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.amount && (
+                    <span className="text-red-500">{errorsSubproducts[index].amount}</span>
                 )}
               </div>
             <div>
                 <label
-                  htmlFor="stock"
+                  htmlFor="unit"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Unidad de medida
@@ -375,8 +407,9 @@ handleSubmit = {handleSubmit}
                   <option value="Gramos">Gramos</option>
 
                                   </select>
-                {errors.unit && (
-                  <span className="text-red-500">{errors.unit}</span>
+              {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.unit&& (
+                    <span className="text-red-500">{errorsSubproducts[index].unit}</span>
                 )}
               </div>
               <div>
@@ -395,8 +428,9 @@ handleSubmit = {handleSubmit}
 
                   onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.stock && (
-                  <span className="text-red-500">{errors.stock}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.stock && (
+                    <span className="text-red-500">{errorsSubproducts[index].stock}</span>
                 )}
               </div>
               <div>
@@ -415,8 +449,9 @@ handleSubmit = {handleSubmit}
 
                   onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.price && (
-                  <span className="text-red-500">{errors.price}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.price && (
+                    <span className="text-red-500">{errorsSubproducts[index].price}</span>
                 )}
               </div>
               <div>
@@ -435,8 +470,9 @@ handleSubmit = {handleSubmit}
 
                   onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.discount && (
-                  <span className="text-red-500">{errors.discount}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.discount && (
+                    <span className="text-red-500">{errorsSubproducts[index].discount}</span>
                 )}
               </div>
               <div>

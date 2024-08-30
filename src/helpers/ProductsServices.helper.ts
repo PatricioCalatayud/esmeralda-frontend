@@ -28,9 +28,8 @@ export async function getProductById(id: string, token: string | undefined) {
               Authorization: `Bearer ${token}`,
             }, 
           });
-          console.log(res)
-          const product = res.data;
-          return product;
+
+          return res;
   } catch (error: any) {
     console.log(error);
   }

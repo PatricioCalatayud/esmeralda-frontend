@@ -8,15 +8,15 @@ import {
   ): IProductErrorUpdate {
     const errors: IProductErrorUpdate = {
       description: "",
-      file: "",
+      imgUrl : "",
       presentacion: "",
       tipoGrano: "",
       categoryID: "",
 
     };
 
-    if (!product.file) {
-      errors.file = "La imagen es obligatoria";
+    if (!product.imgUrl ) {
+      errors.imgUrl = "La imagen es obligatoria";
     }
   
     if (!product.description) {

@@ -12,6 +12,7 @@ import { useAuthContext } from "@/context/auth.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useRouter } from "next/navigation";
 
+
 const ProductEdit = ({ params }: { params: { id: string } }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {categories} = useCategoryContext();
@@ -22,15 +23,19 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     presentacion: "",
     tipoGrano: "",
     categoryID: "",
+    imgUrl:"",
+    
   });
+  console.log(dataProduct);
 
   const [errors, setErrors] = useState<IProductErrorResponse>({
 
     description: "",
     presentacion: "",
     tipoGrano: "",
-    file: "",
+    file: undefined,
     categoryID: "",
+    imgUrl:"",
   });
 
   //! Obtener producto por ID
@@ -39,45 +44,35 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const productData = await getProductById(params.id, token);
       console.log(productData);
       if (productData && (productData.status === 200 || productData.status === 201)) {
-        
+
       
       // Desestructurar solo los campos que deseas actualizar
       const {
         description,
-        price,
-        stock,
         // revisar con el backend
         tipoGrano,
-        medida,
         presentacion,
         imgUrl,
-        
-        discount,
         category = {
           id: "",
           name: "",
         },
-      } = productData;
+      } = productData.data;
       // Establecer solo los campos especificados en dataProduct
       setDataProduct((prevState) => ({
         ...prevState,
         description,
-        price,
-        stock,
         imgUrl,
-        discount,
         tipoGrano,
-        medida,
         presentacion,
-        category: {
-          id: category.id,
-          name: category.name,
-        },
+    categoryID: category.id,
+
       }));
     };
-    fetchProduct();
   }
-  }, [params.id]);
+  fetchProduct();
+
+  }, []);
 
 
 
@@ -102,7 +97,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const imageUrl = URL.createObjectURL(file);
       setDataProduct({
         ...dataProduct,
-        //imgUrl: imageUrl,
       });
     }
   };
@@ -177,6 +171,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   backLink = "/dashboard/administrador/product"
   buttonSubmitText = "Actualizar"
   handleSubmit = {handleSubmit}
+  disabled = {(errors.description !== "" && errors.categoryID !== "" && errors.imgUrl !== "" && errors.presentacion !== "" && errors.tipoGrano !== "")}
   >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div className="grid gap-4 sm:col-span-2">
@@ -192,7 +187,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 id="description"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Ingresa el nombre del producto"
-                //value={dataProduct.amount}
+                defaultValue={dataProduct.description}
                 onChange={handleChange}
               />
               {errors.description && (
@@ -215,7 +210,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 value={dataProduct.categoryID}
                 onChange={handleChange}
               >
-                <option value="">--Seleccione--</option>
+                {categories?.find(category => category.id === dataProduct.categoryID)?.name || "--Seleccione--"}
                 {categories?.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -242,7 +237,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   value={dataProduct.presentacion}
                   onChange={handleChange}
                 >
-                <option value="">--Seleccione--</option>
+                <option value={dataProduct.presentacion}>{dataProduct.presentacion || "--Seleccione--"}</option>
                   <option value="Molido">Molido</option>
                   <option value="Grano">Grano</option>
                   <option value="Capsulas">Cápsulas</option>
@@ -263,10 +258,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   id="tipoGrano"
                   name="tipoGrano"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.tipoGrano}
                   onChange={handleChange}
+                  value={dataProduct.tipoGrano}
                 >
-                  <option value="">--Seleccione--</option>
+                  <option value={dataProduct.tipoGrano}>{dataProduct.tipoGrano || "--Seleccione--"}</option>
                   <option value="Santos">Santos</option>
                   <option value="Colombiano">Colombiano</option>
                   <option value="Torrado">Torrado</option>
@@ -275,15 +270,25 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   <option value="Blend-premium">Blend</option>
                   <option value="Mezcla baja calidad">Mezcla</option>
                 </select>
-                {/* {errors.tipoGrano && (
+                {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
-                )} */}
+                )} 
                 </div>
             </div>
           </div>
 
           <div className="sm:col-span-2">
-            
+          {dataProduct.imgUrl && (
+              <div className="mt-4 flex justify-center ">
+                <Image
+                  src={dataProduct.imgUrl}
+                  alt="Imagen del producto"
+                  width={500} // debes especificar un ancho
+                  height={300} // y una altura
+                  className="max-w-44 h-auto rounded-xl"
+                />
+              </div>
+            )}
           <div className="mb-4">
             <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Imagen del producto
@@ -312,7 +317,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 />
               </label>
             </div>
-
+            
             {imageFile && (
               <div className="mt-4 flex justify-center">
                 <Image
@@ -327,19 +332,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
           </div>
 
 
-            {/*dataProduct.imgUrl && (
-              <Image
-                width={500}
-                height={500}
-                src={dataProduct.imgUrl}
-                alt="Product Image"
-                className="mt-2 rounded-md"
-                style={{ maxHeight: "150px", objectFit: "contain" }}
-              />
-            )*/}
-            {/* {errors.imgUrl && (
-              <span className="text-red-500">{errors.imgUrl}</span>
-            )} */}
+          {errors.imgUrl && (
+                  <span className="text-red-500">{errors.imgUrl}</span>
+                )}
+            
             <hr className="col-span-full my-10" />
           </div>
   </DashboardAddModifyComponent>
