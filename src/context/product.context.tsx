@@ -32,16 +32,9 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       const products = await getProducts();
       setAllProducts(products);
       if (products) {
-        const productsWithDiscount = products.filter(product => 
-          product.subproducts.some(subproduct => {
-            const discount = Number(subproduct.discount); // Asegúrate de convertirlo a número
-            return !isNaN(discount) && discount > 0; // Verifica que es un número y que es mayor a 0
-          })
-        );
-
-        setProductsPromotions(productsWithDiscount);
-      }
-      
+      const productsWithDiscount = products.filter(product => parseFloat(product.discount) > 0);
+      setProductsPromotions(productsWithDiscount);
+    }
       setProductLoading(false);
     };
 

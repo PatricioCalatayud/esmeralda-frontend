@@ -43,10 +43,11 @@ const ProductList = () => {
       const products = await getProducts();
       if (products) {
         setTotalPages(Math.ceil(products.length / PRODUCTS_PER_PAGE));
-        setProducts(products);
-        setLoading(false);
+    setProducts(products);
+    setLoading(false);
       }
-    };
+      
+    }
 
     fetchProducts();
   }, [allProducts]);
@@ -139,7 +140,7 @@ const ProductList = () => {
   };
 
   //! Función para habilitar un producto
-  const handleEnableProduct = async (id: string, idSubproduct: string) => {
+  const handleEnableProduct = async (id: string) => {
     const dataProducts = { isAvailable: true };
     if (!token) {
       Swal.fire(
@@ -170,7 +171,7 @@ const ProductList = () => {
   };
 
   //! Función para manejar la deshabilitación de un producto
-  const handleDisableProduct = async (id: string, idSubproduct: string) => {
+  const handleDisableProduct = async (id: string) => {
     const dataProducts = { isAvailable: false };
     if (!token) {
       Swal.fire(
@@ -246,7 +247,7 @@ const ProductList = () => {
     </div>
   ) : (
     <DashboardComponent
-      setCurrentPage={onPageChange}
+    setCurrentPage={onPageChange}
       titleDashboard="Listado de Productos"
       searchBar="Buscar productos"
       handleSearchChange={handleSearchChange}
@@ -254,7 +255,6 @@ const ProductList = () => {
       tdTable={[
         "Producto",
         "Stock",
-        "Cantidad",
         "Precio",
         "Descuento",
         "Acciones",
@@ -263,9 +263,9 @@ const ProductList = () => {
       noContent="No hay Productos disponibles"
       buttonTopRight={
         <>
-          <RiAddLargeFill />
-          Agregar Producto
-        </>
+            <RiAddLargeFill />
+            Agregar Producto
+            </>
       }
       buttonTopRightLink="../../dashboard/administrador/productAdd"
     >
@@ -276,9 +276,9 @@ const ProductList = () => {
         >
           <th
             scope="row"
-            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white w-1/2"
+            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-            <div className="flex items-center justify-between w-full">
+            <div className="flex items-center ">
               <Image
                 width={500}
                 height={500}
@@ -288,13 +288,27 @@ const ProductList = () => {
                 className="h-12 w-12 mr-3 rounded-lg"
               />
               {product.description}
+            </div>
+          </th>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {product.stock}
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            $ {product.price}
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {product.discount} %
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            <div className="flex items-center space-x-4 justify-center">
               <Tooltip content="Editar">
                 <Link
-                  href={`/dashboard/administrador/product/${product.id}`}
+                  type="button"
                   data-drawer-target="drawer-update-product"
                   data-drawer-show="drawer-update-product"
                   aria-controls="drawer-update-product"
                   className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  href={`/dashboard/administrador/product/${product.id}`}
                 >
                   <FontAwesomeIcon icon={faPen} />
                 </Link>
@@ -528,23 +542,18 @@ const ProductList = () => {
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            <div className="flex flex-col items-center justify-center gap-3">
-              {product.subproducts.map((subproduct, index) => (
-                <input
-                  key={index}
-                  type="checkbox"
-                  checked={subproduct.isAvailable}
-                  onChange={() =>
-                    subproduct.isAvailable
-                      ? handleDisableProduct(product.id, String(subproduct.id))
-                      : handleEnableProduct(product.id, String(subproduct.id))
-                  }
-                  className="w-5 h-5 m-1"
-                />
-              ))}
-              <div className="h-5"/>
+            <div className="flex items-center justify-center space-x-4">
+              <input
+                type="checkbox"
+                checked={product.isAvailable}
+                onChange={() =>
+                  product.isAvailable
+                    ? handleDisableProduct(product.id)
+                    : handleEnableProduct(product.id)
+                }
+                className="w-5 h-5"
+              />
             </div>
-            
           </td>
         </tr>
       ))}

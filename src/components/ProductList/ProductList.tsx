@@ -31,12 +31,10 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   >(productsList);
   const { categories } = useCategoryContext();
 
-   //! Función traer los productos y filtrarlos
   useEffect(() => {
     let sortedProducts = productsList || [];
     console.log(productsList);
     console.log(searchResults);
-    console.log(selectedCategory);
     if (searchResults !== undefined && productsList !== undefined) {
       sortedProducts = [
         ...(searchResults.length > 0 ? searchResults : productsList),
@@ -47,23 +45,18 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         (product) => product.category.id === selectedCategory
       );
     }
-    console.log(sortedProducts);
 
     switch (filterOption) {
       case "price-asc":
-    sortedProducts.sort((a, b) => {
-      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      return priceA - priceB;
-    });
-    break;
-  case "price-desc":
-    sortedProducts.sort((a, b) => {
-      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      return priceB - priceA;
-    });
-    break;
+        sortedProducts.sort(
+          (a, b) => parseFloat(a.price) - parseFloat(b.price)
+        );
+        break;
+      case "price-desc":
+        sortedProducts.sort(
+          (a, b) => parseFloat(b.price) - parseFloat(a.price)
+        );
+        break;
       case "name-asc":
         sortedProducts.sort((a, b) =>
           a.description.localeCompare(b.description)
@@ -91,7 +84,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
-   //! Función para redirigir al usuario a la categoría seleccionada
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
@@ -102,7 +94,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     }
   };
 
-  //! Función para renderizar los headers de cada categoría
   const renderBreadcrumb = () => {
     if (!category) {
       return (
@@ -238,14 +229,14 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         <div className="w-full lg:w-3/4  my-10 lg:my-0">
           {filteredProducts && filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product, index) => {
+              {filteredProducts.map((product) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id
                 );
                 return (
                   <div
-                    key={index}
-                    className="relative rounded-lg h-[480px] shadow-lg hover:scale-105"
+                    key={product.article_id}
+                    className="relative rounded-lg h-[400px] shadow-lg hover:scale-105"
                     onClick={() => router.push(`/products/${product.id}`)}
                   >
                     <Image
@@ -267,23 +258,32 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                         {product.description}
                       </h2>
 
-                      {product.subproducts &&
-  product.subproducts
-    .filter((subproduct) => subproduct.discount > 0)
-    .map((subproduct) => (
-      <div key={subproduct.id}>
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <FontAwesomeIcon icon={faBolt} style={{ color: "white" }} />
-          <p className="text-white font-bold">Promoción</p>
-        </div>
-          <p className="text-teal-400 text-sm font-bold">
-          {subproduct.discount} % de descuento x {subproduct.amount} {subproduct.unit}
-          </p>
-      </div>
-    ))}
-
-                        
-                     { product.subproducts &&
+                      {/*Number(product.discount) !== 0 ? (
+                        <>
+                          <div className="absolute top-4 right-4 flex items-center gap-2">
+                            <FontAwesomeIcon
+                              icon={faBolt}
+                              style={{ color: "white" }}
+                            />
+                            <p className="text-white font-bold">Promoción</p>
+                          </div>
+                          <del className="text-sm font-medium text-gray-600">
+                            $ {product.price}
+                          </del>
+                          <div className="flex gap-4 items-center">
+                            <p className="text-lg font-bold">
+                              ${" "}
+                              {Number(product.price) -
+                                (Number(product.price) *
+                                  Number(product.discount)) /
+                                  100}
+                            </p>
+                            <p className="text-teal-400 text-sm font-bold">
+                              {product.discount} % de descuento
+                            </p>
+                          </div>
+                        </>
+                      ) :*/ product.subproducts &&
                         product.subproducts.length > 0 ? (
                         <>
                           <div className="h-7 flex items-center gap-3">
@@ -310,7 +310,9 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                             </p>
                           </div>
                         </>
-                      ) : null}
+                      ) : (
+                        <p className="text-lg font-bold ">$ {product.price}</p>
+                      )}
                     </div>
                   </div>
                 );
