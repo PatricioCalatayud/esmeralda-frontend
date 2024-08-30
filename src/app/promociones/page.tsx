@@ -5,8 +5,13 @@ export default async  function PromotionsPage() {
 
   const products = await getProducts();
 
-  if (products) {
-    const productsWithDiscount = products.filter(product => parseFloat(product.discount) > 0);
+    const productsWithDiscount = products?.filter(product => 
+      product.subproducts.some(subproduct => {
+        const discount = Number(subproduct.discount); // Asegúrate de convertirlo a número
+        return !isNaN(discount) && discount > 0; // Verifica que es un número y que es mayor a 0
+      })
+    );
+    
   
   
   return (
@@ -17,5 +22,4 @@ export default async  function PromotionsPage() {
       />
 
   );
-}
 }

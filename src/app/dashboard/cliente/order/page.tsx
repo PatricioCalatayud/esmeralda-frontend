@@ -36,8 +36,8 @@ console.log(orders);
     const listOrders = async (userId: string) => {
       try {
         const data = await getOrders(userId, token);
-
-        setOrders(data);
+        if(data ){
+        setOrders(data);}
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -114,18 +114,22 @@ console.log(orders);
             ))}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            {order.productsOrder.map((productOrder, productIndex) => (
-              <div key={productIndex} className="mb-2 text-start">
-                <Image
-                  width={500}
-                  height={500}
-                  priority={true}
-                  src={productOrder.product?.imgUrl}
-                  alt={productOrder.product?.description}
-                  className="w-10 h-10 inline-block mr-2 rounded-full"
-                />
-                <span>{productOrder.product?.description}</span>
-              </div>
+            {order.productsOrder.map((product, productIndex) => (
+              <div key={productIndex} className="mb-2 text-start flex items-center">
+                 <Image
+                      width={500}
+                      height={500}
+                      priority={true}
+                      src={product.subproduct?.product.imgUrl}
+                      alt={product.subproduct?.product.description}
+                      className="w-10 h-10 inline-block mr-2 rounded-full"
+                    />
+                    <div className="flex flex-row gap-1">
+                    <span> {product.subproduct?.product.description}</span>
+
+                    <span>  x {product.subproduct?.amount}</span>
+                    </div>
+                  </div>
             ))}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
