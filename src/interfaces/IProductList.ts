@@ -15,11 +15,18 @@ unit: string;
 }
 
 export interface IProductList {
+  size?:number;
   id: string;
+  article_id: string;
   description: string;
   imgUrl: string;
+  price: string;
+  stock: string;
+  discount: string;
   averageRating: string;
   category: Category;
+  presentacion?: string;
+  tipoGrano?: string;
   quantity?: number;
   presentacion?: string;
   tipoGrano?: string;
@@ -33,7 +40,6 @@ price: string
 stock: number
 unit: string
 isAvailable: boolean
-discount: number;
 }
 
 

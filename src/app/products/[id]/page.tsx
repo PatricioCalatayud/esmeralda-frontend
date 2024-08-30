@@ -7,39 +7,22 @@ import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
 import { getProductById } from "../../../helpers/ProductsServices.helper";
-import { Category, ICart, IProductList } from "@/interfaces/IProductList";
+import { Category, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useCartContext } from "@/context/cart.context";
-interface SelectedCartItem {
-  stock: number;
-  price: number;
-  discount: number;
-  unit: string;
-  idSubProduct: string; // Asegúrate de que el tipo de idSubProduct sea el correcto
-}
+
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<string>("");
-  const [selectedStock, setSelectedStock] = useState<number>(0);
-  const [selectedDiscount, setSelectedDiscount] = useState<number>(0);
-  const [selectedCart, setSelectedCart] = useState<SelectedCartItem>({
-    stock: 0,
-    price: 0,
-    discount: 0,
-    unit: "",
-    idSubProduct: "", // Inicialización con un valor por defecto
-  });
   const [quantity, setQuantity] = useState<number>(1);
-
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
-
   const router = useRouter();
   const productId = params.id;
 
@@ -82,126 +65,44 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           }
         );
 
-        setSelectedSize(lowestPricedSubproduct.amount);
-        setSelectedStock(lowestPricedSubproduct.stock);
-        setSelectedDiscount(lowestPricedSubproduct.discount);
-        setSelectedPrice(
-          Number(lowestPricedSubproduct.discount) !== 0
-            ? (
+          setSelectedSize(lowestPricedSubproduct.amount);
+
+          if (Number(fetchedProduct.discount) !== 0) {
+            // Calcula el precio con el descuento aplicado correctamente
+            setSelectedPrice(
+              (
                 Number(lowestPricedSubproduct.price) *
-                (1 - Number(lowestPricedSubproduct.discount) / 100)
+                (1 - Number(fetchedProduct.discount) / 100)
               ).toFixed(2)
-            : lowestPricedSubproduct.price
-        );
-        setSelectedCart({
-          stock: lowestPricedSubproduct.stock,
-          price: Number(lowestPricedSubproduct.price),
-          discount: lowestPricedSubproduct.discount,
-          unit: lowestPricedSubproduct.unit,
-          idSubProduct: String(lowestPricedSubproduct.id),
-        });
-        
+            );
+          } else {
+            setSelectedPrice(lowestPricedSubproduct.price);
+          }
+        } else if (Number(fetchedProduct.discount) !== 0) {
+          // Calcula el precio con el descuento aplicado correctamente
+          setSelectedPrice(
+            (
+              Number(fetchedProduct.price) *
+              (1 - Number(fetchedProduct.discount) / 100)
+            ).toFixed(2)
+          );
+        } else {
+          setSelectedPrice(fetchedProduct.price);
+        }
+
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartItem = cart.find(
-      (item: any) => item.idSubProduct === selectedCart.idSubProduct
-    );
-    
-    if (cartItem) {
-      setQuantity(cartItem.quantity); // Configura la cantidad inicial
-    }
+        const cartItem = cart.find((item: any) => item.id === productId);
+        if (cartItem) {
+          setQuantity(cartItem.quantity);
+        }
       }
       setIsLoaded(true);
     };
 
     loadProductData();
-  }, [productId, token]);
+  }, [productId]);
 
-  const handleQuantityChange = (newQuantity: number) => {
-    setQuantity(newQuantity);
-  };
-
-  const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    
-    // Busca el índice del producto en el carrito existente
-    const cartItemIndex = cart.findIndex(
-      (item: any) =>
-        item.idSubProduct === selectedCart.idSubProduct &&
-        item.size === selectedSize
-    );
-  
-    const cartItem = {
-      ...selectedCart,
-      quantity,
-      description: product?.description,
-      imgUrl: product?.imgUrl,
-      size: selectedSize,
-      idProduct: product?.id,
-    };
-  
-    if (cartItemIndex !== -1) {
-      // Si el producto ya existe, actualiza la cantidad
-      cart[cartItemIndex].quantity += quantity;
-      localStorage.setItem("cart", JSON.stringify(cart));
-      Swal.fire({
-        title: "Producto actualizado",
-        text: "La cantidad del producto ha sido actualizada.",
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonText: "Ir al carrito",
-        cancelButtonText: "Aceptar",
-      }).then((result: any) => {
-        if (result.isConfirmed) {
-          router.push("/cart");
-        }
-      });
-    } else {
-      // Si el producto no existe, agrégalo al carrito
-      cart.push(cartItem);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      setCartItemCount(cart.length);
-      Swal.fire({
-        title: "Producto agregado",
-        text: "Producto agregado al carrito.",
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonText: "Ir al carrito",
-        cancelButtonText: "Aceptar",
-      }).then((result: any) => {
-        if (result.isConfirmed) {
-          router.push("/cart");
-        }
-      });
-    }
-  };
-
-  const handleSizeChange = (
-    newSize: string,
-    price: string,
-    stock: number,
-    discount: number,
-    unit: string,
-    id: number
-  ) => {
-    setSelectedSize(newSize);
-    setSelectedStock(stock);
-    setSelectedDiscount(discount);
-    setSelectedCart({
-      stock: stock,
-      price: Number(price),
-      discount: discount,
-      unit: unit,
-      idSubProduct: String(id),
-    });
-
-    setSelectedPrice(
-      Number(discount) !== 0
-        ? (Number(price) * (1 - Number(discount) / 100)).toFixed(2)
-        : price
-    );
-  };
-   //! Renderiza el header de la tarjeta del producto 
-   const renderBreadcrumb = () => {
+  const renderBreadcrumb = () => {
     if (!category) {
       return (
         <h1 className="text-lg font-bold animate-fade-in-up">
@@ -229,6 +130,89 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       </h1>
     );
   };
+
+  const handleQuantityChange = (newQuantity: number) => {
+    setQuantity(newQuantity);
+  };
+
+  const handleAddToCart = () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const cartItemIndex = cart.findIndex((item: any) => item.id === productId);
+
+    if (cartItemIndex !== -1) {
+      Swal.fire({
+        title: "Producto ya en el carrito",
+        text: "El producto ya se encuentra en el carrito. ¿Desea actualizar la cantidad?",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Actualizar",
+        cancelButtonText: "Aceptar",
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          // Update the quantity in the cart
+          cart[cartItemIndex].quantity = quantity;
+          localStorage.setItem("cart", JSON.stringify(cart));
+          Swal.fire({
+            title: "Producto actualizado",
+            text: "La cantidad del producto ha sido actualizada.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Ir al carrito",
+            cancelButtonText: "Aceptar",
+          }).then(async (result: any) => {
+            if (result.isConfirmed) {
+              router.push("/cart");
+            }
+          });
+        }
+      });
+    } else {
+      Swal.fire({
+        title: "Agregar producto",
+        text: "¿Desea agregar el producto al carrito?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "No",
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          const newCartItem = {
+            ...product,
+            quantity: quantity,
+            size: selectedSize,
+          };
+          cart.push(newCartItem);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          //const items = JSON.parse(cart);
+          setCartItemCount(cart.length);
+          Swal.fire({
+            title: "Producto agregado",
+            text: "Producto agregado al carrito.",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Ir al carrito",
+            cancelButtonText: "Aceptar",
+          }).then(async (result: any) => {
+            if (result.isConfirmed) {
+              router.push("/cart");
+            }
+          });
+        }
+      });
+    }
+  };
+
+  const handleSizeChange = (newSize: string, price: string) => {
+    setSelectedSize(newSize);
+    if (Number(product?.discount) !== 0) {
+      setSelectedPrice(
+        (Number(price) * (Number(product?.discount) / 100)).toFixed(2)
+      );
+    } else {
+      setSelectedPrice(price);
+    }
+  };
+
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -301,46 +285,42 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                         : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
                     }`}
                     onClick={() =>
-                      handleSizeChange(subproduct.amount, subproduct.price, subproduct.stock, subproduct.discount, subproduct.unit, subproduct.id)
+                      handleSizeChange(subproduct.amount, subproduct.price)
                     }
                   >
                     {`${subproduct.amount} ${subproduct.unit}`}
                   </button>
                 ))}
             </div>
-            {Number(selectedDiscount) !== 0 ? (
+            {/*Number(product.discount) !== 0 ? (
               <div className="flex gap-4 flex-col">
                 <div>
                   <p className="text-lg font-semibold text-gray-600 animate-fade-in-up line-through">
-                    ${selectedPrice}
+                    ${product.price}
                   </p>
                   <p className="text-teal-400 text-sm font-bold">
-                    {selectedDiscount} % de descuento
+                    {product.discount} % de descuento
                   </p>
                 </div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  ${Number(selectedPrice) - (Number(selectedPrice) * selectedDiscount) / 100}
+                  ${selectedPrice}
                 </p>
-              </div>)
-            : (
-              <div className="flex gap-4 flex-col">
-                <div className="h-12">
-                </div>
+              </div>
+            ) : */(
               <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
                 ${selectedPrice}
               </p>
-            </div>
             )}
           </div>
           <div className="animate-fade-in-up flex flex-row items-center gap-4 my-4">
             <IncrementProduct
-              stock={selectedStock.toString()}
+              stock={product.stock}
               productId={product.id}
               initialQuantity={quantity}
               onQuantityChange={handleQuantityChange}
             />
             <p className="text-gray-800 text-xs text-nowrap">
-              {selectedStock} disponibles
+              {product.stock} disponibles
             </p>
           </div>
           <button

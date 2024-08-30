@@ -13,9 +13,6 @@ import { postProducts } from "../../../../helpers/ProductsServices.helper";
 import { Spinner } from "@material-tailwind/react";
 import { useCategoryContext } from "@/context/categories.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
-import { Tooltip } from "flowbite-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 
 const InsertProduct = () => {
@@ -209,7 +206,7 @@ buttonSubmitText = "Agregar producto"
 handleSubmit = {handleSubmit}
 >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
-            <div className="col-span-full">
+            <div>
               <label
                 htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -230,8 +227,6 @@ handleSubmit = {handleSubmit}
               )}
             </div>
 
-           
-            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
             <div>
               <label
                 htmlFor="category"
@@ -258,6 +253,7 @@ handleSubmit = {handleSubmit}
               )}
             </div>
 
+            <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
               <div>
                 <label
                   htmlFor="price"
@@ -479,26 +475,50 @@ handleSubmit = {handleSubmit}
                 <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Precio Final</p>
                 <p className="h-10 flex items-center">  $ {(Number(product.price) - (Number(product.price) * Number(product.discount) / 100)).toFixed(2)}</p>
               </div>
-              <hr  className="col-span-full "/>
-            </div>
-            
-))}
- {/* Botón para añadir más subproductos */}
-            
-            <div className="h-40 col-span-full flex items-center justify-center">
-            <Tooltip content="Agregar Subproducto" >
-                  <button
-                    type="button"
-                    onClick={handleAddSubproduct}
-                    className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                  >
-                    <FontAwesomeIcon icon={faPlus} style={{ width: "24px", height: "24px" }}/>
-                  </button>
-                </Tooltip>
             </div>
           </div>
 
-          
+          <div className="mb-4">
+            <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+              Imagen del producto
+            </span>
+            <div className="flex justify-center items-center w-full">
+              <label
+                htmlFor="dropzone-file"
+                className="flex flex-col justify-center items-center w-full h-18 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+              >
+                <div className="flex flex-col justify-center items-center pt-5 pb-6">
+                  <IoCloudUploadOutline />
+                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-semibold">
+                      Click para subir imagen
+                    </span>
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    PNG, JPG or JPGE (MAX. 800x400px)
+                  </p>
+                </div>
+                <input
+                  id="dropzone-file"
+                  type="file"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+            </div>
+
+            {imageFile && (
+              <div className="mt-4 flex justify-center">
+                <Image
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Imagen del producto"
+                  width={500} // debes especificar un ancho
+                  height={300} // y una altura
+                  className="max-w-44 h-auto"
+                />
+              </div>
+            )}
+          </div>
   </DashboardAddModifyComponent>
     
   );
