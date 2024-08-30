@@ -56,7 +56,8 @@ const Tracking = ({ params }: { params: { id: string } }) => {
             <div className="w-full flex items-center flex-col">
               <div className="w-full flex flex-col gap-4 items-center">
                 <h2 className="text-xl font-medium ">Tu pedido:</h2>
-                {order.productsOrder.map((product, productIndex) => (
+                {/* No esta funcionando por que no trae la orden esto
+                order.productsOrder.map((product, productIndex) => (
                   <div key={productIndex} className="mb-2 text-start">
                     <Image
                       width={500}
@@ -71,15 +72,27 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                     <span>{product.subproduct?.amount}</span>
                     </div>
                   </div>
-                ))}
+                ))*/}
               </div>
               <h4>
-                Tu orden fue realizada el{" "}
-                {format(new Date(order.date), "d 'de' MMMM 'de' yyyy", {
+                Tu orden fue realizada el:{" "}
+                <b className="font-bold">{format(new Date(order.date), "d 'de' MMMM 'de' yyyy", {
                   locale: es,
                 })}
+                    </b> 
+                
               </h4>
               <p></p>
+              {order.orderDetail.transactions.status !== "Recibido" && <p>Tu orden llegara a tu domicilio antes del:{" "}
+                      <b className="font-bold">
+                      {format(
+                        new Date(order.orderDetail.deliveryDate),
+                        "d 'de' MMMM 'de' yyyy",
+                        {
+                          locale: es,
+                        }
+                      )}
+                    </b> </p> }
             </div>
             <div className="w-full flex justify-start items-center py-20">
               <div className="flex gap-4">

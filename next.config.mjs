@@ -22,6 +22,14 @@ const nextConfig = {
           {
             protocol: 'https',
             hostname: 'api.dicebear.com',
+          },
+          {
+            protocol: 'https',
+            hostname: 'example.com',
+          },
+          {
+            protocol: "https",
+            hostname:"storage.googleapis.com"
           }
         ],
         domains: ['www.cafelaesmeralda.com.ar'],

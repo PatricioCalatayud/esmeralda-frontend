@@ -12,8 +12,10 @@ export interface IOrders {
 export interface IOrderCheckout {
     address?: string | undefined;
     userId: string | undefined;
+    account?:boolean,
     products: {
-        id: string;
+        productId: string;
+        subproductId: string;
         quantity: number | undefined;
     }[];
 }
@@ -38,10 +40,10 @@ export interface ProductsOrder {
 export interface SubproductOder {
     amount: number;
     discount: number;
-    id: string;
-    isAvailable: boolean;
+    id?: string;
+    isAvailable?: boolean;
     price: number;
-    product: Product;
+    product?: Product;
     stock: number;
     unit: string;
 
