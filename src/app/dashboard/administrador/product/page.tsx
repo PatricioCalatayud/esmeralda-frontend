@@ -18,7 +18,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
   faPen,
-  faPlug,
   faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
@@ -36,7 +35,8 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(0);
   const [addSubproduct, setAddSubproduct] = useState<{ id: string }>();
-
+  const [editProductId, setEditProductId] = useState({});
+  const [addSubproductId, setAddSubproductId] = useState({});
   //! Obtener los productos
   useEffect(() => {
     const fetchProducts = async () => {
@@ -198,7 +198,42 @@ const ProductList = () => {
       );
     }
   };
-  const handleEditProduct = (e: any, id: string) => {};
+
+  //! Funciónes para editar un subproducto
+  const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, id: string) => {
+    const { name, value } = e.target;
+    setEditProductId((prev) => ({
+      ...prev,
+      [name]: value,
+      id, // Incluye el ID del subproducto o producto principal
+    }));
+    console.log(editProductId);
+  };
+
+  const handleEditSubproductCheck = async(id: string) => {
+    const response = await putProducts(editProductId,id, token);
+    if (response && (response.data.status === 200 || response.data.status === 201)) {
+      setEdit(0)
+    }
+  }
+  //! Funciónes para agregar un subproducto
+  const handleAddSubproduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, id: string) => {
+    const { name, value } = e.target;
+    
+    setAddSubproductId((prev) => ({
+      ...prev,
+      [name]: value,
+      id, // Incluye el ID del subproducto o producto principal
+    }));
+    console.log(addSubproductId);
+  };
+  const handleAddSubproductCheck = async(id: string) => {
+    const response = await putProducts(addSubproductId,id, token);
+
+    if (response && (response.data.status === 200 || response.data.status === 201)) {
+      setAddSubproductId({})
+    }
+  }
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
@@ -282,18 +317,22 @@ const ProductList = () => {
                   key={index}
                   className="h-10 rounded-md p-2 w-full border border-gray-600"
                   type="text"
+                  name="stock"
+                  defaultValue={String(subproduct.stock)}
                   placeholder={String(subproduct.stock)}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
                 />
               )
             )}
-            {addSubproduct?.id === product.id && (
+            {addSubproduct?.id === product.id ? (
               <input
                 className="h-10 rounded-md p-2 w-full border border-gray-600"
                 type="text"
+                name="stock"
                 placeholder="0"
+                onChange={(e) => handleAddSubproduct(e, String(product.id))}
               />
-            )}
+            ) : <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
@@ -315,14 +354,15 @@ const ProductList = () => {
                   <input
                     className="h-10 rounded-md p-2 w-1/2 border border-gray-600"
                     type="text"
+                    name="amount"
                     placeholder={subproduct.amount}
                     onChange={(e) =>
                       handleEditProduct(e, String(subproduct.id))
                     }
                   />
                   <select
-                    id="status"
-                    name="status"
+                    id="unit"
+                    name="unit"
                     className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
                     onChange={(e) =>
                       handleEditProduct(e, String(subproduct.id))
@@ -337,18 +377,21 @@ const ProductList = () => {
                 </div>
               )
             )}
-            {addSubproduct?.id === product.id && (
+            {addSubproduct?.id === product.id ? (
               <div className="flex justify-center items-center gap-2">
                 {" "}
                 <input
                   className="h-10 rounded-md p-2 w-1/2  border border-gray-600"
                   type="text"
+                  name="amount"
                   placeholder="0"
+                  onChange={(e) => handleAddSubproduct(e, String(product.id))}
                 />
                 <select
-                  id="status"
-                  name="status"
+                  id="unit"
+                  name="unit"
                   className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
+                  onChange={(e) => handleAddSubproduct(e, String(product.id))}
                 >
                   <option value="">Unidad</option>
                   <option value={"Kilo"}>Kilo</option>
@@ -357,7 +400,7 @@ const ProductList = () => {
                   <option value={"Sobres"}>Sobres</option>
                 </select>{" "}
               </div>
-            )}
+            ):  <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
@@ -373,6 +416,7 @@ const ProductList = () => {
               ) : (
                 <input
                   key={index}
+                  name="price"
                   className="h-10  rounded-md p-2 w-full border border-gray-600"
                   type="text"
                   placeholder={`$ ${subproduct.price}`}
@@ -380,13 +424,15 @@ const ProductList = () => {
                 />
               )
             )}
-            {addSubproduct?.id === product.id && (
+            {addSubproduct?.id === product.id ? (
               <input
                 className="h-10 rounded-md p-2 w-full border border-gray-600"
                 type="text"
+                name="price"
                 placeholder="0"
+                onChange={(e) => handleAddSubproduct(e, String(product.id))}
               />
-            )}
+            ) : <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
@@ -404,18 +450,21 @@ const ProductList = () => {
                   key={index}
                   className="h-10 rounded-md p-2 w-full border border-gray-600"
                   type="text"
+                  name="discount"
                   placeholder={`${subproduct.discount} %`}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
                 />
               )
             )}
-            {addSubproduct?.id === product.id && (
+            {addSubproduct?.id === product.id ? (
               <input
                 className="h-10 rounded-md p-2 w-full border border-gray-600"
                 type="text"
+                name="discount"
                 placeholder="0"
+                onChange={(e) => handleAddSubproduct(e, String(product.id))}
               />
-            )}
+            ):  <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
 
@@ -427,7 +476,7 @@ const ProductList = () => {
                     <Tooltip content="Correcto" key={index}>
                       <button
                         type="button"
-                        onClick={() => setEdit(0)}
+                        onClick={() => handleEditSubproductCheck(product.id)}
                         className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                       >
                         <FontAwesomeIcon icon={faCheck} />
@@ -440,13 +489,7 @@ const ProductList = () => {
                         data-drawer-show="drawer-update-product"
                         aria-controls="drawer-update-product"
                         className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600  rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                        onClick={() => {
-                          if (edit === subproduct.id) {
-                            setEdit(0);
-                          } else {
-                            setEdit(subproduct.id);
-                          }
-                        }}
+                        onClick={() => setEdit(subproduct.id)}
                       >
                         <FontAwesomeIcon icon={faPen} />
                       </div>
@@ -464,7 +507,7 @@ const ProductList = () => {
                   </button>
                 </Tooltip> : <Tooltip content="Agregar Subproducto">
                   <button
-                    onClick={() => setAddSubproduct({ id: "." })}
+                    onClick={() => handleAddSubproductCheck(product.id)}
                     type="button"
                     className="flex items-center text-gray-600 hover:text-white  hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-900"
                   >

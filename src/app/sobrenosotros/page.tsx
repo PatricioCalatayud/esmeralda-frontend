@@ -22,7 +22,7 @@ const SobreNosotros: React.FC = () => {
             Nos hemos mantenido fieles a nuestro compromiso con la calidad y la excelencia. Invertimos en nuestras comunidades y promovemos el crecimiento sostenible, asegurando que cada etapa de nuestra producción respete el medio ambiente y valore a nuestros productores.
           </p>
           <p className="mb-8 leading-relaxed">
-            Nuestra misión es ofrecer un café de la más alta calidad, respetando y valorizando cada etapa de su producción. Continuamos elevando los estándares y compartiendo nuestra pasión con cada sorbo, brindando una experiencia inigualable a nuestros clientes.
+            Nuestra  misión es ofrecer un café de la más alta calidad, respetando y valorizando cada etapa de su producción. Continuamos elevando los estándares y compartiendo nuestra pasión con cada sorbo, brindando una experiencia inigualable a nuestros clientes.
           </p>
           <div className="flex justify-center">
 {            /*<button className="inline-flex text-white bg-teal-500 border-0 py-2 px-6 focus:outline-none hover:bg-teal-600 rounded text-lg">Aprende más</button>*/}

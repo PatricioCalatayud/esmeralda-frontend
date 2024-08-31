@@ -2,102 +2,77 @@
 
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getCategories } from '@/helpers/CategoriesServices.helper';
-import { Category, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
+import { Category, IProductErrorResponse, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import { useCategoryContext } from "@/context/categories.context";
-import { putProducts } from "@/helpers/ProductsServices.helper";
+import { getProductById, putProducts } from "@/helpers/ProductsServices.helper";
 import { useAuthContext } from "@/context/auth.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
+import { useRouter } from "next/navigation";
+
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
-  //const [token, setToken] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-
-  
   const {categories} = useCategoryContext();
   const {token} = useAuthContext();
+  const router = useRouter();
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
-
     description: "",
-    //imgUrl: "",
-    price: "",
-    stock: "",
-    discount: "",
     presentacion: "",
     tipoGrano: "",
-    medida: "",
     categoryID: "",
-    /*category: {
-      id: "",
-      name: "",
-    },*/
-  });
-
-  const [errors, setErrors] = useState<IProductErrorUpdate>({
-
-    description: "",
-    //imgUrl: "",
-    price: "",
-    stock: "",
-    discount: "",
-    presentacion: "",
-    tipoGrano: "",
-    medida: "",
-    categoryID: "",
+    imgUrl:"",
     
-    /*category: {
-      id: "",
-      name: "",
-    },*/
+  });
+  console.log(dataProduct);
+
+  const [errors, setErrors] = useState<IProductErrorResponse>({
+
+    description: "",
+    presentacion: "",
+    tipoGrano: "",
+    file: undefined,
+    categoryID: "",
+    imgUrl:"",
   });
 
   //! Obtener producto por ID
   useEffect(() => {
     const fetchProduct = async () => {
-      const productData = await fetch(`${apiURL}/products/${params.id}`).then(
-        (res) => res.json()
-      );
+      const productData = await getProductById(params.id, token);
       console.log(productData);
+      if (productData && (productData.status === 200 || productData.status === 201)) {
+
+      
       // Desestructurar solo los campos que deseas actualizar
       const {
         description,
-        price,
-        stock,
         // revisar con el backend
         tipoGrano,
-        medida,
         presentacion,
         imgUrl,
-        
-        discount,
         category = {
           id: "",
           name: "",
         },
-      } = productData;
+      } = productData.data;
       // Establecer solo los campos especificados en dataProduct
       setDataProduct((prevState) => ({
         ...prevState,
         description,
-        price,
-        stock,
         imgUrl,
-        discount,
         tipoGrano,
-        medida,
         presentacion,
-        category: {
-          id: category.id,
-          name: category.name,
-        },
+    categoryID: category.id,
+
       }));
     };
-    fetchProduct();
-  }, [params.id]);
+  }
+  fetchProduct();
+
+  }, []);
 
 
 
@@ -122,7 +97,6 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const imageUrl = URL.createObjectURL(file);
       setDataProduct({
         ...dataProduct,
-        //imgUrl: imageUrl,
       });
     }
   };
@@ -142,29 +116,23 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       },
     });
 
-    try {
+
       const formData = new FormData();
-      //formData.append("article_id", dataProduct.article_id);
+
       formData.append("description", dataProduct.description);
-      formData.append("price", dataProduct.price.toString());
-      formData.append("stock", dataProduct.stock.toString());
-      formData.append("discount", dataProduct.discount.toString());
-      //formData.append("category", dataProduct.category.id);
+      formData.append("category", dataProduct.categoryID);
       formData.append("presentacion", dataProduct.presentacion);
       formData.append("tipoGrano", dataProduct.tipoGrano);
-      formData.append("medida", dataProduct.medida);
+
       if (imageFile) {
         formData.append("file", imageFile);
       }
-      console.log("formData", formData);
-      console.log("token", token);
-      const response = putProducts( formData,params.id,token);
+
+      const response = await putProducts( formData,params.id,token);
 
       
 
-      /*if (response.status !== 200) {
-        throw new Error("Failed to update product");
-      }*/
+      if (response && (response.status === 200 || response.status === 201)) {
 
       const updatedProduct = await response;
       console.log("Product updated successfully:", updatedProduct);
@@ -175,11 +143,9 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         title: "¡Actualizado!",
         text: "El producto ha sido actualizado con éxito.",
       }).then(() => {
-        //router.push("../administrador/product");
+        router.push("/dashboard/administrador/product");
       });
-    } catch (error) {
-      console.error("Error updating product:", error);
-
+    }else {
       // Mostrar alerta de error
       Swal.fire({
         icon: "error",
@@ -187,8 +153,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         text: "Ha ocurrido un error al actualizar el producto.",
       });
     }
+  
   };
-
   //!Validar formulario
   useEffect(() => {
     const errors = productUpdateValidation(dataProduct);
@@ -205,9 +171,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   backLink = "/dashboard/administrador/product"
   buttonSubmitText = "Actualizar"
   handleSubmit = {handleSubmit}
+  disabled = {(errors.description !== "" && errors.categoryID !== "" && errors.imgUrl !== "" && errors.presentacion !== "" && errors.tipoGrano !== "")}
   >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
-            <div>
+            <div className="grid gap-4 sm:col-span-2">
               <label
                 htmlFor="description"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -220,37 +187,14 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 id="description"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 placeholder="Ingresa el nombre del producto"
-                //value={dataProduct.amount}
+                defaultValue={dataProduct.description}
                 onChange={handleChange}
               />
               {errors.description && (
                 <span className="text-red-500">{errors.description}</span>
               )}
             </div>
-            <div>
-            <label
-                htmlFor="presentacion"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Presentación
-              </label>
-            <select
-                  id="presentacion"
-                  name="presentacion"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.presentacion}
-                  defaultValue={dataProduct.presentacion}
-                  onChange={handleChange}
-                >
-                  <option value="">--Seleccione--</option>
-                  <option value="molido">Molido</option>
-                  <option value="grano">Grano</option>
-                  <option value="capsulas">Cápsulas</option>
-                </select>
-                {errors.presentacion && (
-                  <span className="text-red-500">{errors.presentacion}</span>
-                )}
-                </div>
+            
                 <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3">
             <div>
             <label
@@ -266,7 +210,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 value={dataProduct.categoryID}
                 onChange={handleChange}
               >
-                <option value="">--Seleccione--</option>
+                {categories?.find(category => category.id === dataProduct.categoryID)?.name || "--Seleccione--"}
                 {categories?.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -293,10 +237,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   value={dataProduct.presentacion}
                   onChange={handleChange}
                 >
-                  <option value="">--Seleccione--</option>
-                  <option value="molido">Molido</option>
-                  <option value="grano">Grano</option>
-                  <option value="capsulas">Cápsulas</option>
+                <option value={dataProduct.presentacion}>{dataProduct.presentacion || "--Seleccione--"}</option>
+                  <option value="Molido">Molido</option>
+                  <option value="Grano">Grano</option>
+                  <option value="Capsulas">Cápsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
@@ -314,27 +258,37 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   id="tipoGrano"
                   name="tipoGrano"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.tipoGrano}
                   onChange={handleChange}
+                  value={dataProduct.tipoGrano}
                 >
-                  <option value="">--Seleccione--</option>
-                  <option value="santos">Santos</option>
-                  <option value="colombiano">Colombiano</option>
-                  <option value="torrado">Torrado</option>
-                  <option value="rio de oro">Rio de Oro</option>
-                  <option value="descafeino">Descafeinado</option>
-                  <option value="blend-premium">Blend</option>
-                  <option value="mezcla-baja calidad">Mezcla</option>
+                  <option value={dataProduct.tipoGrano}>{dataProduct.tipoGrano || "--Seleccione--"}</option>
+                  <option value="Santos">Santos</option>
+                  <option value="Colombiano">Colombiano</option>
+                  <option value="Torrado">Torrado</option>
+                  <option value="Rio de oro">Rio de Oro</option>
+                  <option value="Descafeino">Descafeinado</option>
+                  <option value="Blend-premium">Blend</option>
+                  <option value="Mezcla baja calidad">Mezcla</option>
                 </select>
-                {/* {errors.tipoGrano && (
+                {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
-                )} */}
+                )} 
                 </div>
             </div>
           </div>
 
           <div className="sm:col-span-2">
-            
+          {dataProduct.imgUrl && (
+              <div className="mt-4 flex justify-center ">
+                <Image
+                  src={dataProduct.imgUrl}
+                  alt="Imagen del producto"
+                  width={500} // debes especificar un ancho
+                  height={300} // y una altura
+                  className="max-w-44 h-auto rounded-xl"
+                />
+              </div>
+            )}
           <div className="mb-4">
             <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Imagen del producto
@@ -363,7 +317,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 />
               </label>
             </div>
-
+            
             {imageFile && (
               <div className="mt-4 flex justify-center">
                 <Image
@@ -378,19 +332,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
           </div>
 
 
-            {/*dataProduct.imgUrl && (
-              <Image
-                width={500}
-                height={500}
-                src={dataProduct.imgUrl}
-                alt="Product Image"
-                className="mt-2 rounded-md"
-                style={{ maxHeight: "150px", objectFit: "contain" }}
-              />
-            )*/}
-            {/* {errors.imgUrl && (
-              <span className="text-red-500">{errors.imgUrl}</span>
-            )} */}
+          {errors.imgUrl && (
+                  <span className="text-red-500">{errors.imgUrl}</span>
+                )}
+            
             <hr className="col-span-full my-10" />
           </div>
   </DashboardAddModifyComponent>

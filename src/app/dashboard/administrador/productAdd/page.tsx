@@ -1,17 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
-import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { Category, IProductResponse, IProductUpdate } from "@/interfaces/IProductList";
+import { Category, IProductErrorResponse, IProductResponse, IProductUpdate, ISubProductUpdate } from "@/interfaces/IProductList";
 
 import { productAddValidation } from "@/utils/productAddValidation";
-
+import {validateSubproduct} from "@/utils/subproductsUpdateValidation"
 import { useAuthContext } from "@/context/auth.context";
-import { getCategories } from "../../../../helpers/CategoriesServices.helper";
 import { postProducts } from "../../../../helpers/ProductsServices.helper";
 import { Spinner } from "@material-tailwind/react";
 import { useCategoryContext } from "@/context/categories.context";
@@ -21,42 +18,40 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 
-const apiURL = process.env.NEXT_PUBLIC_API_URL;
-
 const InsertProduct = () => {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {token} = useAuthContext();
   const {categories, categoriesLoading} = useCategoryContext();
-  const [subproducts, setSubproducts] = useState<{ id: string, amount: string }[]>([]);
+  const [subproducts, setSubproducts] = useState<ISubProductUpdate[]>([
+    {  amount: "", 
+      unit: "", 
+      price:"", 
+      stock:"", 
+      discount:"" }
+  ]);
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
     description: "",
-    price: "",
-    stock: "",
-    discount: "",
     categoryID: "",
-
     presentacion: "",
     tipoGrano: "",
-    medida: "",
+
   });
 
   //! Estado para almacenar los errores
-  const [errors, setErrors] = useState<IProductUpdate>({
+  const [errors, setErrors] = useState<IProductErrorResponse>({
     description: "",
-    price: "",
-    stock: "",
-    discount: "",
     categoryID: "",
-
     presentacion: "",
     tipoGrano: "",
-    medida: "",
+    imgUrl : "",
   });
 
-
+  const [errorsSubproducts, setErrorsSubproducts] = useState<{amount: string; unit: string; stock: string; price: string; discount: string }[]>([
+    { amount: "", unit: "", stock: "", price: "", discount: "" }
+  ]);
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
     e.preventDefault();
@@ -85,24 +80,30 @@ const InsertProduct = () => {
   //! Función para enviar los datos del producto al backend
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+const formData = new FormData();
+formData.append("description", dataProduct.description);
+formData.append("averageRating", "0"); // o puedes utilizar `0` directamente si el backend lo soporta
+formData.append("presentacion", dataProduct.presentacion || "");
+formData.append("tipoGrano", dataProduct.tipoGrano || "");
+formData.append("categoryID", dataProduct.categoryID);
 
-    const formData = new FormData();
-    formData.append("description", dataProduct.description);
-    formData.append("presentacion", dataProduct.presentacion || "");
-    formData.append("tipoGrano", dataProduct.tipoGrano || "");
-    formData.append("medida", dataProduct.medida || "");
-    formData.append("price", dataProduct.price);
-    formData.append("stock", Number(dataProduct.stock).toString());
-    formData.append("discount", dataProduct.discount);
-    formData.append("categoryID", dataProduct.categoryID);
-    if (imageFile) {
-      formData.append("file", imageFile);
-    }
+// Añadir la imagen al FormData si existe
+if (imageFile) {
+  formData.append("file", imageFile);} // Asegúrate de que el campo 'file' coincide con lo que espera el backend
 
-    // Log the FormData content
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
+
+// Añadir cada subproduct al FormData
+subproducts.forEach((subproduct, index) => {
+
+    formData.append(`subproducts[${index}][amount]`, subproduct.amount);
+    formData.append(`subproducts[${index}][unit]`, subproduct.unit);
+    formData.append(`subproducts[${index}][stock]`, subproduct.stock);
+    formData.append(`subproducts[${index}][price]`, subproduct.price);
+    formData.append(`subproducts[${index}][discount]`, subproduct.discount);
+    // Añadir más campos según sea necesario
+});
+  
 
     //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
@@ -114,24 +115,20 @@ const InsertProduct = () => {
       },
     });
 
-    try {
-
       const response = await postProducts(formData, token);
 
-      console.log("Response:", response);
-      console.log("Product added successfully");
-
+      if (response && ( response.status === 201 || response.status === 200)) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Agregado!",
+          text: "El producto ha sido agregado con éxito.",
+        }).then(() => {
+          router.push("../../dashboard/administrador/product");
+        });
+      
       // Mostrar alerta de éxito
-      Swal.fire({
-        icon: "success",
-        title: "¡Agregado!",
-        text: "El producto ha sido agregado con éxito.",
-      }).then(() => {
-        router.push("../../dashboard/administrador/product");
-      });
-    } catch (error) {
-      console.error("Error adding product:", error);
-
+      
+    } else {
       // Mostrar alerta de error
       Swal.fire({
         icon: "error",
@@ -141,21 +138,60 @@ const InsertProduct = () => {
     }
   };
   const handleAddSubproduct = () => {
-    setSubproducts([...subproducts, { id: `subproduct-${subproducts.length + 1}`, amount: "" }]);
+    setSubproducts([...subproducts, {  amount: "", unit: "", price:"", stock:"", discount:"" }]);
   };
 
-  const handleSubproductChange = (index: number, value: string) => {
-    const updatedSubproducts = [...subproducts];
-    updatedSubproducts[index].amount = value;
+  const handleSubproductChange = (index: number, e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    // Crear un nuevo array con los subproductos actualizados
+    const updatedSubproducts = subproducts.map((subproduct, idx) =>
+      idx === index ? { ...subproduct, [name]: value } : subproduct
+    );
+
     setSubproducts(updatedSubproducts);
+
   };
 
   //!Validar formulario
-/*  useEffect(() => {
+  useEffect(() => {
+    // Validar los datos del producto
     const validationErrors = productAddValidation(dataProduct);
+
+    // Validar cada subproducto
+    const validationResults = subproducts.map((subproduct) => (
+        validateSubproduct(subproduct) // Debe devolver un objeto de errores si hay errores
+    ));
+    console.log(validationResults);
+    // Filtrar subproductos inválidos
+    const invalidSubproducts = validationResults.filter(result => Object.keys(result).length > 0);
+
+    if (invalidSubproducts.length > 0) {
+        console.log("Subproductos inválidos:", invalidSubproducts);
+    } else {
+        console.log("Todos los subproductos son válidos.");
+    }
+
+    // Actualizar los errores de subproductos en el estado
+    setErrorsSubproducts(validationResults);
+
+    // Actualizar los errores del producto en el estado
     setErrors(validationErrors);
-  }, [dataProduct]);
-*/
+}, [dataProduct, subproducts]);
+console.log("Errores de producto:", errors);
+console.log("Errores de subproductos:", errorsSubproducts);
+//console.log(errorsSubproducts[0].errors.discount);
+
+
+const areAllFieldsEmpty = (errorsSubproducts: Array<{ [key: string]: string }>): boolean => {
+  return errorsSubproducts.every(subproduct => {
+    return Object.values(subproduct).every(value => value === "");
+  });
+};
+
+
+const allFieldsEmpty = areAllFieldsEmpty(errorsSubproducts);
+
   return (
     categoriesLoading ? <div className="flex items-center justify-center h-screen">
     <Spinner
@@ -166,9 +202,10 @@ const InsertProduct = () => {
     />
   </div> :
   <DashboardAddModifyComponent
+  disabled={ ((errors.description === "" && errors.categoryID === "" && errors.imgUrl === "" && errors.presentacion === "" && errors.tipoGrano === "") && allFieldsEmpty) ? false : true}
   titleDashboard="Agregar un nuevo producto"
 backLink = "/dashboard/administrador/product"
-buttonSubmitText = "Actualizar"
+buttonSubmitText = "Agregar producto"
 handleSubmit = {handleSubmit}
 >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
@@ -236,9 +273,9 @@ handleSubmit = {handleSubmit}
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="molido">Molido</option>
-                  <option value="grano">Grano</option>
-                  <option value="capsulas">Cápsulas</option>
+                  <option value="Molido">Molido</option>
+                  <option value="Grano">Grano</option>
+                  <option value="Capsulas">Cápsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>
@@ -259,15 +296,15 @@ handleSubmit = {handleSubmit}
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="santos">Santos</option>
-                  <option value="colombiano">Colombiano</option>
-                  <option value="torrado">Torrado</option>
-                  <option value="rio de oro">Rio de Oro</option>
-                  <option value="descafeino">Descafeinado</option>
-                  <option value="blend-premium">Blend</option>
-                  <option value="mezcla-baja calidad">Mezcla</option>
+                  <option value="Santos">Santos</option>
+                  <option value="Colombiano">Colombiano</option>
+                  <option value="Torrado">Torrado</option>
+                  <option value="Rio de oro">Rio de Oro</option>
+                  <option value="Descafeino">Descafeinado</option>
+                  <option value="Blend-premium">Blend</option>
+                  <option value="Mezcla baja calidad">Mezcla</option>
                 </select>
-                {errors.discount && (
+                {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
                 )}
               </div>
@@ -303,7 +340,9 @@ handleSubmit = {handleSubmit}
                 />
               </label>
             </div>
-
+            {errors.imgUrl && (
+                  <span className="text-red-500">{errors.imgUrl}</span>
+                )}
             {imageFile && (
               <div className="mt-4 flex justify-center">
                 <Image
@@ -311,7 +350,7 @@ handleSubmit = {handleSubmit}
                   alt="Imagen del producto"
                   width={500} // debes especificar un ancho
                   height={300} // y una altura
-                  className="max-w-44 h-auto"
+                  className="max-w-44 h-auto "
                 />
               </div>
             )}
@@ -321,13 +360,15 @@ handleSubmit = {handleSubmit}
  {/* Subproductos */}
          { subproducts.map((product, index) => (
            
-         
+        
             <div className="grid gap-4 sm:col-span-2 md:gap-6 sm:grid-cols-3" key={index}>
+
             <div>
                 <label
                   htmlFor="amount"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
+                  
                   Cantidad por unidad
                 </label>
                 <input
@@ -336,35 +377,39 @@ handleSubmit = {handleSubmit}
                   id="amount"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="0.00"
-                  value={dataProduct.price}
-                  onChange={handleChange}
+
+                  onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.price && (
-                  <span className="text-red-500">{errors.price}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.amount && (
+                    <span className="text-red-500">{errorsSubproducts[index].amount}</span>
                 )}
               </div>
             <div>
                 <label
-                  htmlFor="stock"
+                  htmlFor="unit"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Unidad de medida
                 </label>
                 <select
-                  id="medida"
-                  name="medida"
+                  id="unit"
+                  name="unit"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.medida}
-                  onChange={handleChange}
+
+                  onChange={(e) => handleSubproductChange(index, e)}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="kilo">Kilo</option>
-                  <option value="unidades">Unidades</option>
-                  <option value="sobre">Sobres</option>
-                  <option value="caja">Caja</option>
-                </select>
-                {errors.medida && (
-                  <span className="text-red-500">{errors.medida}</span>
+                  <option value="Kilo">Kilo</option>
+                  <option value="Unidades">Unidades</option>
+                  <option value="Sobre">Sobres</option>
+                  <option value="Caja">Caja</option>
+                  <option value="Gramos">Gramos</option>
+
+                                  </select>
+              {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.unit&& (
+                    <span className="text-red-500">{errorsSubproducts[index].unit}</span>
                 )}
               </div>
               <div>
@@ -380,11 +425,12 @@ handleSubmit = {handleSubmit}
                   id="stock"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="0"
-                  value={dataProduct.stock}
-                  onChange={handleChange}
+
+                  onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.stock && (
-                  <span className="text-red-500">{errors.stock}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.stock && (
+                    <span className="text-red-500">{errorsSubproducts[index].stock}</span>
                 )}
               </div>
               <div>
@@ -400,11 +446,12 @@ handleSubmit = {handleSubmit}
                   id="price"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="0.00"
-                  value={dataProduct.price}
-                  onChange={handleChange}
+
+                  onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.price && (
-                  <span className="text-red-500">{errors.price}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.price && (
+                    <span className="text-red-500">{errorsSubproducts[index].price}</span>
                 )}
               </div>
               <div>
@@ -420,16 +467,17 @@ handleSubmit = {handleSubmit}
                   id="discount"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="0.00"
-                  value={dataProduct.discount}
-                  onChange={handleChange}
+
+                  onChange={(e) => handleSubproductChange(index, e)}
                 />
-                {errors.discount && (
-                  <span className="text-red-500">{errors.discount}</span>
+                {Array.isArray(errorsSubproducts) && 
+                  errorsSubproducts[index]?.discount && (
+                    <span className="text-red-500">{errorsSubproducts[index].discount}</span>
                 )}
               </div>
               <div>
                 <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Precio Final</p>
-                <p className="h-10 flex items-center">$ {dataProduct.price}</p>
+                <p className="h-10 flex items-center">  $ {(Number(product.price) - (Number(product.price) * Number(product.discount) / 100)).toFixed(2)}</p>
               </div>
               <hr  className="col-span-full "/>
             </div>

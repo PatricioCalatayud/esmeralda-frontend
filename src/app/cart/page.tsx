@@ -133,6 +133,7 @@ const Cart = () => {
       products,
       ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10,
+      //...(session?.role === "Cliente" && {acount === "hola"}),
     };
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);

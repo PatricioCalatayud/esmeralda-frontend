@@ -64,8 +64,9 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     };
 
     const loadProductData = async () => {
-      const fetchedProduct = await getProductById(productId, token);
-      if (fetchedProduct) {
+      const response = await getProductById(productId, token);
+      if (response ) {
+      const fetchedProduct = response.data
         setProduct(fetchedProduct);
         const translatedCategories = categoryTranslations({
           id: fetchedProduct.category?.id,
@@ -76,7 +77,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         setCategory(translatedCategories);
 
         const lowestPricedSubproduct = fetchedProduct.subproducts.reduce(
-          (lowest, current) => {
+          (lowest:any, current:any) => {
             return current.price < lowest.price ? current : lowest;
           }
         );
