@@ -29,25 +29,53 @@ export async function LoginUser(user: ILoginProps) {
 }
 //! Funcion para registrar usuario
 
-export async function NewUser(user: any) {
+export async function NewUser(user: IUserProps): Promise<any> {
   try {
-    const res = await axios.post(`${apiURL}/auth/signup`, user, {
+    const response = await axios.post(`${apiURL}/auth/signup`, user, {
       headers: {
         "Content-Type": "application/json",
       },
     });
-    if (res.status !== 200 && res.status !== 201) {
-      console.log(`Error registrando usuario: ${res.status} - ${res.data.message}`);
+
+    // Validate successful responses (status codes 200 or 201)
+    if (response.status !== 200 && response.status !== 201) {
+      throw new Error(`Error registrando usuario: ${response.status} - ${response.data.message}`);
     }
 
-    return res;
+    // Return the normalized response for further processing
+    return {
+      success: true,
+      message: response.data.message, // Adjust based on your backend response structure
+    };
   } catch (error: any) {
-    if (error.response) {
-      console.log(`Error registrando usuario: ${error.response.status} - ${error.response.data.message}`);
-    } else if (error.request) {
-      console.log("Error registrando usuario: No se recibía respuesta del servidor.");
+    if (axios.isAxiosError(error)) {
+      // Handle Axios-specific errors (network, request/response issues)
+      if (error.response) {
+        console.error(`Error registrando usuario (Axios): ${error.response.status} - ${error.response.data.message}`);
+        return {
+          success: false,
+          message: error.response.data.message, // Adjust based on your backend response structure
+        };
+      } else if (error.request) {
+        console.error("Error registrando usuario (Axios): No se recibía respuesta del servidor.");
+        return {
+          success: false,
+          message: "Error al registrar el usuario. Por favor, inténtalo de nuevo más tarde.", // Generic message for network issues
+        };
+      } else {
+        console.error(`Error registrando usuario (Axios): ${error.message}`);
+        return {
+          success: false,
+          message: "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.", // Generic message for other Axios errors
+        };
+      }
     } else {
-      console.log(`Error registrando usuario: ${error.message}`);
+      // Handle non-Axios errors (e.g., validation errors, unexpected issues)
+      console.error(`Error registrando usuario (non-Axios): ${error.message}`);
+      return {
+        success: false,
+        message: "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.", // Generic message for other errors
+      };
     }
   }
 }

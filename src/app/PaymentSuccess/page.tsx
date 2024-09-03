@@ -8,19 +8,23 @@ const PaymentSuccess: React.FC = () => {
     time: string;
     products: { description: string; imgUrl: string; quantity: number }[];
   } | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);  // Nuevo estado para guardar el orderId
 
   useEffect(() => {
-    setSearchParams(new URLSearchParams(window.location.search));
+    const params = new URLSearchParams(window.location.search);
+    setSearchParams(params);
+    const id = params.get('orderId');
+    setOrderId(id);  // Guardamos el orderId en el estado
   }, []);
 
   useEffect(() => {
     if (!searchParams) return;
 
-    const orderId = searchParams.get('orderId');
-    console.log("Order ID from URL:", orderId);  // Para verificar que el orderId se esté capturando correctamente
+    const id = searchParams.get('orderId');
+    console.log("Order ID from URL:", id);  // Para verificar que el orderId se esté capturando correctamente
 
-    if (orderId) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/${orderId}`)
+    if (id) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/${id}`)
         .then((response) => response.json())
         .then((data) => {
           console.log("API Response:", data);  // Para ver la respuesta completa de la API
@@ -90,9 +94,14 @@ const PaymentSuccess: React.FC = () => {
         ))}
       </div>
 
-      <a href="/" className="payment__container-btn text-white bg-teal-500 text-2xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
-        Explora el estado de tu pedido!
-      </a>
+      {orderId && (
+        <a
+          href={`http://localhost:3000/dashboard/cliente/order/${orderId}`}  // Incluimos el orderId en la URL
+          className="payment__container-btn text-white bg-teal-500 text-2xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out"
+        >
+          Explora el estado de tu pedido!
+        </a>
+      )}
     </div>
   );
 };
