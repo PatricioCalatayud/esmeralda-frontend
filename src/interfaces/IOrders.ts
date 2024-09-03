@@ -34,6 +34,7 @@ export interface Transaction {
 }
 
 export interface ProductsOrder {
+    id?: string;
     quantity: string;
     subproduct: SubproductOder;
 }

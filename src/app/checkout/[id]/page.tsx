@@ -9,6 +9,7 @@ import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {  faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [cart, setCart] = useState<ICart[]>([]);
@@ -96,7 +97,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
         onPointerLeaveCapture={() => {}}
       /></div>: session?.role === "Cliente" ? <div className="flex px-6  mx-auto lg:col-span-2  w-full items-center flex-col gap-4">
         <button className="flex justify-center items-center bg-teal-600 hover:bg-teal-800 text-white gap-2 font-semibold rounded-xl py-2 w-full">Agregar a cuenta corriente</button>
-        <button className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2 w-full">Pago con transferencia bancaria <FontAwesomeIcon icon={faChevronDown}/></button>
+        <Link href={`/transfer/${params.id}`} className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2 w-full">Pago con transferencia bancaria <FontAwesomeIcon icon={faChevronDown}/></Link>
       </div> :<div className="lg:col-span-2 max-lg:order-1 px-6 max-w-4xl mx-auto w-full">
             {preferenceId ? <a href={preferenceId}	target="_blank" className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2">Pagar con Mercado Pago <MercadoPagoIcon color="#ffffff" height={"32px"} width={"32px"} /></a> : <div className="flex justify-center items-center w-full h-full"><h1 className="text-3xl">No existe link de mercado pago</h1></div>}
           </div>}

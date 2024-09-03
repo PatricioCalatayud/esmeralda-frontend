@@ -83,8 +83,22 @@ export async function putOrder(orderId: string, order: IOrders | {}, token: stri
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-    const product: IOrders = response.data;
-    return product;
+
+    return response;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+export async function putOrderTransaction( file: IOrders | {}, token: string | undefined) {
+  
+  try {
+
+    const response = await axios.put(`${apiURL}/image/transfer`, file,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+
+    return response;
   } catch (error: any) {
     console.log(error);
   }

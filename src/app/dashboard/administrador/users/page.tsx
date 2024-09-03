@@ -7,6 +7,10 @@ import { getUsers, putUser } from "@/helpers/Autenticacion.helper";
 import { useAuthContext } from "@/context/auth.context";
 
 import { ISession } from "@/interfaces/ISession";
+import { Tooltip } from "flowbite-react";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 const Users = () => {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState<ISession[] | undefined>([]);
@@ -113,8 +117,19 @@ const Users = () => {
                         scope="row"
                         className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                        <div className="flex items-center w-full justify-center">
+                        <div className="flex items-center w-full justify-center gap-10">
                             {user.name}
+                            {user.role === "Cliente" && <Tooltip content="Panel Cliente">
+                <Link
+                  href={`/dashboard/administrador/users/${user.id}`}
+                  data-drawer-target="drawer-update-product"
+                  data-drawer-show="drawer-update-product"
+                  aria-controls="drawer-update-product"
+                  className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </Tooltip>}
                         </div>
                     </th>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">

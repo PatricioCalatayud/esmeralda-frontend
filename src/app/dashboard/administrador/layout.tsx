@@ -78,6 +78,7 @@ export default function DashboardLayout({
                       }`}
                     >
                       <span className="ml-3">{link.name}</span>
+                      
                     </Link>
                   </li>
                 );
