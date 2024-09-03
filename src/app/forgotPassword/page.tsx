@@ -19,9 +19,22 @@ const theme = createTheme();
 const ForgotPassword: React.FC = () => {
   const Router = useRouter();
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setEmailError("Por favor, introduce un correo electrónico válido.");
+      return;
+    } else {
+      setEmailError(""); // Limpia el mensaje de error si el correo es válido
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`, {
@@ -115,6 +128,8 @@ const ForgotPassword: React.FC = () => {
                   autoFocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  error={!!emailError}
+                  helperText={emailError}
                   InputLabelProps={{ style: { color: "teal" } }}
                 />
                 <Button

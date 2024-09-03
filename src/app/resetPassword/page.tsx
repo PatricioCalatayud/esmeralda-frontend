@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
@@ -31,10 +31,27 @@ const ResetPasswordForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validatePassword = (password: string): string => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/;
+    if (!regex.test(password)) {
+      return "La contraseña debe tener entre 8 y 15 caracteres, incluyendo al menos una mayúscula, una minúscula y un número";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    } else {
+      setPasswordError("");
+    }
 
     if (password !== confirmPassword) {
       setPasswordMismatch(true);
@@ -140,6 +157,8 @@ const ResetPasswordForm: React.FC = () => {
                 </InputAdornment>
               ),
             }}
+            error={!!passwordError}
+            helperText={passwordError}
           />
           <TextField
             margin="normal"
