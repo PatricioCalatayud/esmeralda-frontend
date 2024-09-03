@@ -5,7 +5,7 @@ import { Tooltip } from "flowbite-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import { IProductList } from "@/interfaces/IProductList";
+import { IProductList, ISubProduct } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { useProductContext } from "@/context/product.context";
@@ -139,8 +139,12 @@ const ProductList = () => {
   };
 
   //! Función para habilitar un producto
-  const handleEnableProduct = async (id: string, idSubproduct: string) => {
-    const dataProducts = { isAvailable: true };
+  const handleEnableProduct = async (id: string, subproduct:ISubProduct) => {
+    const dataProducts = {subproducts:[
+      {id:subproduct.id,
+      isAvailable:Boolean(true) 
+    }
+    ] };
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -149,18 +153,28 @@ const ProductList = () => {
       );
       return;
     }
+    console.log(dataProducts);
 
-    try {
       const response = await putProducts(dataProducts, id, token);
 
       console.log("Producto habilitado:", response);
-      setProducts((prevProducts) =>
-        prevProducts?.map((product) =>
-          product.id === id ? { ...product, isAvailable: true } : product
-        )
-      );
-    } catch (error) {
-      console.error("Error enabling product:", error);
+   if(response && (response.status === 200 || response.status === 201)){
+    setProducts((prevProducts) =>
+      prevProducts?.map((product) => {
+        if (product.id === id) {
+          // Reemplaza el subproducto existente con el subproducto actualizado
+          const updatedSubproducts = product.subproducts.map((sp) =>
+            sp.id === subproduct.id
+              ? { ...sp, isAvailable: true } // Solo cambia el estado de disponibilidad
+              : sp
+          );
+          return { ...product, subproducts: updatedSubproducts };
+        }
+        return product;
+      })
+    );
+    } else {
+      console.error("Error enabling product:", response);
       Swal.fire(
         "¡Error!",
         "Ha ocurrido un error al habilitar el producto",
@@ -170,8 +184,11 @@ const ProductList = () => {
   };
 
   //! Función para manejar la deshabilitación de un producto
-  const handleDisableProduct = async (id: string, idSubproduct: string) => {
-    const dataProducts = { isAvailable: false };
+  const handleDisableProduct = async (id: string, subproduct:ISubProduct) => {
+    const dataProducts = {subproducts:[
+      {id:subproduct.id,
+      isAvailable:Boolean(false)}
+    ] };
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -180,17 +197,27 @@ const ProductList = () => {
       );
       return;
     }
-
-    try {
       const response = await putProducts(dataProducts, id, token);
       console.log("Producto deshabilitado:", response);
+    if(response && (response.status === 200 || response.status === 201)){
       setProducts((prevProducts) =>
-        prevProducts?.map((product) =>
-          product.id === id ? { ...product, isAvailable: false } : product
-        )
+        prevProducts?.map((product) => {
+          if (product.id === id) {
+            // Reemplaza el subproducto existente con el subproducto actualizado
+            const updatedSubproducts = product.subproducts.map((sp) =>
+              sp.id === subproduct.id
+                ? { ...sp, isAvailable: false } // Solo cambia el estado de disponibilidad
+                : sp
+            );
+            return { ...product, subproducts: updatedSubproducts };
+          }
+          return product;
+        })
       );
-    } catch (error) {
-      console.error("Error disabling product:", error);
+    }
+      
+    else {
+      console.error("Error disabling product:", response);
       Swal.fire(
         "¡Error!",
         "Ha ocurrido un error al deshabilitar el producto",
@@ -200,22 +227,48 @@ const ProductList = () => {
   };
 
   //! Funciónes para editar un subproducto
-  const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, id: string) => {
+  const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, idSubproduct: string) => {
     const { name, value } = e.target;
     setEditProductId((prev) => ({
       ...prev,
       [name]: value,
-      id, // Incluye el ID del subproducto o producto principal
+      id : idSubproduct, // Incluye el ID del subproducto o producto principal
     }));
     console.log(editProductId);
   };
 
-  const handleEditSubproductCheck = async(id: string) => {
-    const response = await putProducts(editProductId,id, token);
-    if (response && (response.data.status === 200 || response.data.status === 201)) {
-      setEdit(0)
+  const handleEditSubproductCheck = async(id: string,subproduct:ISubProduct) => {
+    const bodySubproducts = {
+      subproducts : [{
+        ...editProductId
+      }]
     }
-  }
+    const response = await putProducts(bodySubproducts,id, token);
+    if (response && (response.status === 200 || response.status === 201)) {
+      setProducts((prevProducts) =>
+        prevProducts?.map((product) => {
+          if (product.id === id) {
+            // Reemplaza el subproducto existente con el subproducto actualizado
+            const updatedSubproducts = product.subproducts.map((sp) =>
+              sp.id === subproduct.id
+                ? { ...subproduct } // Reemplaza completamente el subproducto
+                : sp
+            );
+            return { ...product, subproducts: updatedSubproducts };
+          }
+          return product;
+        })
+      );
+      setEdit(0);
+    } else {
+      console.error("Error al editar el subproducto:", response);
+      Swal.fire(
+        "¡Error!",
+        "Ha ocurrido un error al editar el subproducto",
+        "error"
+      );
+    }
+  };
   //! Funciónes para agregar un subproducto
   const handleAddSubproduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, id: string) => {
     const { name, value } = e.target;
@@ -223,17 +276,42 @@ const ProductList = () => {
     setAddSubproductId((prev) => ({
       ...prev,
       [name]: value,
-      id, // Incluye el ID del subproducto o producto principal
+      //id, // Incluye el ID del subproducto o producto principal
     }));
     console.log(addSubproductId);
   };
   const handleAddSubproductCheck = async(id: string) => {
-    const response = await putProducts(addSubproductId,id, token);
-
-    if (response && (response.data.status === 200 || response.data.status === 201)) {
-      setAddSubproductId({})
+    const bodySubproducts = {
+      subproducts : [{
+        ...addSubproductId
+      }]
     }
-  }
+    const response = await putProducts(bodySubproducts ,id, token);
+    if (response && (response.status === 200 || response.status === 201)) {
+      setProducts((prevProducts) =>
+        prevProducts?.map((product) => {
+          if (product.id === id) {
+            const updatedSubproducts = [
+              ...product.subproducts, // Mantener los subproductos existentes
+              addSubproductId // Agregar el nuevo subproducto
+            ];
+            return { ...product, subproducts: updatedSubproducts };
+          }
+          return product;
+        }) as IProductList[] // Asegurarse de que el resultado final sea del tipo 'IProductList[]'
+      );
+      setAddSubproduct({id:""}); 
+      setAddSubproductId({});
+    } else {
+      console.error("Error al agregar el subproducto:", response);
+      Swal.fire(
+        "¡Error!",
+        "Ha ocurrido un error al agregar el subproducto",
+        "error"
+      );
+    }
+  };
+    
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
@@ -355,7 +433,8 @@ const ProductList = () => {
                     className="h-10 rounded-md p-2 w-1/2 border border-gray-600"
                     type="text"
                     name="amount"
-                    placeholder={subproduct.amount}
+                    placeholder="0"
+                    defaultValue={subproduct.amount}
                     onChange={(e) =>
                       handleEditProduct(e, String(subproduct.id))
                     }
@@ -368,7 +447,7 @@ const ProductList = () => {
                       handleEditProduct(e, String(subproduct.id))
                     }
                   >
-                    <option value="">Unidad</option>
+                    <option value={subproduct.unit}>{subproduct.unit}</option>
                     <option value={"Kilo"}>Kilo</option>
                     <option value={"Gramos"}>Gramos</option>
                     <option value={"Unidad"}>Unidad</option>
@@ -419,7 +498,8 @@ const ProductList = () => {
                   name="price"
                   className="h-10  rounded-md p-2 w-full border border-gray-600"
                   type="text"
-                  placeholder={`$ ${subproduct.price}`}
+                  placeholder={`${subproduct.price}`}
+                  defaultValue={subproduct.price}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
                 />
               )
@@ -451,7 +531,8 @@ const ProductList = () => {
                   className="h-10 rounded-md p-2 w-full border border-gray-600"
                   type="text"
                   name="discount"
-                  placeholder={`${subproduct.discount} %`}
+                  defaultValue={subproduct.discount}
+                  placeholder={`${subproduct.discount}`}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
                 />
               )
@@ -476,7 +557,7 @@ const ProductList = () => {
                     <Tooltip content="Correcto" key={index}>
                       <button
                         type="button"
-                        onClick={() => handleEditSubproductCheck(product.id)}
+                        onClick={() => handleEditSubproductCheck(product.id, subproduct)}
                         className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                       >
                         <FontAwesomeIcon icon={faCheck} />
@@ -536,8 +617,8 @@ const ProductList = () => {
                   checked={subproduct.isAvailable}
                   onChange={() =>
                     subproduct.isAvailable
-                      ? handleDisableProduct(product.id, String(subproduct.id))
-                      : handleEnableProduct(product.id, String(subproduct.id))
+                      ? handleDisableProduct(product.id, subproduct)
+                      : handleEnableProduct(product.id, subproduct)
                   }
                   className="w-5 h-5 m-1"
                 />

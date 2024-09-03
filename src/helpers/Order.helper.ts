@@ -83,8 +83,8 @@ export async function putOrder(orderId: string, order: IOrders | {}, token: stri
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-    const product: IOrders = response.data;
-    return product;
+
+    return response;
   } catch (error: any) {
     console.log(error);
   }

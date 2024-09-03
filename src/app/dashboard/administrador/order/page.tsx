@@ -8,6 +8,7 @@ import { es } from "date-fns/locale";
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 import { getAllOrders, putOrder } from "@/helpers/Order.helper";
+import Image from "next/image";
 
 const OrderList = () => {
   const router = useRouter();
@@ -89,12 +90,13 @@ const OrderList = () => {
 
     const newStatus = {status: e.target.value}
     console.log(newStatus);
-    try {
+
       const response = await putOrder(id, newStatus, token as string);
-      console.log("response", response);
+      if(response && (response?.status === 200 || response?.status === 201)){
+        console.log("response", response);
       Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
-    } catch (error) {
-      console.error("Error updating order:", error);
+      }else {
+      console.error("Error updating order:", response);
       Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
     }
   };
@@ -122,7 +124,7 @@ const OrderList = () => {
         "Fecha de pedido",
         "Precio total",
         "Fecha de entrega",
-        "Total",
+        "Productos",
         "Estado",
       ]}
       noContent="No hay Ordenes disponibles"
@@ -153,9 +155,26 @@ const OrderList = () => {
               locale: es,
             })}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {order.status}
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {order.productsOrder && order.productsOrder.map((product, productIndex) => (
+              <div key={productIndex} className="mb-2 text-start flex items-center">
+                 <Image
+                      width={500}
+                      height={500}
+                      priority={true}
+                      src={product.subproduct.product  ? product.subproduct?.product.imgUrl : ""}
+                      alt={product.subproduct.product ? product.subproduct?.product.description : ""}
+                      className="w-10 h-10 inline-block mr-2 rounded-full"
+                    />
+                    <div className="flex flex-row gap-1">
+                    <span> {product.subproduct.product && product.subproduct?.product.description}</span>
+
+                    <span>  x {product.subproduct?.amount}</span>
+                    </div>
+                  </div>
+            ))}
           </td>
+
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
               order.orderDetail?.transactions.status === "Recibido"
