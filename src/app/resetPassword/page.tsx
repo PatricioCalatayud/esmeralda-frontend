@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
@@ -24,7 +24,7 @@ const theme = createTheme();
 const ResetPasswordForm: React.FC = () => {
   const Router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const [token, setToken] = useState<string | null>(null);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -33,6 +33,11 @@ const ResetPasswordForm: React.FC = () => {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const tokenParam = searchParams.get("token");
+    setToken(tokenParam);
+  }, [searchParams]);
 
   const validatePassword = (password: string): string => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/;
@@ -252,7 +257,9 @@ const ResetPassword: React.FC = () => {
         <div className="relative z-10 font-sans max-w-7xl mx-auto">
           <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <ResetPasswordForm />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ResetPasswordForm />
+            </Suspense>
           </Container>
         </div>
         <div className="absolute bottom-1 left-1 hidden md:block">
