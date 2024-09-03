@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
@@ -11,7 +11,6 @@ import {
   Avatar,
   InputAdornment,
   IconButton,
-  FormHelperText,
   CircularProgress,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -25,17 +24,39 @@ const theme = createTheme();
 const ResetPasswordForm: React.FC = () => {
   const Router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const [token, setToken] = useState<string | null>(null);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const tokenParam = searchParams.get("token");
+    setToken(tokenParam);
+  }, [searchParams]);
+
+  const validatePassword = (password: string): string => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/;
+    if (!regex.test(password)) {
+      return "La contraseña debe tener entre 8 y 15 caracteres, incluyendo al menos una mayúscula, una minúscula y un número";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    } else {
+      setPasswordError("");
+    }
 
     if (password !== confirmPassword) {
       setPasswordMismatch(true);
@@ -101,7 +122,7 @@ const ResetPasswordForm: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           padding: 4,
           borderRadius: 2,
           boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
@@ -141,6 +162,8 @@ const ResetPasswordForm: React.FC = () => {
                 </InputAdornment>
               ),
             }}
+            error={!!passwordError}
+            helperText={passwordError}
           />
           <TextField
             margin="normal"
@@ -174,9 +197,9 @@ const ResetPasswordForm: React.FC = () => {
             }}
           />
           {passwordMismatch && (
-            <FormHelperText error>
+            <Typography color="error" variant="body2">
               Las contraseñas no coinciden
-            </FormHelperText>
+            </Typography>
           )}
           <Button
             type="submit"
@@ -221,25 +244,31 @@ const ResetPasswordForm: React.FC = () => {
 const ResetPassword: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <div className="relative flex justify-center items-center font-sans min-h-screen p-4 bg-gray-100">
-        <Suspense
-          fallback={
-            <CircularProgress
-              size={60}
-              color="primary"
-              sx={{ position: "absolute", top: "50%", left: "50%" }}
-            />
-          }
+      <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
+        <video
+          autoPlay
+          loop
+          muted
+          className="absolute top-0 left-0 w-full h-full object-cover"
         >
-          <ResetPasswordForm />
-        </Suspense>
-        <div className="absolute bottom-4 left-4 hidden md:block">
+          <source src="/roaster.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="relative z-10 font-sans max-w-7xl mx-auto">
+          <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Suspense fallback={<div>Loading...</div>}>
+              <ResetPasswordForm />
+            </Suspense>
+          </Container>
+        </div>
+        <div className="absolute bottom-1 left-1 hidden md:block">
           <Image
             src="/logoblanco.png"
             alt="Logo"
-            width={150}
-            height={150}
-            className="w-[150px] h-[150px]"
+            width={300}
+            height={300}
+            className="w-[300px] h-[300px]"
           />
         </div>
       </div>
