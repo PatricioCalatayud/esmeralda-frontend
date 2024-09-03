@@ -13,9 +13,10 @@ import Image from "next/image";
 import RatingStars from "@/components/ratingStars/ratingStars";
 
 const Tracking = ({ params }: { params: { id: string } }) => {
-  const { token } = useAuthContext();
+  const { token, session } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<IOrders | null>(null); // Tipado correcto
+
 
   useEffect(() => {
     async function fetchOrder() {
@@ -32,7 +33,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
   }, [params.id, token]);
 
   const statusDefault = ["Recibido", "Empaquetado", "Transito", "Entregado"];
-  console.log(order);
+  console.log(order, session?.id);
 
   const handleCambioDeCalificacion = (calificacion: number, id?: string ) => {
     console.log(calificacion, id);
