@@ -142,7 +142,7 @@ const ProductList = () => {
   const handleEnableProduct = async (id: string, subproduct:ISubProduct) => {
     const dataProducts = {subproducts:[
       {id:subproduct.id,
-      isAvailable:Boolean(true) 
+      isAvailable:true 
     }
     ] };
     if (!token) {
@@ -187,7 +187,7 @@ const ProductList = () => {
   const handleDisableProduct = async (id: string, subproduct:ISubProduct) => {
     const dataProducts = {subproducts:[
       {id:subproduct.id,
-      isAvailable:Boolean(false)}
+      isAvailable:false as boolean}
     ] };
     console.log(typeof dataProducts.subproducts[0].isAvailable);
     if (!token) {
@@ -246,6 +246,7 @@ const ProductList = () => {
     }
     const response = await putProducts(bodySubproducts,id, token);
     if (response && (response.status === 200 || response.status === 201)) {
+      
       setProducts((prevProducts) =>
         prevProducts?.map((product) => {
           if (product.id === id) {
@@ -282,6 +283,7 @@ const ProductList = () => {
     console.log(addSubproductId);
   };
   const handleAddSubproductCheck = async(id: string) => {
+    
     const bodySubproducts = {
       subproducts : [{
         ...addSubproductId
@@ -289,6 +291,7 @@ const ProductList = () => {
     }
     const response = await putProducts(bodySubproducts ,id, token);
     if (response && (response.status === 200 || response.status === 201)) {
+      console.log(response.data);
       setProducts((prevProducts) =>
         prevProducts?.map((product) => {
           if (product.id === id) {
