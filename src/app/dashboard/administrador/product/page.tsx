@@ -189,6 +189,7 @@ const ProductList = () => {
       {id:subproduct.id,
       isAvailable:Boolean(false)}
     ] };
+    console.log(typeof dataProducts.subproducts[0].isAvailable);
     if (!token) {
       Swal.fire(
         "¡Error!",

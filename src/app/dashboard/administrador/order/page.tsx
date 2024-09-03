@@ -9,6 +9,7 @@ import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
+import { useAuthContext } from "@/context/auth.context";
 
 const OrderList = () => {
   const router = useRouter();
@@ -16,21 +17,17 @@ const OrderList = () => {
   const [orders, setOrders] = useState<IOrders[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [token, setToken] = useState<string | null>(null);
+  const { token, session } = useAuthContext();
   const ORDERS_PER_PAGE = 5;
   const [loading, setLoading] = useState(true);
   const [dataStatus, setDataStatus] = useState("");
+  
 
   //! Obtener token de usuario
   useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const userSessionString = localStorage.getItem("userSession");
-      if (userSessionString) {
-        const userSession = JSON.parse(userSessionString);
-        const accessToken = userSession.accessToken;
-        console.log("userToken", accessToken);
-        setToken(accessToken);
-      } else {
+
+      if (!session) {
+        
         Swal.fire(
           "¡Error!",
           "Sesión de usuario no encontrada. Por favor, inicia sesión.",
@@ -39,7 +36,7 @@ const OrderList = () => {
           router.push("/login");
         });
       }
-    }
+    
   }, [router]);
 
   //! Obtener las Ordenes
@@ -138,7 +135,10 @@ const OrderList = () => {
             scope="row"
             className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
           >
-            <div className="flex items-center w-full justify-center">{order.user?.name}</div>
+            <div className="flex items-center w-full justify-center">
+              {order.user?.name}
+             
+            </div>
           </th>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
             <div className="flex justify-center items-center">

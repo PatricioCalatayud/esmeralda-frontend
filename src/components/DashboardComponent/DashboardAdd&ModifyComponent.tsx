@@ -9,7 +9,7 @@ interface IDashboardAddModifyInterface {
   backLink: string;
   buttonSubmitText: string;
   disabled?: boolean
-
+screen?: string
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 const DashboardAddModifyComponent = ({
@@ -19,9 +19,10 @@ const DashboardAddModifyComponent = ({
   buttonSubmitText,
   handleSubmit,
   disabled,
+  screen
 }: IDashboardAddModifyInterface) => {
   return (
-<div className="min-h-screen flex flex-col justify-start items-center  dark:bg-gray-700">
+<div className={`${screen || "min-h-screen"} flex flex-col justify-start items-center  dark:bg-gray-700`}>
       <div className="relative p-4 bg-white rounded-lg shadow-2xl dark:bg-gray-800 sm:p-5 w-full">
         <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
