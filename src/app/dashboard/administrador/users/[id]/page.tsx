@@ -12,6 +12,11 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "flowbite-react";
 const UsersId = ( { params }: { params: { id: string }}) => {
     const [dataProduct, setDataProduct] = useState({
         limit: "",
@@ -180,6 +185,31 @@ const { token } = useAuthContext();
         console.log(totalPaidOrders);
         setTotalPaidOrders(totalPaidOrders);
       }, [orders]);
+      const handleTransferOk = async (id : string) => {
+        console.log(id);
+          Swal.fire({
+            title: "¿Estás seguro de realizar la transferencia?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, transferir",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              const response = await putOrder(id,{transferStatus:"Comprobante verificado"}, token);
+              if (response && (response?.status === 200 || response?.status === 201)) {
+                Swal.fire("¡Transferencia exitosa!", "El estado de la orden ha sido actualizado.", "success");
+              } else {
+                console.error("Error updating order:", response);
+                Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+              }
+            } else if (result.isDenied) {
+              Swal.fire("No se realizaron cambios", "", "info");
+            }
+          })
+          }
+      
+      
     return (
         <div className="flex flex-col gap-10">
             <section className=" antialiased  dark:bg-gray-700">
@@ -239,7 +269,8 @@ const { token } = useAuthContext();
         "Precio total",
         "Fecha de entrega",
         "Productos",
-        "Estado",
+        "Estado de pago",
+        "Acciones",
       ]}
       noContent="No hay Ordenes disponibles"
       >
@@ -282,7 +313,32 @@ const { token } = useAuthContext();
                   </div>
             ))}
           </td>
-
+          <td>
+  {order.receipt && (
+    <div className="flex justify-center items-center gap-4">
+        <div>
+      {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
+      {order.receipt.image ? (
+   
+        <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
+              <FontAwesomeIcon icon={faDownload} style={{color: "teal", width: "20px", height: "20px"}}/>
+        </a>
+        
+ 
+      ) : null}
+      </div>
+      <Tooltip content="Correcto" >
+        <button
+          type="button"
+          onClick={() => handleTransferOk(order.id)}
+          className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </button>
+      </Tooltip>
+    </div>
+  )}
+</td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
               order.orderDetail?.transactions.status === "Recibido"

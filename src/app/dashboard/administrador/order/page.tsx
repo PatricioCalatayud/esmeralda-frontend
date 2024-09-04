@@ -10,6 +10,8 @@ import DashboardComponent from "@/components/DashboardComponent/DashboardCompone
 import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const OrderList = () => {
   const router = useRouter();
@@ -123,6 +125,7 @@ const OrderList = () => {
         "Fecha de entrega",
         "Productos",
         "Estado",
+        "Acciones",
       ]}
       noContent="No hay Ordenes disponibles"
     >
@@ -174,7 +177,20 @@ const OrderList = () => {
                   </div>
             ))}
           </td>
+          <td>
+  {order.receipt && (
+    <div>
+      {order.receipt.status ? <p>{order.receipt.status}</p> : null}
+      {order.receipt.image ? (
+   
+        <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
+              <FontAwesomeIcon icon={faDownload} style={{color: "teal", width: "20px", height: "20px"}}/>
+            </a>
 
+      ) : null}
+    </div>
+  )}
+</td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
               order.orderDetail?.transactions.status === "Recibido"

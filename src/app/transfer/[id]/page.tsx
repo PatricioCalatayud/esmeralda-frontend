@@ -1,13 +1,14 @@
 "use client";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useAuthContext } from "@/context/auth.context";
-import { putOrderTransaction } from "@/helpers/Order.helper";
+import { getOrder, putOrderTransaction } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Swal from "sweetalert2";
 const Transfer = ({ params }: { params: { id: string } }) => {
+    const [receiptId, setReceiptId] = useState("");
     const router = useRouter();
     const { token } = useAuthContext();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -22,14 +23,15 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     imgUrl: "",
   });
 
-  //! Función para manejar los cambios en los inputs
-  const handleChange = (e: any) => {
-    e.preventDefault();
-    setDataProduct({
-      ...dataProduct,
-      [e.target.name]: e.target.value,
-    });
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const response = await getOrder(params.id, token);
+      if (response && response.receipt) {
+        setReceiptId(response.receipt.id);
+      }
+    };
+    fetchProduct();
+  }, []);
 
   //! Función para manejar los cambios en la imagen
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,12 +50,14 @@ const Transfer = ({ params }: { params: { id: string } }) => {
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(imageFile);
     const formData = new FormData();
     // Añadir la imagen al FormData si existe
-    formData.append("id", params.id);
+    formData.append("id", receiptId);
+
     if (imageFile) {
       formData.append("file", imageFile);
-    } // Asegúrate de que el campo 'file' coincide con lo que espera el backend
+    } 
 
     //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
@@ -66,14 +70,14 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     });
 
     const response = await putOrderTransaction( formData, token);
-    
+    console.log(response);
           if (response && ( response.status === 201 || response.status === 200)) {
             Swal.fire({
               icon: "success",
               title: "¡Agregado!",
               text: "El producto ha sido agregado con éxito.",
             }).then(() => {
-              router.push("../../dashboard/cliente/order");
+              //router.push("../../dashboard/cliente/order");
             });
           
           // Mostrar alerta de éxito

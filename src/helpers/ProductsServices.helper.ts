@@ -50,12 +50,12 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
   }
 }
 
-export async function putProducts(dataProduct: object,id: string, token: string | undefined) {
-
+export async function putProducts(dataProduct: any,id: string, token: string | undefined) {
+  console.log(typeof(dataProduct.subproducts[0].isAvailable));
     try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });

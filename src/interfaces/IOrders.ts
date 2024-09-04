@@ -6,13 +6,14 @@ export interface IOrders {
     user:          User;
     productsOrder: ProductsOrder[];
     orderDetail:   OrderDetail;
+    receipt?:      Receipt;
     status:    string;
 }
 
 export interface IOrderCheckout {
     address?: string | undefined;
     userId: string | undefined;
-    account?:boolean,
+    account?:string,
     products: {
         productId: string;
         subproductId: string;
@@ -20,6 +21,11 @@ export interface IOrderCheckout {
     }[];
 }
 
+export interface Receipt {
+    id: string;
+    image: string;
+    status: string;
+}
 export interface OrderDetail {
     deliveryDate: string;
     totalPrice:   string;
