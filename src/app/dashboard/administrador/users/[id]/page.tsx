@@ -2,7 +2,7 @@
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent"
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 import { useAuthContext } from "@/context/auth.context";
-import { getUser } from "@/helpers/Autenticacion.helper";
+import { getUser, putUser } from "@/helpers/Autenticacion.helper";
 import { getOrders, putOrder } from "@/helpers/Order.helper";
 import { IOrders } from "@/interfaces/IOrders";
 
@@ -56,7 +56,7 @@ const { token } = useAuthContext();
     if (token) {
       fetchOrders();
     }
-  }, [token]);
+  }, []);
 
 
   const onPageChange = (page: number) => setCurrentPage(page);
@@ -88,6 +88,7 @@ const { token } = useAuthContext();
 
       const response = await putOrder(id, newStatus, token as string);
       if(response && (response?.status === 200 || response?.status === 201)){
+        setOrders(orders.map((order) => order.id === id ? { ...order, status: newStatus.status } : order));
         console.log("response", response);
       Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
       }else {
@@ -122,17 +123,17 @@ const { token } = useAuthContext();
         });
       };
 
-      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, id: string) => {
         e.preventDefault();
         
-    const formData = {
-      limit: dataProduct.limit
+    const user = {
+      accountLimit: Number(dataProduct.limit)
     }
       
     
         //! Mostrar alerta de carga mientras se procesa la solicitud
         Swal.fire({
-          title: "Agregando producto...",
+          title: "Cambiando el limite",
           text: "Por favor espera.",
           allowOutsideClick: false,
           didOpen: () => {
@@ -140,27 +141,25 @@ const { token } = useAuthContext();
           },
         });
     
-          /*const response = await postProducts(formData, token);
+          const response = await putUser(id,user, token);
     
           if (response && ( response.status === 201 || response.status === 200)) {
             Swal.fire({
               icon: "success",
               title: "¡Agregado!",
-              text: "El producto ha sido agregado con éxito.",
-            }).then(() => {
-              router.push("../../dashboard/administrador/product");
-            });
+              text: "El limite ha sido cambiado con exito.",
+            })
           
-          // Mostrar alerta de éxito
+          
           
         } else {
           // Mostrar alerta de error
           Swal.fire({
             icon: "error",
             title: "¡Error!",
-            text: "Ha ocurrido un error al agregar el producto.",
+            text: "Ha ocurrido un error al agregar el limite.",
           });
-        }*/
+        }
       };
       useEffect(() => {
         if (!dataProduct.limit) {
@@ -188,7 +187,7 @@ const { token } = useAuthContext();
       const handleTransferOk = async (id : string) => {
         console.log(id);
           Swal.fire({
-            title: "¿Estás seguro de realizar la transferencia?",
+            title: "¿Estás seguro que el comprobante es correcto?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -198,7 +197,18 @@ const { token } = useAuthContext();
             if (result.isConfirmed) {
               const response = await putOrder(id,{transferStatus:"Comprobante verificado"}, token);
               if (response && (response?.status === 200 || response?.status === 201)) {
-                Swal.fire("¡Transferencia exitosa!", "El estado de la orden ha sido actualizado.", "success");
+                setOrders(orders.map((order) => 
+                  order.id === id 
+                    ? { 
+                        ...order, 
+                        receipt: { 
+                          ...order.receipt, 
+                          status: "Comprobante verificado" 
+                        } 
+                      } as IOrders // Asegura que el objeto cumple con el tipo IOrders
+                    : order
+                ));
+                Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
               } else {
                 console.error("Error updating order:", response);
                 Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
@@ -208,7 +218,7 @@ const { token } = useAuthContext();
             }
           })
           }
-      
+
       
     return (
         <div className="flex flex-col gap-10">
@@ -234,7 +244,7 @@ const { token } = useAuthContext();
         titleDashboard="Limite de cuenta corriente"
         backLink="/dashboard/cliente/order"
         buttonSubmitText="Actualizar limite"
-        handleSubmit={handleSubmit}
+        handleSubmit={(e) => handleSubmit(e, user.id)}
       >
         <div className="grid gap-4 mb-4 sm:grid-cols-2">
           <div className="mb-4 col-span-full">
@@ -327,7 +337,7 @@ const { token } = useAuthContext();
  
       ) : null}
       </div>
-      <Tooltip content="Correcto" >
+      {order.receipt.status === "Pendiente de revisión de comprobante" && <Tooltip content="Correcto" >
         <button
           type="button"
           onClick={() => handleTransferOk(order.id)}
@@ -335,7 +345,7 @@ const { token } = useAuthContext();
         >
           <FontAwesomeIcon icon={faCheck} />
         </button>
-      </Tooltip>
+      </Tooltip>}
     </div>
   )}
 </td>
@@ -367,7 +377,7 @@ const { token } = useAuthContext();
       ))}
 
       </DashboardComponent>
-      <div className="flex flex-col gap-10 mb-28">
+      <div className="flex flex-col gap-10 mb-28 w-full">
             <section className=" antialiased  dark:bg-gray-700">
       <div className="w-full ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">

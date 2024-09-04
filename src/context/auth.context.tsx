@@ -55,6 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         //decodifico el token
         const decodedToken: any = jwtDecode(token);
+        console.log(decodedToken);
         // si hay token decodificado
         if (decodedToken) {
           setUserId(decodedToken.sub);
@@ -113,6 +114,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         if (response && (response.status === 200 || response.status === 201)) {
           const token = response.data.accessToken;
           const decodedToken: any = jwtDecode(token);
+          
           setToken(token);
           setSession({
             id: decodedToken.sub,
