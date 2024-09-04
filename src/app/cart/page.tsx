@@ -121,7 +121,7 @@ const Cart = () => {
   const total = calcularTotal();
 
   //! Función para realizar la orden
-  const handleCheckout = async () => {
+  const handleCheckout = async ( boton: string) => {
     const products = cart.map((product) => ({
       productId: product.idProduct,
       subproductId: product.idSubProduct ,
@@ -133,7 +133,8 @@ const Cart = () => {
       products,
       ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10,
-      //...(session?.role === "Cliente" && {acount === "hola"}),
+      ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && {account : "Transferencia" }),
+      ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && {account : "Cuenta corriente" }),
     };
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
@@ -147,10 +148,21 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-
-      setTimeout(() => {
+      if (session?.role === "Usuario") {
+        setTimeout(() => {
         router.push(`/checkout/${order.data.id}`);
       }, 1500);
+      }else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
+        setTimeout(() => {
+          router.push(`/transfer/${order.data.id}`);
+        }, 1500);
+      }else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
+        setTimeout(() => {
+          router.push(`/dashboard/administrador/order`);
+        }, 1500);
+      }
+      
+
     } else {
       Swal.fire({
         position: "top-end",
@@ -385,8 +397,45 @@ const Cart = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer>
+                { session && session.role === "Cliente" ? <div className="w-full"><button
+                  onClick={() =>handleCheckout("Cliente Cuenta Corriente")}
+                  type="button"
+                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                  disabled={
+                    !session ||
+                    cart.length === 0 ||
+                    (isDelivery === false && addresOrder === "")
+                  }
+                  title={
+                    !session
+                      ? "Necesita estar logueado para continuar con el pago"
+                      : cart.length === 0
+                      ? "El carrito está vacío"
+                      : ""
+                  }
+                >
+                  Agregar a cuenta corriente
+                </button>
                 <button
-                  onClick={handleCheckout}
+                  onClick={() => handleCheckout("Cliente Transferencia")}
+                  type="button"
+                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white  hover:bg-blue-800`}
+                  disabled={
+                    !session ||
+                    cart.length === 0 ||
+                    (isDelivery === false && addresOrder === "")
+                  }
+                  title={
+                    !session
+                      ? "Necesita estar logueado para continuar con el pago"
+                      : cart.length === 0
+                      ? "El carrito está vacío"
+                      : ""
+                  }
+                >
+                  Pago con trasnferencia bancaria
+                </button> </div> : <button
+                  onClick={() =>handleCheckout("Usuario")}
                   type="button"
                   className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
                   disabled={
@@ -403,7 +452,7 @@ const Cart = () => {
                   }
                 >
                   Ir a pagar
-                </button>
+                </button>}
               </Modal.Footer>
             </Modal>
             <Link href="/categories">

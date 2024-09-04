@@ -78,6 +78,7 @@ export async function deleteOrder(orderId: string, token: string | undefined) {
 export async function putOrder(orderId: string, order: IOrders | {}, token: string | undefined) {
   
   try {
+    console.log(orderId);
     console.log(order);
     const response = await axios.put(`${apiURL}/order/${orderId}`, order,{
       headers: {
