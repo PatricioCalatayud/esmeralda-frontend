@@ -9,5 +9,5 @@ export interface IUserUpdateProps {
   email?: string;
   phone?: string;
   role?: string;
-  
+  accountLimit?: number;
 }

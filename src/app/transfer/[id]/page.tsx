@@ -77,7 +77,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
               title: "¡Agregado!",
               text: "El producto ha sido agregado con éxito.",
             }).then(() => {
-              //router.push("../../dashboard/cliente/order");
+              router.push("../../dashboard/cliente/order");
             });
           
           // Mostrar alerta de éxito

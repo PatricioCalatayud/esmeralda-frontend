@@ -105,6 +105,7 @@ export async function getUser(userId: string, token: string | undefined) {
       headers: {
         Authorization: `Bearer ${token}`,
       },});
+      console.log(response);
     const user: IUserProps = response.data;
     return user;
   } catch (error: any) {
