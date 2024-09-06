@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faDownload, faPen, faX } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "flowbite-react";
 const UsersId = ( { params }: { params: { id: string }}) => {
     const [dataProduct, setDataProduct] = useState({
@@ -37,6 +37,7 @@ const { token } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [dataStatus, setDataStatus] = useState("");
   const [totalPaidOrders, setTotalPaidOrders] = useState(0);
+  const [showInputTransfer, setShowInputTransfer] = useState(false);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -192,10 +193,10 @@ const { token } = useAuthContext();
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Si, transferir",
+            confirmButtonText: "Si, Es correcto",
           }).then(async (result) => {
             if (result.isConfirmed) {
-              const response = await putOrder(id,{transferStatus:"Comprobante verificado"}, token);
+              const response = await putOrder(id,{transferStatus:"Comprobante verificado", orderStatus:true}, token);
               if (response && (response?.status === 200 || response?.status === 201)) {
                 setOrders(orders.map((order) => 
                   order.id === id 
@@ -218,7 +219,40 @@ const { token } = useAuthContext();
             }
           })
           }
-
+          const handleTransferReject = async (id : string) => {
+            console.log(id);
+              Swal.fire({
+                title: "¿Estás seguro que el comprobante es incorrecto?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Si, Es incorrecto",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const response = await putOrder(id,{transferStatus:"Rechazado"}, token);
+                  if (response && (response?.status === 200 || response?.status === 201)) {
+                    setOrders(orders.map((order) => 
+                      order.id === id 
+                        ? { 
+                            ...order, 
+                            receipt: { 
+                              ...order.receipt, 
+                              status: "Rechazado" 
+                            } 
+                          } as IOrders // Asegura que el objeto cumple con el tipo IOrders
+                        : order
+                    ));
+                    Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
+                  } else {
+                    console.error("Error updating order:", response);
+                    Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+                  }
+                } else if (result.isDenied) {
+                  Swal.fire("No se realizaron cambios", "", "info");
+                }
+              })
+              }
       
     return (
         <div className="flex flex-col gap-10">
@@ -242,27 +276,55 @@ const { token } = useAuthContext();
             screen = "h-min"
         disabled={errors.limit === ""}
         titleDashboard="Limite de cuenta corriente"
-        backLink="/dashboard/cliente/order"
         buttonSubmitText="Actualizar limite"
         handleSubmit={(e) => handleSubmit(e, user.id)}
       >
         <div className="grid gap-4 mb-4 sm:grid-cols-2">
           <div className="mb-4 col-span-full">
           <div className="col-span-full">
-            
-              <input
+              <div className="flex items-center gap-4">
+              {showInputTransfer && <input
                 type="text"
                 name="limit"
                 id="limit"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Nombre del producto"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                placeholder="Monto limite"
                 value={dataProduct.limit}
                 onChange={handleChange}
-              />
-              {errors.limit && (
+              />}
+              { showInputTransfer ? (<Tooltip content="Salir" >
+                      <button
+                        type="button"
+                        onClick={() => setShowInputTransfer(false)}
+                        className="py-3 px-3.5 flex items-center text-sm hover:text-white font-medium text-center text-red-600 border-red-600 border rounded-lg hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                      >
+                        <FontAwesomeIcon icon={faX} />
+                      </button>
+                    </Tooltip>
+                  ) : (
+                    <div className="flex items-center gap-4">
+                    <p>$ {user?.account?.creditLimit}</p>
+                    <Tooltip content="Editar" >
+                      <div
+                        data-drawer-target="drawer-update-product"
+                        data-drawer-show="drawer-update-product"
+                        aria-controls="drawer-update-product"
+                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600  rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                        onClick={() => setShowInputTransfer(true)}
+                      ><FontAwesomeIcon icon={faPen} />
+                      </div>
+                      
+                    </Tooltip>
+                    </div>
+                  )
+                }
+              </div>
+              {showInputTransfer && errors.limit && (
                 <span className="text-red-500">{errors.limit}</span>
               )}
+              
             </div>
+            
           </div>
         </div>
       </DashboardAddModifyComponent>
@@ -346,6 +408,15 @@ const { token } = useAuthContext();
           <FontAwesomeIcon icon={faCheck} />
         </button>
       </Tooltip>}
+      <Tooltip content="Rechazar" >
+                      <button
+                        type="button"
+                        onClick={() => handleTransferReject(order.id)}
+                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-red-600 border-red-600 border rounded-lg hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                      >
+                        <FontAwesomeIcon icon={faX} />
+                      </button>
+                    </Tooltip>
     </div>
   )}
 </td>
@@ -382,7 +453,7 @@ const { token } = useAuthContext();
       <div className="w-full ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center md:justify-end space-y-3 md:space-y-0 md:space-x-1 p-4 bg-white border border-gray-200 rounded-t-lg">
-            <h1>Total de adeudado: <b className="text-red-500">$ {totalPaidOrders}</b></h1>
+            <h1>Balance Total: <b className="text-red-500">$ {user?.account?.balance} </b> / Limite: <b className="text-teal-500">$ {user?.account?.creditLimit} </b></h1>
             </div>
         </div>
       </div>

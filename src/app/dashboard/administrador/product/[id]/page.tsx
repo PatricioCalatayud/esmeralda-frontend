@@ -7,7 +7,7 @@ import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import { useCategoryContext } from "@/context/categories.context";
-import { getProductById, putProducts } from "@/helpers/ProductsServices.helper";
+import { getProductById, putProducts, putProductsFormData } from "@/helpers/ProductsServices.helper";
 import { useAuthContext } from "@/context/auth.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useRouter } from "next/navigation";
@@ -128,7 +128,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         formData.append("file", imageFile);
       }
 
-      const response = await putProducts( formData,params.id,token);
+      const response = await putProductsFormData( formData,params.id,token);
 
       
 

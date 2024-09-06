@@ -23,6 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
+import { validateSubproduct } from "@/utils/subproductsUpdateValidation";
 
 const ProductList = () => {
   const { token } = useAuthContext();
@@ -272,17 +273,18 @@ const ProductList = () => {
       }]
     }
     const response = await putProducts(bodySubproducts,id, token);
-    if (response && (response.status === 200 || response.status === 201)) {
+    if (response && (response.status === 200 || response.status === 201) ) {
       
-      setProducts((prevProducts) =>
-        prevProducts?.map((product) => {
+      setProducts((prevProducts: any) =>
+        prevProducts?.map((product:any) => {
           if (product.id === id) {
             // Reemplaza el subproducto existente con el subproducto actualizado
-            const updatedSubproducts = product.subproducts.map((sp) =>
+            const updatedSubproducts = product.subproducts.map((sp:any) =>
               sp.id === subproduct.id
-                ? { ...subproduct } // Reemplaza completamente el subproducto
+                ? { ...editProductId, id: subproduct.id } // Reemplaza completamente el subproducto
                 : sp
             );
+            console.log(product);
             return { ...product, subproducts: updatedSubproducts };
           }
           return product;
@@ -290,10 +292,12 @@ const ProductList = () => {
       );
       setEdit(0);
     } else {
+      const validate = validateSubproduct(editProductId);
+
       console.error("Error al editar el subproducto:", response);
       Swal.fire(
         "¡Error!",
-        "Ha ocurrido un error al editar el subproducto",
+        `Ha ocurrido un error al editar el subproducto ${validate.amount && validate.amount + " ," } ${validate.unit && validate.unit + " ,"} ${validate.price && validate.price + " ,"} ${validate.stock && validate.stock + " ,"} ${validate.discount}`,
         "error"
       );
     }}
@@ -326,14 +330,22 @@ const ProductList = () => {
     }
     
     const response = await putProducts(bodySubproducts ,id, token);
-    if (response && (response.status === 200 || response.status === 201)) {
-      console.log(response.data);
+    if (response && (response.status === 200 || response.status === 201) ) {
+      const addId  = response.data.subproducts.at(-1)?.id
+      const newSubproduct = {
+        id: addId,
+        amount: addSubproductId.amount,
+        unit: addSubproductId.unit,
+        price: addSubproductId.price,
+        stock: addSubproductId.stock,
+        discount: addSubproductId.discount
+      }
       setProducts((prevProducts) =>
         prevProducts?.map((product) => {
           if (product.id === id) {
             const updatedSubproducts = [
-              ...product.subproducts, // Mantener los subproductos existentes
-              addSubproductId // Agregar el nuevo subproducto
+              ...product.subproducts , // Mantener los subproductos existentes
+              newSubproduct // Agregar el nuevo subproducto
             ];
             return { ...product, subproducts: updatedSubproducts };
           }
@@ -348,9 +360,10 @@ const ProductList = () => {
         stock: 0,});
     } else {
       console.error("Error al agregar el subproducto:", response);
+      const validate = validateSubproduct(addSubproductId);
       Swal.fire(
         "¡Error!",
-        "Ha ocurrido un error al agregar el subproducto",
+        `Ha ocurrido un error al agregar el subproducto ${validate.amount && validate.amount + " ," } ${validate.unit && validate.unit + " ,"} ${validate.price && validate.price + " ,"} ${validate.stock && validate.stock + " ,"} ${validate.discount}`,
         "error"
       );
     }}
@@ -424,20 +437,20 @@ const ProductList = () => {
             </div>
           </th>
 
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center ">
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-20">
             <div className="flex flex-col gap-1 ">
             {product.subproducts.map((subproduct, index) =>
               String(edit) !== String(subproduct.id) ? (
                 <p
                   key={index}
-                  className="h-10 flex items-center justify-center w-full"
+                  className="h-10 flex items-center justify-center w-20"
                 >
                   {subproduct.stock}
                 </p>
               ) : (
                 <input
                   key={index}
-                  className="h-10 rounded-md p-2 w-full border border-gray-600"
+                  className="h-10 rounded-md p-2 w-20 border border-gray-600 "
                   type="text"
                   name="stock"
                   defaultValue={String(subproduct.stock)}
@@ -448,7 +461,7 @@ const ProductList = () => {
             )}
             {addSubproduct?.id === product.id ? (
               <input
-                className="h-10 rounded-md p-2 w-full border border-gray-600"
+                className="h-10 rounded-md p-2 w-20 border border-gray-600"
                 type="text"
                 name="stock"
                 placeholder="0"
@@ -457,24 +470,24 @@ const ProductList = () => {
             ) : <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-52">
           <div className="flex flex-col gap-1">
             {product.subproducts.map((subproduct, index) =>
               String(edit) !== String(subproduct.id) ? (
                 <p
                   key={index}
-                  className="h-10 flex items-center  justify-center w-full"
+                  className="h-10 flex items-center  justify-center w-52"
                 >
                   {subproduct.amount} {subproduct.unit}
                 </p>
               ) : (
                 <div
                   key={index}
-                  className="flex justify-center items-center gap-2"
+                  className="flex justify-center items-center gap-2 w-52"
                 >
                   {" "}
                   <input
-                    className="h-10 rounded-md p-2 w-1/2 border border-gray-600"
+                    className="h-10 rounded-md p-2 w-1/3 border border-gray-600"
                     type="text"
                     name="amount"
                     placeholder="0"
@@ -486,25 +499,26 @@ const ProductList = () => {
                   <select
                     id="unit"
                     name="unit"
-                    className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
+                    className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-2/3 "
                     onChange={(e) =>
                       handleEditProduct(e, String(subproduct.id))
                     }
                   >
                     <option value={subproduct.unit}>{subproduct.unit}</option>
-                    <option value={"Kilo"}>Kilo</option>
-                    <option value={"Gramos"}>Gramos</option>
-                    <option value={"Unidad"}>Unidad</option>
-                    <option value={"Sobres"}>Sobres</option>
+                     {subproduct.unit !== "Kilo" && <option value="Kilo">Kilo</option>}
+    {subproduct.unit !== "Gramos" && <option value="Gramos">Gramos</option>}
+    {subproduct.unit !== "Unidades" && <option value="Unidades">Unidades</option>}
+    {subproduct.unit !== "Sobres" && <option value="Sobres">Sobres</option>}
+    {subproduct.unit !== "Cajas" && <option value="Cajas">Cajas</option>}
                   </select>{" "}
                 </div>
               )
             )}
             {addSubproduct?.id === product.id ? (
-              <div className="flex justify-center items-center gap-2">
+              <div className="flex justify-center items-center gap-2 w-52">
                 {" "}
                 <input
-                  className="h-10 rounded-md p-2 w-1/2  border border-gray-600"
+                  className="h-10 rounded-md p-2 w-1/3  border border-gray-600"
                   type="text"
                   name="amount"
                   placeholder="0"
@@ -513,31 +527,32 @@ const ProductList = () => {
                 <select
                   id="unit"
                   name="unit"
-                  className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-1/2 "
+                  className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-2/3 "
                   onChange={(e) => handleAddSubproduct(e, String(product.id))}
                 >
-                  <option value="">Unidad</option>
+                  <option value="">Seleccionar</option>
                   <option value={"Kilo"}>Kilo</option>
                   <option value={"Gramos"}>Gramos</option>
-                  <option value={"Unidad"}>Unidad</option>
+                  <option value={"Unidades"}>Unidades</option>
                   <option value={"Sobres"}>Sobres</option>
+                  <option value={"Cajas"}>Cajas</option>
                 </select>{" "}
               </div>
             ):  <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-32">
           <div className="flex flex-col gap-1">
             {product.subproducts.map((subproduct, index) =>
               String(edit) !== String(subproduct.id) ? (
                 <p
                   key={index}
-                  className="h-10 flex items-center  justify-center w-full"
+                  className="h-10 flex items-center  justify-center w-32"
                 >
                   $ {subproduct.price}
                 </p>
               ) : (
-                <input
+                <div className="flex justify-center items-center gap-2 w-32" key={index}> $ <input
                   key={index}
                   name="price"
                   className="h-10  rounded-md p-2 w-full border border-gray-600"
@@ -545,32 +560,32 @@ const ProductList = () => {
                   placeholder={`${subproduct.price}`}
                   defaultValue={subproduct.price}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
-                />
+                /> </div>
               )
             )}
             {addSubproduct?.id === product.id ? (
-              <input
+              <div className="flex justify-center items-center gap-2 w-32"> $<input
                 className="h-10 rounded-md p-2 w-full border border-gray-600"
                 type="text"
                 name="price"
                 placeholder="0"
                 onChange={(e) => handleAddSubproduct(e, String(product.id))}
-              />
+              /></div>
             ) : <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-full">
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center w-32">
           <div className="flex flex-col gap-1">
             {product.subproducts.map((subproduct, index) =>
               String(edit) !== String(subproduct.id) ? (
                 <p
                   key={index}
-                  className="h-10 flex items-center  justify-center w-full"
+                  className="h-10 flex items-center  justify-center w-32"
                 >
                   {subproduct.discount} %
                 </p>
               ) : (
-                <input
+                <div className="flex justify-center items-center gap-2 w-32" key={index}><input
                   key={index}
                   className="h-10 rounded-md p-2 w-full border border-gray-600"
                   type="text"
@@ -578,17 +593,17 @@ const ProductList = () => {
                   defaultValue={subproduct.discount}
                   placeholder={`${subproduct.discount}`}
                   onChange={(e) => handleEditProduct(e, String(subproduct.id))}
-                />
+                /> %</div>
               )
             )}
             {addSubproduct?.id === product.id ? (
-              <input
+              <div className="flex justify-center items-center gap-2 w-32"><input
                 className="h-10 rounded-md p-2 w-full border border-gray-600"
                 type="text"
                 name="discount"
                 placeholder="0"
                 onChange={(e) => handleAddSubproduct(e, String(product.id))}
-              />
+              />%</div>
             ):  <div className="h-10 flex items-center justify-center"/>}
             </div>
           </td>

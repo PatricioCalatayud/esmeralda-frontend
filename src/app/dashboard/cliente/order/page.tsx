@@ -157,7 +157,7 @@ console.log(orders);
                   Ver detalle
                 </Link>
                  }
-              {order.orderDetail.transactions.status === "Pendiente de pago" && 
+              {order.orderDetail.transactions.status === "Pendiente de pago" &&  order?.receipt?.status === "Pendiente de revisión de comprobante" &&
           <Link
                   type="button"
                   data-drawer-target="drawer-update-product"

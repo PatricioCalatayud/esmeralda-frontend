@@ -11,7 +11,7 @@ import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faDownload, faX } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "flowbite-react";
 
 const OrderList = () => {
@@ -114,10 +114,10 @@ const OrderList = () => {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Si, transferir",
+        confirmButtonText: "Si, Es correcto",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          const response = await putOrder(id,{transferStatus:"Comprobante verificado"}, token);
+          const response = await putOrder(id,{transferStatus:"Comprobante verificado", orderStatus:true}, token);
           if (response && (response?.status === 200 || response?.status === 201)) {
             setOrders(orders.map((order) => 
               order.id === id 
@@ -140,6 +140,40 @@ const OrderList = () => {
         }
       })
       }
+      const handleTransferReject = async (id : string) => {
+        console.log(id);
+          Swal.fire({
+            title: "¿Estás seguro que el comprobante es incorrecto?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, Es incorrecto",
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              const response = await putOrder(id,{transferStatus:"Rechazado"}, token);
+              if (response && (response?.status === 200 || response?.status === 201)) {
+                setOrders(orders.map((order) => 
+                  order.id === id 
+                    ? { 
+                        ...order, 
+                        receipt: { 
+                          ...order.receipt, 
+                          status: "Rechazado" 
+                        } 
+                      } as IOrders // Asegura que el objeto cumple con el tipo IOrders
+                    : order
+                ));
+                Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
+              } else {
+                console.error("Error updating order:", response);
+                Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+              }
+            } else if (result.isDenied) {
+              Swal.fire("No se realizaron cambios", "", "info");
+            }
+          })
+          }
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
@@ -213,7 +247,7 @@ const OrderList = () => {
             ))}
           </td>
           <td>
-          {order.receipt && (
+  {order.receipt && (
     <div className="flex justify-center items-center gap-4">
         <div>
       {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
@@ -235,6 +269,15 @@ const OrderList = () => {
           <FontAwesomeIcon icon={faCheck} />
         </button>
       </Tooltip>}
+      <Tooltip content="Rechazar" >
+                      <button
+                        type="button"
+                        onClick={() => handleTransferReject(order.id)}
+                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-red-600 border-red-600 border rounded-lg hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                      >
+                        <FontAwesomeIcon icon={faX} />
+                      </button>
+                    </Tooltip>
     </div>
   )}
 </td>

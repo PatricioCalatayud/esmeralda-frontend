@@ -46,7 +46,7 @@ const RegisterUser = () => {
   const [error, setError] = useState<IUserProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<Record<keyof IUserProps, boolean>>({
+  const [touched, setTouched] = useState<any>({
     name: false,
     email: false,
     password: false,
@@ -75,7 +75,7 @@ const RegisterUser = () => {
     }));
 
     if (!touched[name as keyof IUserProps]) {
-      setTouched((prevTouched) => ({
+      setTouched((prevTouched: any) => ({
         ...prevTouched,
         [name]: true,
       }));

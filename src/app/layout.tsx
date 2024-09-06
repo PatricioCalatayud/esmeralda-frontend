@@ -43,6 +43,7 @@ export default function RootLayout({
                   <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}}/>
                   </button>
                 </Link>
+                
               </div>
                 <Footer />
               
