@@ -39,9 +39,24 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
-
+  const [filteredProduct, setFilteredProduct] = useState<IProductList | null>(null);
+  
   const router = useRouter();
   const productId = params.id;
+  useEffect(() => {
+    if (product) {
+      // Filtrar subproductos que no están disponibles
+      const filteredSubproducts = product.subproducts?.filter(
+        subproduct => subproduct.isAvailable
+      );
+  
+      // Actualizar el producto filtrado con los subproductos disponibles
+      setFilteredProduct({
+        ...product,
+        subproducts: filteredSubproducts || [], // Asegurarse de no retornar `undefined`
+      });
+    }
+  }, [product]);
 
   useEffect(() => {
     type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
@@ -63,6 +78,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       };
     };
 
+    
     const loadProductData = async () => {
       const response = await getProductById(productId, token);
       if (response ) {
@@ -133,10 +149,10 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     const cartItem = {
       ...selectedCart,
       quantity,
-      description: product?.description,
-      imgUrl: product?.imgUrl,
+      description: filteredProduct?.description,
+      imgUrl: filteredProduct?.imgUrl,
       size: selectedSize,
-      idProduct: product?.id,
+      idProduct: filteredProduct?.id,
     };
   
     if (cartItemIndex !== -1) {
@@ -225,7 +241,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           {category.name}
         </Link>
         {" / "}
-        <span className="font-bold">{product?.description}</span>
+        <span className="font-bold">{filteredProduct?.description}</span>
       </h1>
     );
   };
@@ -242,7 +258,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     );
   }
 
-  if (!product) {
+  if (!filteredProduct) {
     return (
       <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">
         No se encontró el producto.
@@ -270,8 +286,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             width={1000}
             height={1000}
             priority={true}
-            src={product.imgUrl}
-            alt={product.description}
+            src={filteredProduct.imgUrl}
+            alt={filteredProduct.description}
             className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
           />
         </div>
@@ -285,14 +301,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </h3>
           )}
           <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
-            {product.description}
+            {filteredProduct.description}
           </h1>
           <hr className="animate-fade-in-up" />
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
-              {product.subproducts &&
-                product.subproducts?.length > 0 &&
-                product.subproducts?.map((subproduct, index) => (
+              {filteredProduct.subproducts &&
+                filteredProduct.subproducts?.length > 0 &&
+                filteredProduct.subproducts?.map((subproduct, index) => (
                   <button
                     key={index}
                     className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
@@ -335,7 +351,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           <div className="animate-fade-in-up flex flex-row items-center gap-4 my-4">
             <IncrementProduct
               stock={selectedStock.toString()}
-              productId={product.id}
+              productId={filteredProduct.id}
               initialQuantity={quantity}
               onQuantityChange={handleQuantityChange}
             />

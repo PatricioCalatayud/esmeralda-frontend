@@ -1,6 +1,7 @@
 "use client";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useAuthContext } from "@/context/auth.context";
+import { useCartContext } from "@/context/cart.context";
 import { getOrder, putOrderTransaction } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const { token } = useAuthContext();
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const {setCartItemCount} = useCartContext();
 
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState({
@@ -61,7 +63,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
 
     //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
-      title: "Agregando producto...",
+      title: "Agregando comprobante...",
       text: "Por favor espera.",
       allowOutsideClick: false,
       didOpen: () => {
@@ -74,9 +76,11 @@ const Transfer = ({ params }: { params: { id: string } }) => {
           if (response && ( response.status === 201 || response.status === 200)) {
             Swal.fire({
               icon: "success",
-              title: "¡Agregado!",
-              text: "El producto ha sido agregado con éxito.",
+              title: "¡Comprobante agregado!",
+              text: "El comprobante ha sido agregado con éxito.",
             }).then(() => {
+              localStorage.removeItem("cart");
+              setCartItemCount(0);
               router.push("../../dashboard/cliente/order");
             });
           
@@ -87,7 +91,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
           Swal.fire({
             icon: "error",
             title: "¡Error!",
-            text: "Ha ocurrido un error al agregar el producto.",
+            text: "Ha ocurrido un error al agregar el comprobante.",
           });
         }
   };

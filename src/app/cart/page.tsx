@@ -17,6 +17,8 @@ import {
 import { postOrder } from "@/helpers/Order.helper";
 import { Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
+import { getUser } from "@/helpers/Autenticacion.helper";
+import { IAccountProps } from "@/interfaces/IUser";
 
 const Cart = () => {
   const router = useRouter();
@@ -27,6 +29,8 @@ const Cart = () => {
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
+  const [account, setAccount] = useState<IAccountProps >();
+
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -35,8 +39,19 @@ const Cart = () => {
       setCart(cartItems);
     };
 
+    const fetchUser = async () => {
+      if (token && session) {
+        const response = await getUser(session.id, token);
+        console.log(response);
+        if (response) {
+          setAccount(response.account || undefined);
+          
+        }
+      }
+    };
+    fetchUser();
     fetchCart();
-  }, []);
+  }, [token]);
 
   //! Función para aumentar la cantidad
   const handleIncrease = (article_id: string) => {
@@ -141,13 +156,7 @@ const Cart = () => {
     console.log(order);
     
     if (order?.status === 200 || order?.status === 201) {
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Tu pedido ha sido realizado con exito",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+     
       if (session?.role === "Usuario") {
         setTimeout(() => {
         router.push(`/checkout/${order.data.id}`);
@@ -158,7 +167,9 @@ const Cart = () => {
         }, 1500);
       }else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
         setTimeout(() => {
-          router.push(`/dashboard/administrador/order`);
+          setCartItemCount(0);
+          localStorage.removeItem("cart");
+          router.push(`/dashboard/cliente/order`);
         }, 1500);
       }
       
@@ -404,7 +415,8 @@ const Cart = () => {
                   disabled={
                     !session ||
                     cart.length === 0 ||
-                    (isDelivery === false && addresOrder === "")
+                    (isDelivery === false && addresOrder === "") ||
+                    account && (account.balance + total) > account.creditLimit 
                   }
                   title={
                     !session
@@ -414,7 +426,8 @@ const Cart = () => {
                       : ""
                   }
                 >
-                  Agregar a cuenta corriente
+                  <p>Agregar a cuenta corriente: $ {total}</p>
+                  {account && <p> <b className={`${(account.balance + total) > account.creditLimit ? "text-red-500" : "text-white"}`}> $ {account.balance + total} </b>/ $ {account?.creditLimit}</p>}
                 </button>
                 <button
                   onClick={() => handleCheckout("Cliente Transferencia")}

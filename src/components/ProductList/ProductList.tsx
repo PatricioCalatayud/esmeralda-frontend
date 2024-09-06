@@ -83,11 +83,22 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     }
     console.log(sortedProducts);
     setFilteredProducts(
-      sortedProducts.filter(product => {
-        // Cambia la validación para reflejar el tipo correcto
-        const subproduct = product.subproducts?.[0] as { isAvailable: boolean } | undefined;
-        return subproduct?.isAvailable === true;
-      })
+      sortedProducts.reduce((acc: IProductList[], product: IProductList) => {
+        // Filtrar subproductos que no están disponibles
+        const filteredSubproducts = product.subproducts?.filter(
+          subproduct => subproduct.isAvailable
+        );
+    
+        // Solo añadir el producto al acumulador si hay subproductos disponibles
+        if (filteredSubproducts && filteredSubproducts.length > 0) {
+          acc.push({
+            ...product,
+            subproducts: filteredSubproducts,
+          });
+        }
+    
+        return acc;
+      }, [])
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 

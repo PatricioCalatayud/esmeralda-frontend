@@ -273,9 +273,11 @@ handleSubmit = {handleSubmit}
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value="Molido">Molido</option>
-                  <option value="Grano">Grano</option>
-                  <option value="Capsulas">Cápsulas</option>
+                  <option value={"Kilo"}>Kilo</option>
+                    <option value={"Gramos"}>Gramos</option>
+                    <option value={"Unidades"}>Unidades</option>
+                    <option value={"Sobres"}>Sobres</option>
+                    <option value={"Cajas"}>Cajas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>

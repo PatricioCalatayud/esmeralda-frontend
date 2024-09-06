@@ -51,7 +51,7 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
 }
 
 export async function putProducts(dataProduct: any,id: string, token: string | undefined) {
-  console.log(typeof(dataProduct.subproducts[0].isAvailable));
+
     try {
     const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
       headers: {
@@ -65,6 +65,22 @@ export async function putProducts(dataProduct: any,id: string, token: string | u
     /*throw new Error(error);*/
     console.log(error);
   }
+}
+export async function putProductsFormData(dataProduct: any,id: string, token: string | undefined) {
+
+  try {
+  const res = await axios.put(`${apiURL}/products/${id}`, dataProduct, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log(res);
+  return res;
+} catch (error: any) {
+  /*throw new Error(error);*/
+  console.log(error);
+}
 }
 
 export async function deleteProducts(id: string, token: string) {
