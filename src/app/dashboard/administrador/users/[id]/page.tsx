@@ -276,7 +276,6 @@ const { token } = useAuthContext();
             screen = "h-min"
         disabled={errors.limit === ""}
         titleDashboard="Limite de cuenta corriente"
-        backLink="/dashboard/cliente/order"
         buttonSubmitText="Actualizar limite"
         handleSubmit={(e) => handleSubmit(e, user.id)}
       >
