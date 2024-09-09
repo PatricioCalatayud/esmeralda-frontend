@@ -10,6 +10,8 @@ import { CategoryProvider } from "@/context/categories.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
+import ChatBotEsmeralda from "@/components/ChatBot/ChatBot";
+
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -43,8 +45,9 @@ export default function RootLayout({
                   <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}}/>
                   </button>
                 </Link>
-                
-              </div>
+                </div>
+                <ChatBotEsmeralda/>
+              
                 <Footer />
               
             </ProductProvider>
