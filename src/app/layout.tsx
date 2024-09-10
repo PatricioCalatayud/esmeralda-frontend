@@ -39,15 +39,18 @@ export default function RootLayout({
               
                 <Navbar />
                 {children}
-                <div className="fixed bottom-6 right-6 z-50">
+                <div className="fixed bottom-5 right-6 z-50">
+                
                 <Link href="https://api.whatsapp.com/send?phone=541158803709">
-                  <button  className="bg-primary hover:bg-teal-800 text-white rounded-full py-5 px-5 shadow-xl w-20 h-20">
+                  <button  className="bg-primary hover:bg-teal-800 text-white rounded-full py-5 px-5 shadow-xl w-[75px] h-[75px]">
                   <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}}/>
                   </button>
                 </Link>
-                </div>
                 <ChatBotEsmeralda/>
-              
+                </div>
+         
+                 
+                              
                 <Footer />
               
             </ProductProvider>

@@ -1,69 +1,56 @@
 "use client";
-import ChatBot from "react-simple-chatbot";
-import { useState, useEffect, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
 
-const steps = [
-    {
-      id: '1',
-      message: 'Hola guachin, ¿cómo te llamas?',
-      trigger: '2', // Redirige al paso donde el usuario puede escribir
-    },
-    {
-      id: '2',
-      user: true, // El usuario puede escribir aquí
-      trigger: '3', // Luego pasa al siguiente paso
-    },
-    {
-      id: '3',
-      message: '¡Hola {previousValue}, encantado de conocerte!',
-      end: true,
-    },
-  ];
+import ChatBot from "react-chatbotify";
+
 const ChatBotEsmeralda = () => {
-    const [showChat, setShowChat] = useState(false);
-
-    const chatRef = useRef<HTMLDivElement | null>(null);
-    const toggleChat = () => {
-      setShowChat((prev) => !prev); // Cambia el estado al hacer clic
-    };
-    useEffect(() => {
-        const handleClickOutside = (event: any ) => {
-          if (chatRef.current && !chatRef.current.contains(event.target)) {
-            setShowChat(false);  // Cierra el chatbot si se hace clic fuera de él
-          }
-        };
-    
-        if (showChat) {
-          document.addEventListener('mousedown', handleClickOutside);
-        } else {
-          document.removeEventListener('mousedown', handleClickOutside);
-        }
-    
-        return () => {
-          document.removeEventListener('mousedown', handleClickOutside);
-        };
-      }, [showChat]);
-    
-    return (
-        <div className="fixed bottom-6 right-28 z-50">
-        {/* Botón del ícono para abrir/cerrar el chatbot */}
-        { !showChat && <button
-          onClick={toggleChat}
-          className="bg-primary hover:bg-teal-800 text-white rounded-full py-4 px-4 shadow-xl w-20 h-20"
-        >
-          <FontAwesomeIcon icon={faCommentDots} style={{ width: '26px', height: '26px' }} />
-        </button>}
+  const settings = {
+    general: {
+      embedded: false,
+      primaryColor: '#00796b'
+    },
+    header:{
+      title: "EsmeraldaBot",
+      avatar: "/Recurso1.png",
+    },
+    chatButton: {
+      icon: "/Recurso1.png",
+    },
+    botBubble:{
+      avatar: "/Recurso1.png",
+    }
+  }
   
-        {/* ChatBot se despliega o se oculta según el estado */}
-        {showChat && (
-          <div ref={chatRef} className="mt-4">
-            <ChatBot steps={steps} />
-          </div>
-        )}
-      </div>
-    );
+  // styles here
+  const styles = {
+    headerStyle: {
+      background: '#00796b',
+      color: '#ffffff',
+      padding: '10px',
+    },
+    chatWindowStyle: {
+      backgroundColor: '#f2f2f2',
+    },
+    botAvatarStyle: {
+      backgroundColor: '#00796b',
+    },
+    chatButtonStyle: {
+      position: 'fixed' as const,
+      bottom: '20px',
+      right: '120px',
+      zIndex: 50,
+    },
+    tooltipStyle: {
+      position: 'fixed' as const,
+      bottom: '20px',
+      right: '210px',
+      zIndex: 50,
+    },
+
+  };
+  return (
+    <ChatBot styles={styles} settings={settings} />
+
+  );
 };
 
-export default ChatBotEsmeralda
+export default ChatBotEsmeralda;
