@@ -1,151 +1,129 @@
-"use client";
+"use client"; // Asegura que este componente solo se ejecute en el cliente
 
 import { useAuthContext } from "@/context/auth.context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import ChatBot from "react-chatbotify";
+import dynamic from 'next/dynamic';
+
+const ChatBot = dynamic(() => import("react-chatbotify"), { ssr: false });
 const urlLocal = process.env.NEXT_PUBLIC_URL_LOCAL;
+
 const ChatBotEsmeralda = () => {
-  const {session} = useAuthContext();
+  const { session } = useAuthContext();
   const router = useRouter();
   const [flow, setFlow] = useState({});
-  const helpClientOptions = ["Quiero comprar", "Quiero ver ofertas", "Quiero ver mis ordenes", "Quiero hablar con una persona"];
-  const helpUserOptions = ["Quiero comprar", "Quiero ver ofertas",];
-  const userOptions = ["Quiero iniciar sesion", "Quiero registrarme", "No, gracias"];
+
+  const helpClientOptions = [
+    "Quiero comprar", 
+    "Quiero ver ofertas", 
+    "Quiero ver mis ordenes", 
+    "Quiero hablar con una persona"
+  ];
+
+  const helpUserOptions = [
+    "Quiero comprar", 
+    "Quiero ver ofertas"
+  ];
+
+  const userOptions = [
+    "Quiero iniciar sesion", 
+    "Quiero registrarme", 
+    "No, gracias"
+  ];
+
   useEffect(() => {
+    if (typeof window === 'undefined') return; // Evita que el código se ejecute en el servidor
+
     if (session) {
       setFlow({
-    
         start: {
           message: `Hola ${session.name}!`,
-          transition: {duration: 1000},
-          path: "step2"
-          
+          transition: { duration: 1000 },
+          path: "step2",
         },
         step2: {
           message: "¿Que quieres hacer?",
           options: helpClientOptions,
-          path: "process_options"
-        },
-    
-        process_options: {
-          transition: {duration: 0},
-          chatDisabled: true,
-          path: async (params: any) => {
-            let link = "";
-            switch (params.userInput) {
-            case "Quiero comprar":
-              router.push (urlLocal + "/categories");
-              await params.injectMessage("Ya estas aca, elige lo que quieras.");
-              break;
-            case "Quiero ver ofertas":
-              router.push (urlLocal + "/promociones");
-              await params.injectMessage("Ya estas aca, elige lo que quieras.");
-              break;
-            case "Quiero ver mis ordenes":
-              router.push (urlLocal + "/dashboard/cliente/order");
-              await params.injectMessage("Aca puedes revisar las ordenes.");
-              break;
-            case "Quiero hablar con una persona":
-              link = "https://api.whatsapp.com/send?phone=541158803709";
-              window.open(link, "_blank");
-              await params.injectMessage("Aca puedes hablar con una persona.");
-              break;
-            default:
-              return "unknown_input";
-            }
-            return "repeat"
-          },
-        },
-        repeat: {
-          transition: {duration: 3000},
-          path: "step2"
-        },
-    
-        end: {
-          message: (params: any) => `Hola ${params.userInput}!`,
-          chatDisabled: true
-        } 
-      });
-    }else if (!session) {
-      setFlow({
-        start: {
-          message: `Hola!`,
-          transition: {duration: 1000},
-          path: "step2"
-        },
-        step2: {
-          message: `Te recomendamos que ingreses a tu cuenta o crees una.`,
-        options: userOptions,
-          path: "process_options"
+          path: "process_options",
         },
         process_options: {
-          transition: {duration: 0},
-          chatDisabled: true,
-          path: async (params: any) => {
-            let link = "";
-            switch (params.userInput) {
-            case "Quiero iniciar sesion":
-              router.push (urlLocal + "/login");
-              await params.injectMessage("Ya estas aca, elige lo que quieras.");
-              break;
-            case "Quiero registrarme":
-              router.push (urlLocal + "/register");
-              await params.injectMessage("Ya estas aca, elige lo que quieras.");
-              break;
-            case "No, gracias":
-              return "continue";
-            case "Quiero hablar con una persona":
-              link = "https://api.whatsapp.com/send?phone=541158803709";
-              window.open(link, "_blank");
-              await params.injectMessage("Aca puedes hablar con una persona.");
-              break;
-            default:
-              return "unknown_input";
-            }
-            return "repeat"
-          },
-        },
-        
-        continue: {
-          message: `Dale! que quieres hacer ?.`,
-        options: helpUserOptions,
-          path: "process_userOptions"
-        },
-        process_userOptions: {
-          transition: {duration: 0},
+          transition: { duration: 0 },
           chatDisabled: true,
           path: async (params: any) => {
             let link = "";
             switch (params.userInput) {
               case "Quiero comprar":
-                router.push (urlLocal + "/categories");
-                await params.injectMessage("Ya estas aca, elige lo que quieras.");
+                router.push(urlLocal + "/categories");
+                await params.injectMessage("Ya estás acá, elige lo que quieras.");
                 break;
               case "Quiero ver ofertas":
-                router.push (urlLocal + "/promociones");
-                await params.injectMessage("Ya estas aca, elige lo que quieras.");
+                router.push(urlLocal + "/promociones");
+                await params.injectMessage("Ya estás acá, elige lo que quieras.");
                 break;
-            
-            default:
-              return "unknown_input";
+              case "Quiero ver mis ordenes":
+                router.push(urlLocal + "/dashboard/cliente/order");
+                await params.injectMessage("Aquí puedes revisar las ordenes.");
+                break;
+              case "Quiero hablar con una persona":
+                link = "https://api.whatsapp.com/send?phone=541158803709";
+                window.open(link, "_blank");
+                await params.injectMessage("Aquí puedes hablar con una persona.");
+                break;
+              default:
+                return "unknown_input";
             }
-            return "repeat"
+            return "repeat";
           },
         },
         repeat: {
-          transition: {duration: 3000},
-          path: "step2"
+          transition: { duration: 3000 },
+          path: "step2",
         },
-      });}
-  }, [])
-  
+      });
+    } else {
+      setFlow({
+        start: {
+          message: `Hola!`,
+          transition: { duration: 1000 },
+          path: "step2",
+        },
+        step2: {
+          message: `Te recomendamos que ingreses a tu cuenta o crees una.`,
+          options: userOptions,
+          path: "process_options",
+        },
+        process_options: {
+          transition: { duration: 0 },
+          chatDisabled: true,
+          path: async (params: any) => {
+            let link = "";
+            switch (params.userInput) {
+              case "Quiero iniciar sesion":
+                router.push(urlLocal + "/login");
+                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                break;
+              case "Quiero registrarme":
+                router.push(urlLocal + "/register");
+                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                break;
+              case "No, gracias":
+                return "continue";
+              default:
+                return "unknown_input";
+            }
+            return "repeat";
+          },
+        },
+      });
+    }
+  }, [session]);
+
   const settings = {
     general: {
       embedded: false,
-      primaryColor: '#00796b'
+      primaryColor: '#00796b',
     },
-    header:{
+    header: {
       title: "EsmeraldaBot",
       avatar: "/Recurso1.png",
     },
@@ -165,16 +143,14 @@ const ChatBotEsmeralda = () => {
     chatHistory: {
       storageKey: "messages_bot"
     }
+  };
 
-  }
-  
-  // styles here
   const styles = {
     headerStyle: {
       background: '#00796b',
       color: '#ffffff',
       padding: '10px',
-      fontSize : '20px'
+      fontSize: '20px',
     },
     chatWindowStyle: {
       backgroundColor: '#f2f2f2',
@@ -196,11 +172,10 @@ const ChatBotEsmeralda = () => {
       fontSize: '15px',
       
     },
-
   };
+
   return (
     <ChatBot styles={styles} settings={settings} flow={flow} />
-
   );
 };
 
