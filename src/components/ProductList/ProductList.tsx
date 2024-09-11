@@ -24,19 +24,15 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 }) => {
   const router = useRouter();
   const { searchResults } = useProductContext();
-  console.log(searchResults);
   const [filterOption, setFilterOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<
     IProductList[] | undefined
   >(productsList);
   const { categories } = useCategoryContext();
 
-   //! Función traer los productos y filtrarlos
+  //! Función para traer los productos y filtrarlos
   useEffect(() => {
     let sortedProducts = productsList || [];
-    console.log(productsList);
-    console.log(searchResults);
-    console.log(selectedCategory);
     if (searchResults !== undefined && productsList !== undefined) {
       sortedProducts = [
         ...(searchResults.length > 0 ? searchResults : productsList),
@@ -47,23 +43,38 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
         (product) => product.category.id === selectedCategory
       );
     }
-    console.log(sortedProducts);
 
     switch (filterOption) {
       case "price-asc":
-    sortedProducts.sort((a, b) => {
-      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      return priceA - priceB;
-    });
-    break;
-  case "price-desc":
-    sortedProducts.sort((a, b) => {
-      const priceA = Math.min(...a.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      const priceB = Math.min(...b.subproducts.map(subproduct => parseFloat(subproduct.price || "0")));
-      return priceB - priceA;
-    });
-    break;
+        sortedProducts.sort((a, b) => {
+          const priceA = Math.min(
+            ...a.subproducts.map((subproduct) =>
+              parseFloat(subproduct.price || "0")
+            )
+          );
+          const priceB = Math.min(
+            ...b.subproducts.map((subproduct) =>
+              parseFloat(subproduct.price || "0")
+            )
+          );
+          return priceA - priceB;
+        });
+        break;
+      case "price-desc":
+        sortedProducts.sort((a, b) => {
+          const priceA = Math.min(
+            ...a.subproducts.map((subproduct) =>
+              parseFloat(subproduct.price || "0")
+            )
+          );
+          const priceB = Math.min(
+            ...b.subproducts.map((subproduct) =>
+              parseFloat(subproduct.price || "0")
+            )
+          );
+          return priceB - priceA;
+        });
+        break;
       case "name-asc":
         sortedProducts.sort((a, b) =>
           a.description.localeCompare(b.description)
@@ -81,28 +92,25 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
           ];
         }
     }
-    console.log(sortedProducts);
     setFilteredProducts(
       sortedProducts.reduce((acc: IProductList[], product: IProductList) => {
-        // Filtrar subproductos que no están disponibles
         const filteredSubproducts = product.subproducts?.filter(
-          subproduct => subproduct.isAvailable
+          (subproduct) => subproduct.isAvailable
         );
-    
-        // Solo añadir el producto al acumulador si hay subproductos disponibles
+
         if (filteredSubproducts && filteredSubproducts.length > 0) {
           acc.push({
             ...product,
             subproducts: filteredSubproducts,
           });
         }
-    
+
         return acc;
       }, [])
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
-   //! Función para redirigir al usuario a la categoría seleccionada
+  //! Función para redirigir al usuario a la categoría seleccionada
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
@@ -158,7 +166,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               >
                 <path
                   fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -279,27 +287,35 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                       </h2>
 
                       {product.subproducts &&
-  product.subproducts
-    .filter((subproduct) => subproduct.discount > 0)
-    .map((subproduct) => (
-      <div key={subproduct.id}>
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <FontAwesomeIcon icon={faBolt} style={{ color: "white" }} />
-          <p className="text-white font-bold">Promoción</p>
-        </div>
-          <p className="text-teal-400 text-sm font-bold">
-          {subproduct.discount} % de descuento x {subproduct.amount} {subproduct.unit}
-          </p>
-      </div>
-    ))}
+                        product.subproducts
+                          .filter((subproduct) => subproduct.discount > 0)
+                          .map((subproduct) => (
+                            <div key={subproduct.id}>
+                              <div className="absolute top-4 right-4 flex items-center gap-2">
+                                <FontAwesomeIcon
+                                  icon={faBolt}
+                                  style={{ color: "white" }}
+                                />
+                                <p className="text-white font-bold">
+                                  Promoción
+                                </p>
+                              </div>
+                              <p className="text-teal-400 text-sm font-bold">
+                                {subproduct.discount} % de descuento x{" "}
+                                {subproduct.amount} {subproduct.unit}
+                              </p>
+                            </div>
+                          ))}
 
-                        
-                     { product.subproducts &&
-                        product.subproducts.length > 0 ? (
+                      {product.subproducts &&
+                      product.subproducts.length > 0 ? (
                         <>
                           <div className="h-7 flex items-center gap-3">
                             {product.subproducts.map((subProduct, index) => (
-                              <p key={index} className="text-sm font-medium text-gray-500 ">
+                              <p
+                                key={index}
+                                className="text-sm font-medium text-gray-500 "
+                              >
                                 {" "}
                                 {subProduct.amount} {subProduct.unit}{" "}
                               </p>
@@ -309,15 +325,12 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                             <p className="text-lg font-medium ">Desde:</p>
                             <p className="text-lg font-bold ">
                               ${" "}
-                              {
-                                product.subproducts.reduce(
-                                  (lowest, current) => {
-                                    return current.price < lowest.price
-                                      ? current
-                                      : lowest;
-                                  }
-                                ).price
-                              }
+                              {product.subproducts.reduce((lowest, current) => {
+                                return current.price < lowest.price
+                                  ? current
+                                  : lowest;
+                              }).price}{" "}
+                              (+IVA)
                             </p>
                           </div>
                         </>
