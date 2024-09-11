@@ -29,8 +29,7 @@ const Cart = () => {
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
-  const [account, setAccount] = useState<IAccountProps >();
-
+  const [account, setAccount] = useState<IAccountProps>();
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -45,7 +44,6 @@ const Cart = () => {
         console.log(response);
         if (response) {
           setAccount(response.account || undefined);
-          
         }
       }
     };
@@ -124,22 +122,30 @@ const Cart = () => {
     }, 0);
   };
 
+  //! Función para calcular el IVA (21%)
+  const calcularIVA = () => {
+    const subtotal = calcularSubtotal();
+    return subtotal * 0.21; // 21% de IVA
+  };
+
   //! Función para calcular el total
   const calcularTotal = () => {
     const subtotal = calcularSubtotal();
     const descuento = calcularDescuento();
-    return subtotal - descuento;
+    const iva = calcularIVA();
+    return subtotal - descuento + iva;
   };
 
   const subtotal = calcularSubtotal();
   const descuento = calcularDescuento();
+  const iva = calcularIVA();
   const total = calcularTotal();
 
   //! Función para realizar la orden
-  const handleCheckout = async ( boton: string) => {
+  const handleCheckout = async (boton: string) => {
     const products = cart.map((product) => ({
       productId: product.idProduct,
-      subproductId: product.idSubProduct ,
+      subproductId: product.idSubProduct,
       quantity: product.quantity,
     }));
 
@@ -148,32 +154,31 @@ const Cart = () => {
       products,
       ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10,
-      ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && {account : "Transferencia" }),
-      ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && {account : "Cuenta corriente" }),
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Transferencia" && { account: "Transferencia" }),
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
     };
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
     console.log(order);
-    
+
     if (order?.status === 200 || order?.status === 201) {
-     
       if (session?.role === "Usuario") {
         setTimeout(() => {
-        router.push(`/checkout/${order.data.id}`);
-      }, 1500);
-      }else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
+          router.push(`/checkout/${order.data.id}`);
+        }, 1500);
+      } else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
         setTimeout(() => {
           router.push(`/transfer/${order.data.id}`);
         }, 1500);
-      }else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
+      } else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
         setTimeout(() => {
           setCartItemCount(0);
           localStorage.removeItem("cart");
           router.push(`/dashboard/cliente/order`);
         }, 1500);
       }
-      
-
     } else {
       Swal.fire({
         position: "top-end",
@@ -185,7 +190,7 @@ const Cart = () => {
     }
   };
 
-//! Renderizado si no hay elementos en el carrito
+  //! Renderizado si no hay elementos en el carrito
   if (cart.length === 0) {
     return (
       <section className="text-gray-600 body-font">
@@ -247,10 +252,12 @@ const Cart = () => {
                   </div>
                   <div className="flex flex-col gap-3 w-full ">
                     <div className="flex gap-4">
-                    <h3 className="text-base font-bold text-gray-800 text-nowrap ">
-                      {item.description}
-                    </h3>
-                    <p className="text-base font-bold text-gray-800 text-nowrap ">({item.size} {item.unit})</p>
+                      <h3 className="text-base font-bold text-gray-800 text-nowrap ">
+                        {item.description}
+                      </h3>
+                      <p className="text-base font-bold text-gray-800 text-nowrap ">
+                        ({item.size} {item.unit})
+                      </p>
                     </div>
                     <div
                       onClick={() => removeFromCart(index)}
@@ -306,7 +313,7 @@ const Cart = () => {
                                 (1 - Number(item.discount) / 100)
                               ).toFixed(2)}
                             </h4>
-                            </div>
+                          </div>
                         ) : (
                           <h4 className="text-lg font-bold text-gray-800">
                             $
@@ -324,7 +331,7 @@ const Cart = () => {
           </div>
         </div>
 
-        <div className=" rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
+        <div className="rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
           <h2 className="text-xl font-bold  h-10 flex  justify-center items-center">
             Resumen de compra
           </h2>
@@ -345,6 +352,12 @@ const Cart = () => {
                   </span>
                 </li>
               )}
+              <li className="flex flex-wrap gap-4 text-base w-full">
+                IVA (21%){" "}
+                <span className="ml-auto font-medium text-lg">
+                  ${iva.toFixed(2)}
+                </span>
+              </li>
               <li className="flex flex-wrap gap-4 text-lg font-bold">
                 Total <span className="ml-auto">${total.toFixed(2)}</span>
               </li>
@@ -408,64 +421,83 @@ const Cart = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer>
-                { session && session.role === "Cliente" ? <div className="w-full"><button
-                  onClick={() =>handleCheckout("Cliente Cuenta Corriente")}
-                  type="button"
-                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
-                  disabled={
-                    !session ||
-                    cart.length === 0 ||
-                    (isDelivery === false && addresOrder === "") ||
-                    account && (account.balance + total) > account.creditLimit 
-                  }
-                  title={
-                    !session
-                      ? "Necesita estar logueado para continuar con el pago"
-                      : cart.length === 0
-                      ? "El carrito está vacío"
-                      : ""
-                  }
-                >
-                  <p>Agregar a cuenta corriente: $ {total}</p>
-                  {account && <p> <b className={`${(account.balance + total) > account.creditLimit ? "text-red-500" : "text-white"}`}> $ {account.balance + total} </b>/ $ {account?.creditLimit}</p>}
-                </button>
-                <button
-                  onClick={() => handleCheckout("Cliente Transferencia")}
-                  type="button"
-                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white  hover:bg-blue-800`}
-                  disabled={
-                    !session ||
-                    cart.length === 0 ||
-                    (isDelivery === false && addresOrder === "")
-                  }
-                  title={
-                    !session
-                      ? "Necesita estar logueado para continuar con el pago"
-                      : cart.length === 0
-                      ? "El carrito está vacío"
-                      : ""
-                  }
-                >
-                  Pago con trasnferencia bancaria
-                </button> </div> : <button
-                  onClick={() =>handleCheckout("Usuario")}
-                  type="button"
-                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
-                  disabled={
-                    !session ||
-                    cart.length === 0 ||
-                    (isDelivery === false && addresOrder === "")
-                  }
-                  title={
-                    !session
-                      ? "Necesita estar logueado para continuar con el pago"
-                      : cart.length === 0
-                      ? "El carrito está vacío"
-                      : ""
-                  }
-                >
-                  Ir a pagar
-                </button>}
+                {session && session.role === "Cliente" ? (
+                  <div className="w-full">
+                    <button
+                      onClick={() => handleCheckout("Cliente Cuenta Corriente")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && addresOrder === "") ||
+                        account && account.balance + total > account.creditLimit
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      <p>Agregar a cuenta corriente: $ {total}</p>
+                      {account && (
+                        <p>
+                          {" "}
+                          <b
+                            className={`${
+                              account.balance + total > account.creditLimit
+                                ? "text-red-500"
+                                : "text-white"
+                            }`}
+                          >
+                            $ {account.balance + total}{" "}
+                          </b>/ $ {account?.creditLimit}
+                        </p>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleCheckout("Cliente Transferencia")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white  hover:bg-blue-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && addresOrder === "")
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      Pago con trasnferencia bancaria
+                    </button>{" "}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout("Usuario")}
+                    type="button"
+                    className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                    disabled={
+                      !session ||
+                      cart.length === 0 ||
+                      (isDelivery === false && addresOrder === "")
+                    }
+                    title={
+                      !session
+                        ? "Necesita estar logueado para continuar con el pago"
+                        : cart.length === 0
+                        ? "El carrito está vacío"
+                        : ""
+                    }
+                  >
+                    Ir a pagar
+                  </button>
+                )}
               </Modal.Footer>
             </Modal>
             <Link href="/categories">
