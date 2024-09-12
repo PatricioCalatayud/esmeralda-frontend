@@ -66,3 +66,8 @@ export interface User {
     id: string;
     name: string;
 }
+
+export interface IAccountPayment {
+    accountId: string;
+    amount: number;
+}

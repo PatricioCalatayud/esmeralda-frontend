@@ -173,7 +173,7 @@ console.log(limitTransfer);
                         scope="row"
                         className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                        <div className="flex items-center w-full justify-center gap-10">
+                        <div className={`flex items-center w-full  ${user.role === "Cliente" ? "justify-between px-10" : "justify-center" }`}>
                             {user.name}
                             {user.role === "Cliente" && <Tooltip content="Panel Cliente">
                 <Link
