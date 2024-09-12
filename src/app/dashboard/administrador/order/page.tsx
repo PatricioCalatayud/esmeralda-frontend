@@ -260,7 +260,7 @@ const OrderList = () => {
  
       ) : null}
       </div>
-      {order.receipt.status === "Pendiente de revisión de comprobante" && <Tooltip content="Correcto" >
+       <Tooltip content="Aceptar" >
         <button
           type="button"
           onClick={() => handleTransferOk(order.id)}
@@ -268,7 +268,7 @@ const OrderList = () => {
         >
           <FontAwesomeIcon icon={faCheck} />
         </button>
-      </Tooltip>}
+      </Tooltip>
       <Tooltip content="Rechazar" >
                       <button
                         type="button"

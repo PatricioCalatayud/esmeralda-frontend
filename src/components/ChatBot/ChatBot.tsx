@@ -15,19 +15,19 @@ const ChatBotEsmeralda = () => {
 
   const helpClientOptions = [
     "Quiero comprar", 
-    "Quiero ver ofertas", 
-    "Quiero ver mis ordenes", 
+    "Ver ofertas", 
+    "Ver mis ordenes", 
     "Quiero hablar con una persona"
   ];
 
   const helpUserOptions = [
     "Quiero comprar", 
-    "Quiero ver ofertas"
+    "Ver ofertas"
   ];
 
   const userOptions = [
-    "Quiero iniciar sesion", 
-    "Quiero registrarme", 
+    "Iniciar sesion", 
+    "Registrarme", 
     "No, gracias"
   ];
 
@@ -54,15 +54,22 @@ const ChatBotEsmeralda = () => {
             switch (params.userInput) {
               case "Quiero comprar":
                 router.push(urlLocal + "/categories");
-                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                setTimeout(async() => {
+                  await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                }, 2000); 
                 break;
-              case "Quiero ver ofertas":
+              case "Ver ofertas":
                 router.push(urlLocal + "/promociones");
-                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                setTimeout(async() => {
+                  await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                }, 2000); 
                 break;
-              case "Quiero ver mis ordenes":
+              case "Ver mis ordenes":
                 router.push(urlLocal + "/dashboard/cliente/order");
-                await params.injectMessage("Aquí puedes revisar las ordenes.");
+                setTimeout(async() => {
+                  await params.injectMessage("Aquí puedes revisar las ordenes.");
+                }, 2000); 
+                
                 break;
               case "Quiero hablar con una persona":
                 link = "https://api.whatsapp.com/send?phone=541158803709";
@@ -98,13 +105,17 @@ const ChatBotEsmeralda = () => {
           path: async (params: any) => {
             let link = "";
             switch (params.userInput) {
-              case "Quiero iniciar sesion":
+              case "Iniciar sesion":
                 router.push(urlLocal + "/login");
-                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                setTimeout(async() => {
+                  await params.injectMessage("Ya estás acá, puedes iniciar sessión.");
+                }, 2000); 
                 break;
-              case "Quiero registrarme":
+              case "Registrarme":
                 router.push(urlLocal + "/register");
-                await params.injectMessage("Ya estás acá, elige lo que quieras.");
+                setTimeout(async() => {
+                  await params.injectMessage("Ya estás acá, registrate.");
+                }, 2000); 
                 break;
               case "No, gracias":
                 return "continue";

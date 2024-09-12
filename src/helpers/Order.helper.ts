@@ -1,4 +1,4 @@
-import { IOrderCheckout, IOrders } from "@/interfaces/IOrders";
+import { IAccountPayment, IOrderCheckout, IOrders } from "@/interfaces/IOrders";
 import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -95,6 +95,21 @@ export async function putOrderTransaction( file: IOrders | {}, token: string | u
   try {
 
     const response = await axios.put(`${apiURL}/image/transfer`, file,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+
+    return response;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function putAccountPayment( data: IAccountPayment, token: string | undefined) {
+  
+  try {
+
+    const response = await axios.put(`${apiURL}/account/payment`, data,{
       headers: {
         Authorization: `Bearer ${token}`,
       },});
