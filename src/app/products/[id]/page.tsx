@@ -13,13 +13,15 @@ import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useCartContext } from "@/context/cart.context";
+
 interface SelectedCartItem {
   stock: number;
   price: number;
   discount: number;
   unit: string;
-  idSubProduct: string; // Asegúrate de que el tipo de idSubProduct sea el correcto
+  idSubProduct: string;
 }
+
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
@@ -33,67 +35,41 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     price: 0,
     discount: 0,
     unit: "",
-    idSubProduct: "", // Inicialización con un valor por defecto
+    idSubProduct: "",
   });
   const [quantity, setQuantity] = useState<number>(1);
 
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
-  const [filteredProduct, setFilteredProduct] = useState<IProductList | null>(null);
-  
+  const [filteredProduct, setFilteredProduct] = useState<IProductList | null>(
+    null
+  );
+
   const router = useRouter();
   const productId = params.id;
+
   useEffect(() => {
     if (product) {
-      // Filtrar subproductos que no están disponibles
       const filteredSubproducts = product.subproducts?.filter(
-        subproduct => subproduct.isAvailable
+        (subproduct) => subproduct.isAvailable
       );
-  
-      // Actualizar el producto filtrado con los subproductos disponibles
+
       setFilteredProduct({
         ...product,
-        subproducts: filteredSubproducts || [], // Asegurarse de no retornar `undefined`
+        subproducts: filteredSubproducts || [],
       });
     }
   }, [product]);
 
   useEffect(() => {
-    type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
-    const categoryTranslations = (category: {
-      id: string;
-      name: CategoryName | string;
-    }) => {
-      const translations: { [key in CategoryName]: string } = {
-        Coffee: "Café",
-        Tea: "Té",
-        Accesory: "Accesorio",
-        Sweetener: "Endulzante",
-        Mate: "Mate",
-      };
-
-      return {
-        id: category.id,
-        name: translations[category.name as CategoryName] || category.name,
-      };
-    };
-
-    
     const loadProductData = async () => {
       const response = await getProductById(productId, token);
-      if (response ) {
-      const fetchedProduct = response.data
+      if (response) {
+        const fetchedProduct = response.data;
         setProduct(fetchedProduct);
-        const translatedCategories = categoryTranslations({
-          id: fetchedProduct.category?.id,
-          name:
-            (fetchedProduct.category?.name as CategoryName) ||
-            fetchedProduct.category?.name,
-        });
-        setCategory(translatedCategories);
 
         const lowestPricedSubproduct = fetchedProduct.subproducts.reduce(
-          (lowest:any, current:any) => {
+          (lowest: any, current: any) => {
             return current.price < lowest.price ? current : lowest;
           }
         );
@@ -116,15 +92,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           unit: lowestPricedSubproduct.unit,
           idSubProduct: String(lowestPricedSubproduct.id),
         });
-        
-        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartItem = cart.find(
-      (item: any) => item.idSubProduct === selectedCart.idSubProduct
-    );
-    
-    if (cartItem) {
-      setQuantity(cartItem.quantity); // Configura la cantidad inicial
-    }
       }
       setIsLoaded(true);
     };
@@ -138,14 +105,13 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    
-    // Busca el índice del producto en el carrito existente
+
     const cartItemIndex = cart.findIndex(
       (item: any) =>
         item.idSubProduct === selectedCart.idSubProduct &&
         item.size === selectedSize
     );
-  
+
     const cartItem = {
       ...selectedCart,
       quantity,
@@ -154,9 +120,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       size: selectedSize,
       idProduct: filteredProduct?.id,
     };
-  
+
     if (cartItemIndex !== -1) {
-      // Si el producto ya existe, actualiza la cantidad
       cart[cartItemIndex].quantity += quantity;
       localStorage.setItem("cart", JSON.stringify(cart));
       Swal.fire({
@@ -172,7 +137,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         }
       });
     } else {
-      // Si el producto no existe, agrégalo al carrito
       cart.push(cartItem);
       localStorage.setItem("cart", JSON.stringify(cart));
       setCartItemCount(cart.length);
@@ -216,8 +180,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         : price
     );
   };
-   //! Renderiza el header de la tarjeta del producto 
-   const renderBreadcrumb = () => {
+
+  const renderBreadcrumb = () => {
     if (!category) {
       return (
         <h1 className="text-lg font-bold animate-fade-in-up">
@@ -245,6 +209,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       </h1>
     );
   };
+
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -317,7 +282,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                         : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
                     }`}
                     onClick={() =>
-                      handleSizeChange(subproduct.amount, subproduct.price, subproduct.stock, subproduct.discount, subproduct.unit, subproduct.id)
+                      handleSizeChange(
+                        subproduct.amount,
+                        subproduct.price,
+                        subproduct.stock,
+                        subproduct.discount,
+                        subproduct.unit,
+                        subproduct.id
+                      )
                     }
                   >
                     {`${subproduct.amount} ${subproduct.unit}`}
@@ -335,17 +307,18 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                   </p>
                 </div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  ${Number(selectedPrice) - (Number(selectedPrice) * selectedDiscount) / 100}
+                  ${Number(selectedPrice) -
+                    (Number(selectedPrice) * selectedDiscount) / 100}{" "}
+                  (+IVA)
                 </p>
-              </div>)
-            : (
+              </div>
+            ) : (
               <div className="flex gap-4 flex-col">
-                <div className="h-12">
-                </div>
-              <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                ${selectedPrice}
-              </p>
-            </div>
+                <div className="h-12"></div>
+                <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
+                  ${selectedPrice} (+IVA)
+                </p>
+              </div>
             )}
           </div>
           <div className="animate-fade-in-up flex flex-row items-center gap-4 my-4">
@@ -360,7 +333,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </p>
           </div>
           <button
-            className="  py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
+            className="py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
             onClick={handleAddToCart}
           >
             <FontAwesomeIcon
