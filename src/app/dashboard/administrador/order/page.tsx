@@ -189,9 +189,9 @@ const OrderList = () => {
       totalPages={totalPages}
       tdTable={[
         "Cliente",
-        "Fecha de pedido",
         "Precio total",
-        "Fecha de entrega",
+        "Fecha de pedido - entrega",
+        "Lugar de envio",
         "Productos",
         "Estado",
         "Acciones",
@@ -212,24 +212,27 @@ const OrderList = () => {
              
             </div>
           </th>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            <div className="flex justify-center items-center">
-              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", {
-                locale: es,
-              })}
-            </div>
-          </td>
+
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
           $ {order.orderDetail?.totalPrice}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+          <div className="flex justify-center items-center">
+              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", {
+                locale: es,
+              })}
+            </div>
             {order.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", {
               locale: es,
             })}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {order.orderDetail?.addressDelivery
+            }
+          </td>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white gap-4">
             {order.productsOrder && order.productsOrder.map((product, productIndex) => (
-              <div key={productIndex} className="mb-2 text-start flex items-center">
+              <div key={productIndex} className=" text-start flex items-center">
                  <Image
                       width={500}
                       height={500}

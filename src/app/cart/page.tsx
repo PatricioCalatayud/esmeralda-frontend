@@ -19,6 +19,7 @@ import { Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
 import { getUser } from "@/helpers/Autenticacion.helper";
 import { IAccountProps } from "@/interfaces/IUser";
+import { Spinner } from "@material-tailwind/react";
 
 const Cart = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const Cart = () => {
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [account, setAccount] = useState<IAccountProps>();
-
+  const [loading, setLoading] = useState(false)
   //! Obtiene los datos del carro
   useEffect(() => {
     const fetchCart = () => {
@@ -148,7 +149,7 @@ const Cart = () => {
       subproductId: product.idSubProduct,
       quantity: product.quantity,
     }));
-
+    setLoading(true)
     const orderCheckout = {
       userId: session?.id,
       products,
@@ -162,6 +163,7 @@ const Cart = () => {
     console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
     console.log(order);
+    
 
     if (order?.status === 200 || order?.status === 201) {
       if (session?.role === "Usuario") {
@@ -187,6 +189,7 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+      setLoading(false)
     }
   };
 
@@ -390,7 +393,7 @@ const Cart = () => {
             >
               <Modal.Header>Detalle de envio</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
-                <div className="w-full h-20 gap-4 flex flex-col">
+                {loading === false ? <><div className="w-full h-20 gap-4 flex flex-col">
                   <label
                     htmlFor="addresOrder"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -418,7 +421,10 @@ const Cart = () => {
                     id="isDelivery"
                     onChange={(e) => setIsDelivery(e.target.checked)}
                   />
-                </div>
+                </div></>: <div className="flex items-center justify-center h-40">
+      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}/>
+    </div> }
               </Modal.Body>
               <Modal.Footer>
                 {session && session.role === "Cliente" ? (
