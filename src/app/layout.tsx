@@ -10,6 +10,8 @@ import { CategoryProvider } from "@/context/categories.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
+import ChatBotEsmeralda from "@/components/ChatBot/ChatBot";
+
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -30,24 +32,25 @@ export default function RootLayout({
         <link rel="icon" href="/cafe.ico" />
       </head>
       <body className={`${inter.className} h-min-screen`}>
+      <CartProvider>
         <AuthProvider>
           <CategoryProvider>
             <ProductProvider>
-              <CartProvider>
                 <Navbar />
                 {children}
-                <div className="fixed bottom-6 right-6 z-50">
+                <div className="fixed bottom-5 right-6 z-50">
                 <Link href="https://api.whatsapp.com/send?phone=541158803709">
-                  <button  className="bg-primary hover:bg-teal-800 text-white rounded-full py-5 px-5 shadow-xl w-20 h-20">
+                  <button  className="bg-primary hover:bg-teal-800 text-white rounded-full py-5 px-5 shadow-xl w-[75px] h-[75px]">
                   <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}}/>
                   </button>
                 </Link>
-              </div>
+                <ChatBotEsmeralda/>
+                </div>       
                 <Footer />
-              </CartProvider>
             </ProductProvider>
           </CategoryProvider>
         </AuthProvider>
+        </CartProvider>
       </body>
     </html>
   );

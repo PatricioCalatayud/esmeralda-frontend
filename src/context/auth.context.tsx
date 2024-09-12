@@ -13,6 +13,7 @@ import { getSessionGoogle, signOutWithGoogle } from "@/utils/singGoogle";
 import { ISession } from "@/interfaces/ISession";
 import Swal from "sweetalert2";
 import { LoginUser, NewUser } from "@/helpers/Autenticacion.helper";
+import { useCartContext } from "./cart.context";
 interface AuthContextType {
   session: ISession | undefined;
   handleSignOut: () => void;
@@ -42,7 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [token, setToken] = useState<string | undefined>();
   const [userId, setUserId] = useState<string | undefined>();
   const [authLoading, setAuthLoading] = useState(true);
-
+  const { setCartItemCount } = useCartContext();
   const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
@@ -54,6 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         //decodifico el token
         const decodedToken: any = jwtDecode(token);
+        console.log(decodedToken);
         // si hay token decodificado
         if (decodedToken) {
           setUserId(decodedToken.sub);
@@ -105,11 +107,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const newUser = {
           email: sessionGoogle.user.email as string,
           name: sessionGoogle.user.name as string,
+          password: "", // Add a password property
+          phone: "", // Add a phone property
         }
         const response = await NewUser(newUser);
         if (response && (response.status === 200 || response.status === 201)) {
           const token = response.data.accessToken;
           const decodedToken: any = jwtDecode(token);
+          
           setToken(token);
           setSession({
             id: decodedToken.sub,
@@ -139,6 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       localStorage.removeItem("userSession");
       localStorage.removeItem("cart");
+      setCartItemCount(0)
       setSession(undefined);
     }
     Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");

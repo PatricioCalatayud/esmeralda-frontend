@@ -7,12 +7,20 @@ import Link from "next/link";
 import IncrementProduct from "@/components/IncrementProduct/IncrementProduct";
 import Swal from "sweetalert2";
 import { getProductById } from "../../../helpers/ProductsServices.helper";
-import { Category, IProductList } from "@/interfaces/IProductList";
+import { Category, ICart, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useCartContext } from "@/context/cart.context";
+
+interface SelectedCartItem {
+  stock: number;
+  price: number;
+  discount: number;
+  unit: string;
+  idSubProduct: string;
+}
 
 const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [product, setProduct] = useState<IProductList | null>(null);
@@ -20,90 +28,158 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedPrice, setSelectedPrice] = useState<string>("");
+  const [selectedStock, setSelectedStock] = useState<number>(0);
+  const [selectedDiscount, setSelectedDiscount] = useState<number>(0);
+  const [selectedCart, setSelectedCart] = useState<SelectedCartItem>({
+    stock: 0,
+    price: 0,
+    discount: 0,
+    unit: "",
+    idSubProduct: "",
+  });
   const [quantity, setQuantity] = useState<number>(1);
+
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
+  const [filteredProduct, setFilteredProduct] = useState<IProductList | null>(
+    null
+  );
+
   const router = useRouter();
   const productId = params.id;
 
   useEffect(() => {
-    type CategoryName = "Coffee" | "Tea" | "Accesory" | "Sweetener" | "Mate";
-    const categoryTranslations = (category: {
-      id: string;
-      name: CategoryName | string;
-    }) => {
-      const translations: { [key in CategoryName]: string } = {
-        Coffee: "Café",
-        Tea: "Té",
-        Accesory: "Accesorio",
-        Sweetener: "Endulzante",
-        Mate: "Mate",
-      };
+    if (product) {
+      const filteredSubproducts = product.subproducts?.filter(
+        (subproduct) => subproduct.isAvailable
+      );
 
-      return {
-        id: category.id,
-        name: translations[category.name as CategoryName] || category.name,
-      };
-    };
+      setFilteredProduct({
+        ...product,
+        subproducts: filteredSubproducts || [],
+      });
+    }
+  }, [product]);
 
+  useEffect(() => {
     const loadProductData = async () => {
-      const fetchedProduct = await getProductById(productId, token);
-      console.log(fetchedProduct);
-      if (fetchedProduct) {
+      const response = await getProductById(productId, token);
+      if (response) {
+        const fetchedProduct = response.data;
         setProduct(fetchedProduct);
-        const translatedCategories = categoryTranslations({
-          id: fetchedProduct.category?.id,
-          name:
-            (fetchedProduct.category?.name as CategoryName) ||
-            fetchedProduct.category?.name,
-        });
-        setCategory(translatedCategories);
-        if (
-          fetchedProduct.subproducts &&
-          fetchedProduct.subproducts.length > 0
-        ) {
-          const lowestPricedSubproduct = fetchedProduct.subproducts.reduce(
-            (lowest, current) => {
-              return current.price < lowest.price ? current : lowest;
-            }
-          );
 
-          setSelectedSize(lowestPricedSubproduct.amount);
-
-          if (Number(fetchedProduct.discount) !== 0) {
-            // Calcula el precio con el descuento aplicado correctamente
-            setSelectedPrice(
-              (
-                Number(lowestPricedSubproduct.price) *
-                (1 - Number(fetchedProduct.discount) / 100)
-              ).toFixed(2)
-            );
-          } else {
-            setSelectedPrice(lowestPricedSubproduct.price);
+        const lowestPricedSubproduct = fetchedProduct.subproducts.reduce(
+          (lowest: any, current: any) => {
+            return current.price < lowest.price ? current : lowest;
           }
-        } else if (Number(fetchedProduct.discount) !== 0) {
-          // Calcula el precio con el descuento aplicado correctamente
-          setSelectedPrice(
-            (
-              Number(fetchedProduct.price) *
-              (1 - Number(fetchedProduct.discount) / 100)
-            ).toFixed(2)
-          );
-        } else {
-          setSelectedPrice(fetchedProduct.price);
-        }
+        );
 
-        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-        const cartItem = cart.find((item: any) => item.id === productId);
-        if (cartItem) {
-          setQuantity(cartItem.quantity);
-        }
+        setSelectedSize(lowestPricedSubproduct.amount);
+        setSelectedStock(lowestPricedSubproduct.stock);
+        setSelectedDiscount(lowestPricedSubproduct.discount);
+        setSelectedPrice(
+          Number(lowestPricedSubproduct.discount) !== 0
+            ? (
+                Number(lowestPricedSubproduct.price) *
+                (1 - Number(lowestPricedSubproduct.discount) / 100)
+              ).toFixed(2)
+            : lowestPricedSubproduct.price
+        );
+        setSelectedCart({
+          stock: lowestPricedSubproduct.stock,
+          price: Number(lowestPricedSubproduct.price),
+          discount: lowestPricedSubproduct.discount,
+          unit: lowestPricedSubproduct.unit,
+          idSubProduct: String(lowestPricedSubproduct.id),
+        });
       }
       setIsLoaded(true);
     };
 
     loadProductData();
-  }, [productId]);
+  }, [productId, token]);
+
+  const handleQuantityChange = (newQuantity: number) => {
+    setQuantity(newQuantity);
+  };
+
+  const handleAddToCart = () => {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const cartItemIndex = cart.findIndex(
+      (item: any) =>
+        item.idSubProduct === selectedCart.idSubProduct &&
+        item.size === selectedSize
+    );
+
+    const cartItem = {
+      ...selectedCart,
+      quantity,
+      description: filteredProduct?.description,
+      imgUrl: filteredProduct?.imgUrl,
+      size: selectedSize,
+      idProduct: filteredProduct?.id,
+    };
+
+    if (cartItemIndex !== -1) {
+      cart[cartItemIndex].quantity += quantity;
+      localStorage.setItem("cart", JSON.stringify(cart));
+      Swal.fire({
+        title: "Producto actualizado",
+        text: "La cantidad del producto ha sido actualizada.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Ir al carrito",
+        cancelButtonText: "Aceptar",
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          router.push("/cart");
+        }
+      });
+    } else {
+      cart.push(cartItem);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      setCartItemCount(cart.length);
+      Swal.fire({
+        title: "Producto agregado",
+        text: "Producto agregado al carrito.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonText: "Ir al carrito",
+        cancelButtonText: "Aceptar",
+      }).then((result: any) => {
+        if (result.isConfirmed) {
+          router.push("/cart");
+        }
+      });
+    }
+  };
+
+  const handleSizeChange = (
+    newSize: string,
+    price: string,
+    stock: number,
+    discount: number,
+    unit: string,
+    id: number
+  ) => {
+    setSelectedSize(newSize);
+    setSelectedStock(stock);
+    setSelectedDiscount(discount);
+    setSelectedCart({
+      stock: stock,
+      price: Number(price),
+      discount: discount,
+      unit: unit,
+      idSubProduct: String(id),
+    });
+
+    setSelectedPrice(
+      Number(discount) !== 0
+        ? (Number(price) * (1 - Number(discount) / 100)).toFixed(2)
+        : price
+    );
+  };
 
   const renderBreadcrumb = () => {
     if (!category) {
@@ -129,91 +205,9 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           {category.name}
         </Link>
         {" / "}
-        <span className="font-bold">{product?.description}</span>
+        <span className="font-bold">{filteredProduct?.description}</span>
       </h1>
     );
-  };
-
-  const handleQuantityChange = (newQuantity: number) => {
-    setQuantity(newQuantity);
-  };
-
-  const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartItemIndex = cart.findIndex((item: any) => item.id === productId);
-
-    if (cartItemIndex !== -1) {
-      Swal.fire({
-        title: "Producto ya en el carrito",
-        text: "El producto ya se encuentra en el carrito. ¿Desea actualizar la cantidad?",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonText: "Actualizar",
-        cancelButtonText: "Aceptar",
-      }).then((result: any) => {
-        if (result.isConfirmed) {
-          // Update the quantity in the cart
-          cart[cartItemIndex].quantity = quantity;
-          localStorage.setItem("cart", JSON.stringify(cart));
-          Swal.fire({
-            title: "Producto actualizado",
-            text: "La cantidad del producto ha sido actualizada.",
-            icon: "success",
-            showCancelButton: true,
-            confirmButtonText: "Ir al carrito",
-            cancelButtonText: "Aceptar",
-          }).then(async (result: any) => {
-            if (result.isConfirmed) {
-              router.push("/cart");
-            }
-          });
-        }
-      });
-    } else {
-      Swal.fire({
-        title: "Agregar producto",
-        text: "¿Desea agregar el producto al carrito?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "No",
-      }).then((result: any) => {
-        if (result.isConfirmed) {
-          const newCartItem = {
-            ...product,
-            quantity: quantity,
-            size: selectedSize,
-          };
-          cart.push(newCartItem);
-          localStorage.setItem("cart", JSON.stringify(cart));
-          //const items = JSON.parse(cart);
-          setCartItemCount(cart.length);
-          Swal.fire({
-            title: "Producto agregado",
-            text: "Producto agregado al carrito.",
-            icon: "success",
-            showCancelButton: true,
-            confirmButtonText: "Ir al carrito",
-            cancelButtonText: "Aceptar",
-          }).then(async (result: any) => {
-            if (result.isConfirmed) {
-              router.push("/cart");
-            }
-          });
-        }
-      });
-    }
-  };
-
-  const handleSizeChange = (newSize: string, price: string) => {
-    setSelectedSize(newSize);
-    if (Number(product?.discount) !== 0) {
-      setSelectedPrice(
-        (Number(price) * (Number(product?.discount) / 100)).toFixed(2)
-      );
-    } else {
-      setSelectedPrice(price);
-    }
   };
 
   if (!isLoaded) {
@@ -229,7 +223,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     );
   }
 
-  if (!product) {
+  if (!filteredProduct) {
     return (
       <p className="text-2xl font-bold w-full h-40 flex items-center justify-center">
         No se encontró el producto.
@@ -257,8 +251,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             width={1000}
             height={1000}
             priority={true}
-            src={product.imgUrl}
-            alt={product.description}
+            src={filteredProduct.imgUrl}
+            alt={filteredProduct.description}
             className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
           />
         </div>
@@ -272,14 +266,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </h3>
           )}
           <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
-            {product.description}
+            {filteredProduct.description}
           </h1>
           <hr className="animate-fade-in-up" />
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
-              {product.subproducts &&
-                product.subproducts?.length > 0 &&
-                product.subproducts?.map((subproduct, index) => (
+              {filteredProduct.subproducts &&
+                filteredProduct.subproducts?.length > 0 &&
+                filteredProduct.subproducts?.map((subproduct, index) => (
                   <button
                     key={index}
                     className={`w-32 py-2 px-4 rounded-xl transition-colors duration-300 text-sm ${
@@ -288,46 +282,58 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                         : "bg-gray-200 font-bold text-black shadow-sm hover:bg-gray-600 hover:text-white "
                     }`}
                     onClick={() =>
-                      handleSizeChange(subproduct.amount, subproduct.price)
+                      handleSizeChange(
+                        subproduct.amount,
+                        subproduct.price,
+                        subproduct.stock,
+                        subproduct.discount,
+                        subproduct.unit,
+                        subproduct.id
+                      )
                     }
                   >
                     {`${subproduct.amount} ${subproduct.unit}`}
                   </button>
                 ))}
             </div>
-            {/*Number(product.discount) !== 0 ? (
+            {Number(selectedDiscount) !== 0 ? (
               <div className="flex gap-4 flex-col">
                 <div>
                   <p className="text-lg font-semibold text-gray-600 animate-fade-in-up line-through">
-                    ${product.price}
+                    ${selectedPrice}
                   </p>
                   <p className="text-teal-400 text-sm font-bold">
-                    {product.discount} % de descuento
+                    {selectedDiscount} % de descuento
                   </p>
                 </div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  ${selectedPrice}
+                  ${Number(selectedPrice) -
+                    (Number(selectedPrice) * selectedDiscount) / 100}{" "}
+                  (+IVA)
                 </p>
               </div>
-            ) : */(
-              <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                ${selectedPrice}
-              </p>
+            ) : (
+              <div className="flex gap-4 flex-col">
+                <div className="h-12"></div>
+                <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
+                  ${selectedPrice} (+IVA)
+                </p>
+              </div>
             )}
           </div>
           <div className="animate-fade-in-up flex flex-row items-center gap-4 my-4">
             <IncrementProduct
-              stock={product.stock}
-              productId={product.id}
+              stock={selectedStock.toString()}
+              productId={filteredProduct.id}
               initialQuantity={quantity}
               onQuantityChange={handleQuantityChange}
             />
             <p className="text-gray-800 text-xs text-nowrap">
-              {product.stock} disponibles
+              {selectedStock} disponibles
             </p>
           </div>
           <button
-            className="  py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
+            className="py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
             onClick={handleAddToCart}
           >
             <FontAwesomeIcon

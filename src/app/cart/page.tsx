@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IProductList } from "@/interfaces/IProductList";
+import { ICart, IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
   faBagShopping,
   faMinus,
@@ -18,27 +17,45 @@ import {
 import { postOrder } from "@/helpers/Order.helper";
 import { Modal } from "flowbite-react";
 import { useCartContext } from "@/context/cart.context";
+import { getUser } from "@/helpers/Autenticacion.helper";
+import { IAccountProps } from "@/interfaces/IUser";
+import { Spinner } from "@material-tailwind/react";
+
 const Cart = () => {
   const router = useRouter();
-  const [cart, setCart] = useState<IProductList[]>([]);
+  const [cart, setCart] = useState<ICart[]>([]);
   const { session, token } = useAuthContext();
   const [openModal, setOpenModal] = useState(false);
   const [addresOrder, setAddresOrder] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
+  const [account, setAccount] = useState<IAccountProps>();
+  const [loading, setLoading] = useState(false)
+  //! Obtiene los datos del carro
   useEffect(() => {
     const fetchCart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
       setCart(cartItems);
     };
 
+    const fetchUser = async () => {
+      if (token && session) {
+        const response = await getUser(session.id, token);
+        console.log(response);
+        if (response) {
+          setAccount(response.account || undefined);
+        }
+      }
+    };
+    fetchUser();
     fetchCart();
-  }, []);
+  }, [token]);
 
+  //! Función para aumentar la cantidad
   const handleIncrease = (article_id: string) => {
     const newCart = cart.map((item) => {
-      if (item.id === article_id) {
+      if (item.idSubProduct === article_id) {
         // Crea una nueva instancia del objeto para garantizar la inmutabilidad
         return { ...item, quantity: (item.quantity || 1) + 1 };
       }
@@ -49,9 +66,10 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
+  //! Función para disminuir la cantidad
   const handleDecrease = (article_id: string) => {
     const newCart = cart.map((item) => {
-      if (item.id === article_id) {
+      if (item.idSubProduct === article_id) {
         // Crea una nueva instancia del objeto para garantizar la inmutabilidad
         return { ...item, quantity: Math.max((item.quantity || 1) - 1, 1) };
       }
@@ -62,6 +80,7 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newCart));
   };
 
+  //! Función para eliminar el articulo
   const removeFromCart = (index: number) => {
     Swal.fire({
       title: "¿Estás seguro?",
@@ -86,12 +105,14 @@ const Cart = () => {
     });
   };
 
+  //! Función para calcular el subtotal
   const calcularSubtotal = () => {
     return cart.reduce((acc, item) => {
       return acc + (item.quantity || 1) * Number(item.price);
     }, 0);
   };
 
+  //! Función para calcular el descuento
   const calcularDescuento = () => {
     return cart.reduce((acc, item) => {
       // Aplicar descuento como un porcentaje del precio
@@ -102,41 +123,64 @@ const Cart = () => {
     }, 0);
   };
 
+  //! Función para calcular el IVA (21%)
+  const calcularIVA = () => {
+    const subtotal = calcularSubtotal();
+    return subtotal * 0.21; // 21% de IVA
+  };
+
+  //! Función para calcular el total
   const calcularTotal = () => {
     const subtotal = calcularSubtotal();
     const descuento = calcularDescuento();
-    return subtotal - descuento;
+    const iva = calcularIVA();
+    return subtotal - descuento + iva;
   };
 
   const subtotal = calcularSubtotal();
   const descuento = calcularDescuento();
+  const iva = calcularIVA();
   const total = calcularTotal();
 
-  const handleCheckout = async () => {
+  //! Función para realizar la orden
+  const handleCheckout = async (boton: string) => {
     const products = cart.map((product) => ({
-      id: product.id,
+      productId: product.idProduct,
+      subproductId: product.idSubProduct,
       quantity: product.quantity,
     }));
-
+    setLoading(true)
     const orderCheckout = {
       userId: session?.id,
       products,
       ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
       discount: 10,
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Transferencia" && { account: "Transferencia" }),
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
     };
+    console.log(orderCheckout);
     const order = await postOrder(orderCheckout, token);
-    if (order?.status === 200 || order?.status === 201) {
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Tu pedido ha sido realizado con exito",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+    console.log(order);
+    
 
-      setTimeout(() => {
-        router.push(`/checkout/${order.data.id}`);
-      }, 1500);
+    if (order?.status === 200 || order?.status === 201) {
+      if (session?.role === "Usuario") {
+        setTimeout(() => {
+          router.push(`/checkout/${order.data.id}`);
+        }, 1500);
+      } else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
+        setTimeout(() => {
+          router.push(`/transfer/${order.data.id}`);
+        }, 1500);
+      } else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
+        setTimeout(() => {
+          setCartItemCount(0);
+          localStorage.removeItem("cart");
+          router.push(`/dashboard/cliente/order`);
+        }, 1500);
+      }
     } else {
       Swal.fire({
         position: "top-end",
@@ -145,9 +189,11 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+      setLoading(false)
     }
   };
 
+  //! Renderizado si no hay elementos en el carrito
   if (cart.length === 0) {
     return (
       <section className="text-gray-600 body-font">
@@ -180,6 +226,8 @@ const Cart = () => {
     );
   }
 
+  //! Renderizado si hay elementos en el carrito
+
   return (
     <div className="font-sans w-3/4 mx-auto  h-screen ">
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
@@ -191,7 +239,7 @@ const Cart = () => {
           <div className="space-y-4 w-full mt-4">
             {cart.map((item, index) => (
               <div
-                key={item.article_id}
+                key={index}
                 className="grid sm:flex items-center gap-4 border border-gray-400 rounded-2xl px-4 py-2 w-full shadow-xl"
               >
                 <div className="sm:col-span-2 flex items-center gap-4 w-full">
@@ -205,10 +253,15 @@ const Cart = () => {
                       alt={item.description}
                     />
                   </div>
-                  <div className="flex flex-col gap-3 w-full">
-                    <h3 className="text-base font-bold text-gray-800 text-nowrap">
-                      {item.description}
-                    </h3>
+                  <div className="flex flex-col gap-3 w-full ">
+                    <div className="flex gap-4">
+                      <h3 className="text-base font-bold text-gray-800 text-nowrap ">
+                        {item.description}
+                      </h3>
+                      <p className="text-base font-bold text-gray-800 text-nowrap ">
+                        ({item.size} {item.unit})
+                      </p>
+                    </div>
                     <div
                       onClick={() => removeFromCart(index)}
                       className="flex items-center text-sm font-semibold text-red-500 cursor-pointer gap-2"
@@ -220,7 +273,7 @@ const Cart = () => {
                       <div className="flex gap-3 font-bold items-center">
                         <button
                           className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleDecrease(item.id)}
+                          onClick={() => handleDecrease(item.idSubProduct)}
                           disabled={item.quantity === 1}
                         >
                           <FontAwesomeIcon
@@ -231,7 +284,7 @@ const Cart = () => {
                         {item.quantity || 1}
                         <button
                           className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleIncrease(item.id)}
+                          onClick={() => handleIncrease(item.idSubProduct)}
                           disabled={item.quantity === Number(item.stock)}
                         >
                           <FontAwesomeIcon
@@ -246,18 +299,21 @@ const Cart = () => {
                       <div className="ml-auto">
                         {item.discount && Number(item.discount) > 0 ? (
                           <div>
+                            <h4 className="text-sm text-gray-500 line-through">
+                              $
+                              {(
+                                Number(item.price) * (item.quantity || 1)
+                              ).toFixed(2)}
+                            </h4>
+                            <h4 className="text-sm text-teal-600 font-bold">
+                              % {Number(item.discount)} de descuento
+                            </h4>
                             <h4 className="text-lg font-bold text-gray-800">
                               $
                               {(
                                 Number(item.price) *
                                 (item.quantity || 1) *
                                 (1 - Number(item.discount) / 100)
-                              ).toFixed(2)}
-                            </h4>
-                            <h4 className="text-sm text-gray-500 line-through">
-                              $
-                              {(
-                                Number(item.price) * (item.quantity || 1)
                               ).toFixed(2)}
                             </h4>
                           </div>
@@ -278,7 +334,7 @@ const Cart = () => {
           </div>
         </div>
 
-        <div className=" rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
+        <div className="rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
           <h2 className="text-xl font-bold  h-10 flex  justify-center items-center">
             Resumen de compra
           </h2>
@@ -299,6 +355,12 @@ const Cart = () => {
                   </span>
                 </li>
               )}
+              <li className="flex flex-wrap gap-4 text-base w-full">
+                IVA (21%){" "}
+                <span className="ml-auto font-medium text-lg">
+                  ${iva.toFixed(2)}
+                </span>
+              </li>
               <li className="flex flex-wrap gap-4 text-lg font-bold">
                 Total <span className="ml-auto">${total.toFixed(2)}</span>
               </li>
@@ -331,7 +393,7 @@ const Cart = () => {
             >
               <Modal.Header>Detalle de envio</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
-                <div className="w-full h-20 gap-4 flex flex-col">
+                {loading === false ? <><div className="w-full h-20 gap-4 flex flex-col">
                   <label
                     htmlFor="addresOrder"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -359,28 +421,89 @@ const Cart = () => {
                     id="isDelivery"
                     onChange={(e) => setIsDelivery(e.target.checked)}
                   />
-                </div>
+                </div></>: <div className="flex items-center justify-center h-40">
+      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
+      onPointerLeaveCapture={() => {}}/>
+    </div> }
               </Modal.Body>
               <Modal.Footer>
-                <button
-                  onClick={handleCheckout}
-                  type="button"
-                  className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
-                  disabled={
-                    !session ||
-                    cart.length === 0 ||
-                    (isDelivery === false && addresOrder === "")
-                  }
-                  title={
-                    !session
-                      ? "Necesita estar logueado para continuar con el pago"
-                      : cart.length === 0
-                      ? "El carrito está vacío"
-                      : ""
-                  }
-                >
-                  Ir a pagar
-                </button>
+                {session && session.role === "Cliente" ? (
+                  <div className="w-full">
+                    <button
+                      onClick={() => handleCheckout("Cliente Cuenta Corriente")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && addresOrder === "") ||
+                        account && account.balance + total > account.creditLimit
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      <p>Agregar a cuenta corriente: $ {total}</p>
+                      {account && (
+                        <p>
+                          {" "}
+                          <b
+                            className={`${
+                              account.balance + total > account.creditLimit
+                                ? "text-red-500"
+                                : "text-white"
+                            }`}
+                          >
+                            $ {account.balance + total}{" "}
+                          </b>/ $ {account?.creditLimit}
+                        </p>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleCheckout("Cliente Transferencia")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white  hover:bg-blue-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && addresOrder === "")
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      Pago con trasnferencia bancaria
+                    </button>{" "}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout("Usuario")}
+                    type="button"
+                    className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                    disabled={
+                      !session ||
+                      cart.length === 0 ||
+                      (isDelivery === false && addresOrder === "")
+                    }
+                    title={
+                      !session
+                        ? "Necesita estar logueado para continuar con el pago"
+                        : cart.length === 0
+                        ? "El carrito está vacío"
+                        : ""
+                    }
+                  >
+                    Ir a pagar
+                  </button>
+                )}
               </Modal.Footer>
             </Modal>
             <Link href="/categories">

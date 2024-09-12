@@ -1,4 +1,4 @@
-import { IOrderCheckout, IOrders } from "@/interfaces/IOrders";
+import { IAccountPayment, IOrderCheckout, IOrders } from "@/interfaces/IOrders";
 import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,7 +28,7 @@ export async function getOrders(userId: string, token: string | undefined , page
           page,  // Pasar el número de página
           limit, // Pasar el límite de resultados por página
         },});
-      const products: IOrders[] = response.data;
+      const products: IOrders[] = response.data.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -78,13 +78,43 @@ export async function deleteOrder(orderId: string, token: string | undefined) {
 export async function putOrder(orderId: string, order: IOrders | {}, token: string | undefined) {
   
   try {
+    console.log(orderId);
     console.log(order);
     const response = await axios.put(`${apiURL}/order/${orderId}`, order,{
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-    const product: IOrders = response.data;
-    return product;
+
+    return response;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+export async function putOrderTransaction( file: IOrders | {}, token: string | undefined) {
+  
+  try {
+
+    const response = await axios.put(`${apiURL}/image/transfer`, file,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+
+    return response;
+  } catch (error: any) {
+    console.log(error);
+  }
+}
+
+export async function putAccountPayment( data: IAccountPayment, token: string | undefined) {
+  
+  try {
+
+    const response = await axios.put(`${apiURL}/account/payment`, data,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },});
+
+    return response;
   } catch (error: any) {
     console.log(error);
   }
