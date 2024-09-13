@@ -99,7 +99,7 @@ const ChatBotEsmeralda = () => {
       }, [])
     );}
   }, [allProducts]);
-  const price: ProductItem[] = form?.map((productString) => {
+  const price: any = form?.map((productString) => {
     // Divide el string en partes
 const parts = productString.split(' - ');
 console.log(parts);
@@ -129,15 +129,15 @@ if (!foundSubproduct) {
   throw new Error(`Subproduct not found for amount: ${quantity}`);
 }
 
-return Number(foundSubproduct.price) * quantity;
+return Number(foundSubproduct.price) * quantity * 1.21;
 });
 
-const totalPrice = (price || []).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => accumulator + currentValue, 0);
 
 console.log(totalPrice);
 
   const handleCheckout = async() => {
-    const products: ProductItem[] = form?.map((productString) => {
+    const products: any = form?.map((productString) => {
       // Divide el string en partes
   const parts = productString.split(' - ');
   console.log(parts);
@@ -304,10 +304,10 @@ console.log(quantity);
           
             if (index !== -1) {
               // Si la opción existe, creamos una copia del array form
-              const updatedForm = [...form];
+              const updatedForm = [ ...form as any];
               
               // Reemplazamos el valor en ese índice con `optionForm + newInput`
-              updatedForm[index] = `${optionForm} - ${newInput}`;
+              updatedForm[index as any] = `${optionForm} - ${newInput}`;
           
               // Actualizamos el estado con el nuevo array
               setForm(updatedForm);
@@ -334,7 +334,7 @@ console.log(quantity);
                 <p key={index}>{option}</p>
               ))}
               <p>Direccion: {address}</p>
-              <p>Precio total con iva: {totalPrice}</p>
+              <p>Precio total con iva: $ {totalPrice}</p>
             </div>
           ),
           options: ["Listo!", "Volver al inicio"],
