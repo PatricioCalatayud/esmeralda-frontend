@@ -8,20 +8,39 @@ import dynamic from "next/dynamic";
 import { useProductContext } from "@/context/product.context";
 import { IProductList } from "@/interfaces/IProductList";
 import { step } from "@material-tailwind/react";
+import { postOrder, putOrderTransaction } from "@/helpers/Order.helper";
+import Swal from "sweetalert2";
+
 
 const ChatBot = dynamic(() => import("react-chatbotify"), { ssr: false });
 const urlLocal = process.env.NEXT_PUBLIC_URL_LOCAL;
+interface Product {
+  id: string;
+  description: string;
+  subproducts: { id: string; amount: number }[];
+}
 
+interface ProductItem {
+  productId: string;
+  subproductId: string;
+  quantity: number;
+}
 const ChatBotEsmeralda = () => {
-  const { session, handleSignOut } = useAuthContext();
+  const { session, handleSignOut, token } = useAuthContext();
   const router = useRouter();
   const [flow, setFlow] = useState({});
+  const [settings, setSettings] = useState({});
   const pathname = usePathname();
   const {allProducts} = useProductContext();
   const [tooltipText, setTooltipText] = useState("Tienes alguna pregunta?");
   const [filteredProducts, setFilteredProducts] = useState<
     IProductList[] | undefined
   >(allProducts);
+  const [form, setForm] = useState<string[]>()
+  const [optionForm, setOptionForm] = useState<string>()
+  const [address, setAddress] = useState<string>("")
+  const [receiptId, setReceiptId] = useState<string>("")
+  console.log(form);
   const helpLoginOptions = [
     "Registrarme",
     "Olvide mi contraseña",
@@ -44,7 +63,7 @@ const ChatBotEsmeralda = () => {
     "Saber mas de la esmeralda",
     "Cerrar sesion",
   ];
-
+  
   const helpUserOptions = [
     "Quiero comprar",
     "Ver ofertas",
@@ -57,8 +76,8 @@ const ChatBotEsmeralda = () => {
     "Hacer el pedido por aca",
     "Mas opciones"];
   const userOptions = ["Iniciar sesion", "Registrarme", "Mas opciones"];
+  const clientShopOptions = ["Es lo que necesito", "Quiero cambiar mi compra", "Volver al inicio"];
   
-
   useEffect(() => {
     if (allProducts) {
       
@@ -80,8 +99,119 @@ const ChatBotEsmeralda = () => {
       }, [])
     );}
   }, [allProducts]);
+  const price: ProductItem[] = form?.map((productString) => {
+    // Divide el string en partes
+const parts = productString.split(' - ');
+console.log(parts);
+// Obtiene el nombre del producto
+const productName = parts[0];
 
+// Encuentra todos los números en el string y los convierte a enteros
+const numbers = (productString.match(/\d+/g) || []).map(num => parseInt(num, 10));
+console.log(numbers);
+// Determina el amount a usar
+const amount = numbers.length > 1 ? numbers[0] : (numbers[0] || 1);
+console.log(amount);
+// Determina la cantidad a usar
+const quantity = numbers.length > 1 ? numbers[numbers.length - 1] : (1);
+console.log(quantity);
+// Busca el producto en allProducts
+const foundProduct = filteredProducts?.find(p => p.description.toLowerCase() === productName.toLowerCase());
 
+if (!foundProduct) {
+  throw new Error(`Product not found: ${productName}`);
+}
+
+// Busca el subproducto basado en la cantidad
+const foundSubproduct = foundProduct.subproducts.find(sp => Number(sp.amount) === amount);
+
+if (!foundSubproduct) {
+  throw new Error(`Subproduct not found for amount: ${quantity}`);
+}
+
+return Number(foundSubproduct.price) * quantity;
+});
+
+const totalPrice = (price || []).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+console.log(totalPrice);
+
+  const handleCheckout = async() => {
+    const products: ProductItem[] = form?.map((productString) => {
+      // Divide el string en partes
+  const parts = productString.split(' - ');
+  console.log(parts);
+  // Obtiene el nombre del producto
+  const productName = parts[0];
+  
+  // Encuentra todos los números en el string y los convierte a enteros
+  const numbers = (productString.match(/\d+/g) || []).map(num => parseInt(num, 10));
+  console.log(numbers);
+  // Determina el amount a usar
+  const amount = numbers.length > 1 ? numbers[0] : (numbers[0] || 1);
+  console.log(amount);
+  // Determina la cantidad a usar
+  const quantity = numbers.length > 1 ? numbers[numbers.length - 1] : (1);
+console.log(quantity);
+  // Busca el producto en allProducts
+  const foundProduct = filteredProducts?.find(p => p.description.toLowerCase() === productName.toLowerCase());
+
+  if (!foundProduct) {
+    throw new Error(`Product not found: ${productName}`);
+  }
+
+  // Busca el subproducto basado en la cantidad
+  const foundSubproduct = foundProduct.subproducts.find(sp => Number(sp.amount) === amount);
+
+  if (!foundSubproduct) {
+    throw new Error(`Subproduct not found for amount: ${quantity}`);
+  }
+
+  return {
+    productId: foundProduct.id,
+    subproductId: foundSubproduct.id,
+    quantity: quantity,
+  };
+    });
+    console.log(products);
+    const orderCheckout = {
+      userId: session?.id,
+      products,
+      account: "Transferencia",
+      address: address,
+    };
+    if (session) {
+      
+      const order = await postOrder(orderCheckout, token);
+      if(order?.status === 200 || order?.status === 201) {
+        setReceiptId(order.data.receipt.id);
+      router.push(`/transfer/${order.data.id}`);
+    }
+  }}
+  const handleUpload = async(params:any) => {
+    console.log(params);
+    const formData = new FormData();
+    // Añadir la imagen al FormData si existe
+    formData.append("id", receiptId);
+      formData.append("file", params.files[0]);
+      const response = await putOrderTransaction( formData, token);
+      console.log(response);
+            if (response && ( response.status === 201 || response.status === 200)) {
+              Swal.fire({
+                icon: "success",
+                title: "¡Comprobante agregado!",
+                text: "El comprobante ha sido agregado con éxito.",
+              })
+              router.push("/");
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "¡Error!",
+              text: "Ha ocurrido un error al agregar el comprobante.",
+            });
+          }
+		// handle files logic here
+	}
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -98,7 +228,7 @@ const ChatBotEsmeralda = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return; // Evita que el código se ejecute en el servidor
-
+    
     if (session) {
       setFlow({
         start: {
@@ -144,20 +274,99 @@ const ChatBotEsmeralda = () => {
         },
         step7: {
           message: "Clickea una de las opciones y veras los detalles.",
-          checkboxes: allProducts?.flatMap(product =>
+          checkboxes: filteredProducts?.flatMap(product =>
             product.subproducts.map(subproduct => 
               `${product.description} - ${subproduct.amount} ${subproduct.unit}`
             )
           ),
+          function: (params: any) => setForm(params.userInput.split(", ")),
+          path: "step8",
+        },
+        step8: {
+          message: "Perfecto!.",
+          options :clientShopOptions,
           path: "process_options",
         },
+        step9: {
+          message: "Clickea una de las opciones y me diras si quieres mas de 1.",
+          options:Array.isArray(form) && [...form, "Enviar pedido"],
+          function: async(params: any) => setOptionForm(params.userInput),
+          
+          path: "process_options",
+
+        },
+        step10: {
+          message: "Dime cuantas quieres.",
+          function: async(params: any) =>{  const newInput = params.userInput; // Número que vas a sumar
+
+            // Encuentra el índice de la opción que debe ser reemplazada
+            const index = form?.findIndex(option => option === optionForm);
+          
+            if (index !== -1) {
+              // Si la opción existe, creamos una copia del array form
+              const updatedForm = [...form];
+              
+              // Reemplazamos el valor en ese índice con `optionForm + newInput`
+              updatedForm[index] = `${optionForm} - ${newInput}`;
+          
+              // Actualizamos el estado con el nuevo array
+              setForm(updatedForm);
+            } else {
+              console.error("Opción no encontrada en form");
+            }
+            await params.injectMessage(
+             `${optionForm} - ${params.userInput}`
+            );
+
+          },
+          path: "step9",
+        },
+        step11: {
+          message: "Genial, a donde lo enviamos.",
+          function: (params: any) => setAddress(params.userInput),
+          path: "step12",
+
+        },
+        step12: {
+          component: (
+            <div className="bg-gray-100 border border-gray-400 rounded-lg p-4 m-4 w-full">
+              {form?.map ((option, index) => (
+                <p key={index}>{option}</p>
+              ))}
+              <p>Direccion: {address}</p>
+              <p>Precio total con iva: {totalPrice}</p>
+            </div>
+          ),
+          options: ["Listo!", "Volver al inicio"],
+          path: "process_options",
+        },
+        step13: {
+          message: "Adjunta comporbante de pago.",
+          file: (params: any) => handleUpload(params),
+          path: "step14",
+        },
+        step14: {
+          message: "Perfecto!.",
+          options: ["Ver mis ordenes", "Volver al inicio"],
+          path: "process_options",
+        },
+
         process_options: {
           transition: { duration: 0 },
           chatDisabled: true,
           path: async (params: any) => {
             let link = "";
-            console.log(params.userInput.toLowerCase().replace(/\s+/g, ""));
-            switch (params.userInput.toLowerCase().replace(/\s+/g, "")) {
+    const userInputNormalized = params.userInput.toLowerCase().replace(/\s+/g, "");
+
+    // Normaliza y verifica cada opción en el array `form`
+    const formMatches = form?.some(item => item.toLowerCase().replace(/\s+/g, "") === userInputNormalized);
+
+    if (formMatches) {
+      console.log("form", form);
+      return "step10";
+    }
+
+    switch (userInputNormalized) {
               case "quierocomprar":
                 router.push(urlLocal + "/categories");
                 await params.injectMessage(
@@ -222,12 +431,24 @@ const ChatBotEsmeralda = () => {
                 );
                 router.push(urlLocal + "/sobrenosotros");
                 return "step3c";
+              case "esloquenecesito":
+                await params.injectMessage(
+                  "Genial, continuemos con tu pedido."
+                )
+                return "step9"
+              case "quierocambiarmicompra":
+                return "step7";
               case "verprimerasopciones":
                 return "step2";
+              case "enviarpedido":
+                return "step11";
+              case "listo!":
+                handleCheckout();
+                return "step13";
               default:
                 return "unknown_input";
             }
-            return "repeat";
+            
           },
         },
         repeat: {
@@ -347,9 +568,12 @@ const ChatBotEsmeralda = () => {
         },
       });
     }
-  }, [session, allProducts]);
+  }, [session, filteredProducts, form, optionForm, address,totalPrice]);
 
-  const settings = {
+  useEffect(() => {
+    
+ 
+  setSettings ({
     general: {
       embedded: false,
       primaryColor: "#00796b",
@@ -365,7 +589,7 @@ const ChatBotEsmeralda = () => {
       avatar: "/Recurso1.png",
     },
     tooltip: {
-      text: tooltipText,
+      text: pathname === "/categories" ? "Elige lo que quieras" : "Tienes alguna pregunta?",
     },
     notification: {
       showCount: false,
@@ -373,7 +597,8 @@ const ChatBotEsmeralda = () => {
     chatHistory: {
       storageKey: "messages_bot",
     },
-  };
+  });
+},[pathname, pathname])
 
   const styles = {
     headerStyle: {
