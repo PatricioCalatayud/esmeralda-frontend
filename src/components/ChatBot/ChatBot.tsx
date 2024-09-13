@@ -7,40 +7,24 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useProductContext } from "@/context/product.context";
 import { IProductList } from "@/interfaces/IProductList";
-import { step } from "@material-tailwind/react";
 import { postOrder, putOrderTransaction } from "@/helpers/Order.helper";
 import Swal from "sweetalert2";
 
-
 const ChatBot = dynamic(() => import("react-chatbotify"), { ssr: false });
 const urlLocal = process.env.NEXT_PUBLIC_URL_LOCAL;
-interface Product {
-  id: string;
-  description: string;
-  subproducts: { id: string; amount: number }[];
-}
-
-interface ProductItem {
-  productId: string;
-  subproductId: string;
-  quantity: number;
-}
 const ChatBotEsmeralda = () => {
   const { session, handleSignOut, token } = useAuthContext();
   const router = useRouter();
   const [flow, setFlow] = useState({});
-  const [settings, setSettings] = useState({});
   const pathname = usePathname();
   const {allProducts} = useProductContext();
   const [tooltipText, setTooltipText] = useState("Tienes alguna pregunta?");
-  const [filteredProducts, setFilteredProducts] = useState<
-    IProductList[] | undefined
-  >(allProducts);
+  const [filteredProducts, setFilteredProducts] = useState<IProductList[] | undefined>(allProducts);
   const [form, setForm] = useState<string[]>()
   const [optionForm, setOptionForm] = useState<string>()
   const [address, setAddress] = useState<string>("")
   const [receiptId, setReceiptId] = useState<string>("")
-  console.log(form);
+
   const helpLoginOptions = [
     "Registrarme",
     "Olvide mi contraseña",
@@ -52,7 +36,6 @@ const ChatBotEsmeralda = () => {
     "Volver al inicio",
     "Mas opciones",
   ];
-
   const helpClientOptions = [
     "Quiero comprar",
     "Ver ofertas",
@@ -63,7 +46,6 @@ const ChatBotEsmeralda = () => {
     "Saber mas de la esmeralda",
     "Cerrar sesion",
   ];
-  
   const helpUserOptions = [
     "Quiero comprar",
     "Ver ofertas",
@@ -72,29 +54,25 @@ const ChatBotEsmeralda = () => {
     "Ver Primeras Opciones",
   ];
   const helpShopOptions = ["Mas opciones"];
-  const helpClientShopOptions = [
-    "Hacer el pedido por aca",
-    "Mas opciones"];
+  const helpClientShopOptions = session && session.role === "Cliente"  ? ([
+     "Hacer el pedido por aca",
+    "Mas opciones"]) : (["Mas opciones"]);
   const userOptions = ["Iniciar sesion", "Registrarme", "Mas opciones"];
   const clientShopOptions = ["Es lo que necesito", "Quiero cambiar mi compra", "Volver al inicio"];
   
   useEffect(() => {
     if (allProducts) {
-      
-    
     setFilteredProducts(
       allProducts.reduce((acc: IProductList[], product: IProductList) => {
         const filteredSubproducts = product.subproducts?.filter(
           (subproduct) => subproduct.isAvailable
         );
-
         if (filteredSubproducts && filteredSubproducts.length > 0) {
           acc.push({
             ...product,
             subproducts: filteredSubproducts,
           });
         }
-
         return acc;
       }, [])
     );}
@@ -102,19 +80,19 @@ const ChatBotEsmeralda = () => {
   const price: any = form?.map((productString) => {
     // Divide el string en partes
 const parts = productString.split(' - ');
-console.log(parts);
+
 // Obtiene el nombre del producto
 const productName = parts[0];
 
 // Encuentra todos los números en el string y los convierte a enteros
 const numbers = (productString.match(/\d+/g) || []).map(num => parseInt(num, 10));
-console.log(numbers);
+
 // Determina el amount a usar
 const amount = numbers.length > 1 ? numbers[0] : (numbers[0] || 1);
-console.log(amount);
+
 // Determina la cantidad a usar
 const quantity = numbers.length > 1 ? numbers[numbers.length - 1] : (1);
-console.log(quantity);
+
 // Busca el producto en allProducts
 const foundProduct = filteredProducts?.find(p => p.description.toLowerCase() === productName.toLowerCase());
 
@@ -134,25 +112,23 @@ return Number(foundSubproduct.price) * quantity * 1.21;
 
 const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => accumulator + currentValue, 0);
 
-console.log(totalPrice);
-
   const handleCheckout = async() => {
     const products: any = form?.map((productString) => {
       // Divide el string en partes
   const parts = productString.split(' - ');
-  console.log(parts);
+
   // Obtiene el nombre del producto
   const productName = parts[0];
   
   // Encuentra todos los números en el string y los convierte a enteros
   const numbers = (productString.match(/\d+/g) || []).map(num => parseInt(num, 10));
-  console.log(numbers);
+
   // Determina el amount a usar
   const amount = numbers.length > 1 ? numbers[0] : (numbers[0] || 1);
-  console.log(amount);
+
   // Determina la cantidad a usar
   const quantity = numbers.length > 1 ? numbers[numbers.length - 1] : (1);
-console.log(quantity);
+
   // Busca el producto en allProducts
   const foundProduct = filteredProducts?.find(p => p.description.toLowerCase() === productName.toLowerCase());
 
@@ -173,7 +149,6 @@ console.log(quantity);
     quantity: quantity,
   };
     });
-    console.log(products);
     const orderCheckout = {
       userId: session?.id,
       products,
@@ -189,13 +164,11 @@ console.log(quantity);
     }
   }}
   const handleUpload = async(params:any) => {
-    console.log(params);
     const formData = new FormData();
     // Añadir la imagen al FormData si existe
     formData.append("id", receiptId);
       formData.append("file", params.files[0]);
       const response = await putOrderTransaction( formData, token);
-      console.log(response);
             if (response && ( response.status === 201 || response.status === 200)) {
               Swal.fire({
                 icon: "success",
@@ -210,11 +183,9 @@ console.log(quantity);
               text: "Ha ocurrido un error al agregar el comprobante.",
             });
           }
-		// handle files logic here
 	}
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     const handleRouteChange = (url: string) => {
       console.log(url);
       if (url === "/categories") {
@@ -229,7 +200,7 @@ console.log(quantity);
   useEffect(() => {
     if (typeof window === "undefined") return; // Evita que el código se ejecute en el servidor
     
-    if (session && session.role==="Cliente") {
+    if (session ) {
       setFlow({
         start: {
           message: `Hola ${session.name}!`,
@@ -259,12 +230,12 @@ console.log(quantity);
         step4: {
           message:
             "Puedes filtrar por categorias o promociones a la izquierda.",
-          transition: { duration: 1500 },
+          transition: { duration: 1000 },
           path: "step5",
         },
         step5: {
           message: "Arriba puedes filtrar por precio o alfabeticamente.",
-          transition: { duration: 1500 },
+          transition: { duration: 1000 },
           path: "step6",
         },
         step6: {
@@ -287,14 +258,17 @@ console.log(quantity);
           options :clientShopOptions,
           path: "process_options",
         },
+        preStep9: {
+          transition: { duration: 1000 },
+          path: "step9",
+        },
         step9: {
           message: "Clickea una de las opciones y me diras si quieres mas de 1.",
-          options:Array.isArray(form) && [...form, "Enviar pedido"],
+          options:Array.isArray(form) && [...form, "Continuar"],
           function: async(params: any) => setOptionForm(params.userInput),
-          
           path: "process_options",
-
         },
+       
         step10: {
           message: "Dime cuantas quieres.",
           function: async(params: any) =>{  const newInput = params.userInput; // Número que vas a sumar
@@ -319,13 +293,21 @@ console.log(quantity);
             );
 
           },
-          path: "step9",
+          path: "preStep9",
+        },
+        preStep11: {
+          transition: { duration: 1000 },
+          path: "step11",
         },
         step11: {
           message: "Genial, a donde lo enviamos.",
           function: (params: any) => setAddress(params.userInput),
-          path: "step12",
+          path: "preStep12",
 
+        },
+        preStep12: {
+          transition: { duration: 1000 },
+          path: "step12",
         },
         step12: {
           component: (
@@ -337,7 +319,7 @@ console.log(quantity);
               <p>Precio total con iva: $ {totalPrice}</p>
             </div>
           ),
-          options: ["Listo!", "Volver al inicio"],
+          options: ["Listo, transferir", "Volver al inicio"],
           path: "process_options",
         },
         step13: {
@@ -362,7 +344,6 @@ console.log(quantity);
     const formMatches = form?.some(item => item.toLowerCase().replace(/\s+/g, "") === userInputNormalized);
 
     if (formMatches) {
-      console.log("form", form);
       return "step10";
     }
 
@@ -440,9 +421,9 @@ console.log(quantity);
                 return "step7";
               case "verprimerasopciones":
                 return "step2";
-              case "enviarpedido":
-                return "step11";
-              case "listo!":
+              case "continuar":
+                return "preStep11";
+              case "listo,transferir":
                 handleCheckout();
                 return "step13";
               default:
@@ -533,8 +514,6 @@ console.log(quantity);
                   "Ya estás acá, puedes iniciar sessión."
                 );
                 return "step3a";
-              
-
               case "olvidemicontraseña":
                 router.push(urlLocal + "/forgotPassword");
                 return "step3b";
@@ -570,10 +549,8 @@ console.log(quantity);
     }
   }, [session, filteredProducts, form, optionForm, address,totalPrice]);
 
-  useEffect(() => {
-    
- 
-  setSettings ({
+
+  const settings ={
     general: {
       embedded: false,
       primaryColor: "#00796b",
@@ -589,7 +566,7 @@ console.log(quantity);
       avatar: "/Recurso1.png",
     },
     tooltip: {
-      text: pathname === "/categories" ? "Elige lo que quieras" : "Tienes alguna pregunta?",
+      text: tooltipText,
     },
     notification: {
       showCount: false,
@@ -597,8 +574,7 @@ console.log(quantity);
     chatHistory: {
       storageKey: "messages_bot",
     },
-  });
-},[pathname, pathname])
+  };
 
   const styles = {
     headerStyle: {
