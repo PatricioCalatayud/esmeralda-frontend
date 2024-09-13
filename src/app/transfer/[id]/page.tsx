@@ -39,10 +39,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const Transfer = ({ params }: { params: { id: string } }) => {
     const [receiptId, setReceiptId] = useState("");
     const router = useRouter();
-    const { token, session } = useAuthContext();
+    const { token, session, authLoading } = useAuthContext();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {setCartItemCount} = useCartContext();
   const [openModal, setOpenModal] = useState(false);
+  const [totalPrice, setTotalPrice] = useState("");
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState({
     imgUrl: "",
@@ -52,9 +53,10 @@ const Transfer = ({ params }: { params: { id: string } }) => {
   const [errors, setErrors] = useState({
     imgUrl: "",
   });
-
+  console.log(session);
   useEffect(() => {
-    if(!session) {
+    if (!authLoading) {
+    if( !session) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -66,16 +68,18 @@ const Transfer = ({ params }: { params: { id: string } }) => {
       
     }else{
       setOpenModal(false);
-    }
+    }}
     const fetchProduct = async () => {
       const response = await getOrder(params.id, token);
       if (response && response.receipt) {
+        console.log(response);
+        setTotalPrice(response.orderDetail.totalPrice);
         setReceiptId(response.receipt.id);
       }
     };
     fetchProduct();
     
-  }, [session]);
+  }, [authLoading]);
 
   //! Función para manejar los cambios en la imagen
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -513,6 +517,9 @@ const Transfer = ({ params }: { params: { id: string } }) => {
           <div className="mb-4 col-span-full">
             <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Comprobante de transferencia
+            </span>
+            <span className="block mb-2 text-sm font-semibold text-red-800 dark:text-white">
+              Monto a transferir: $ {totalPrice}
             </span>
             <div className="flex justify-center items-center w-full ">
               <label
