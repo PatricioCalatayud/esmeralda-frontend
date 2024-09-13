@@ -46,6 +46,13 @@ const ChatBotEsmeralda = () => {
     "Saber mas de la esmeralda",
     "Cerrar sesion",
   ];
+  const helpAdminOptions = [
+    "Ver Ordenes",
+    "Ver Productos",
+    "Agregar Productos",
+    "Ver lista de usuarios",
+    "Cerrar sesion",
+  ];
   const helpUserOptions = [
     "Quiero comprar",
     "Ver ofertas",
@@ -209,7 +216,7 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
         },
         step2: {
           message: "¿Que quieres hacer?",
-          options: helpClientOptions,
+          options: session.role === "Administrador" ? helpAdminOptions : helpClientOptions,
           path: "process_options",
         },
         step3a: {
@@ -426,6 +433,18 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
               case "listo,transferir":
                 handleCheckout();
                 return "step13";
+              case "verordenes":
+                router.push(urlLocal + "/dashboard/administrador/order");
+                return "step2";
+              case "verproductos":
+                router.push(urlLocal + "/dashboard/administrador/product");
+                return "step2";
+              case "agregarproductos":
+                router.push(urlLocal + "/dashboard/administrador/productAdd");
+                return "step2";
+              case "verlistadeusuarios":
+                router.push(urlLocal + "/dashboard/administrador/users");
+                return "step2";
               default:
                 return "unknown_input";
             }
