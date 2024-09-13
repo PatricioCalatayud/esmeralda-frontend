@@ -431,18 +431,33 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
               case "continuar":
                 return "preStep11";
               case "listo,transferir":
+                await params.injectMessage(
+                  "Puedes agregar el comprobante por el chat o por la pagina web."
+                );
                 handleCheckout();
                 return "step13";
               case "verordenes":
                 router.push(urlLocal + "/dashboard/administrador/order");
+                await params.injectMessage(
+                  "Aquí puedes verificar comprobantes de transferencia, o cambiar estado de envios."
+                );
                 return "step2";
               case "verproductos":
                 router.push(urlLocal + "/dashboard/administrador/product");
+                await params.injectMessage(
+                  "Aquí puedes editar los productos, editar subproductos, añadir subproductos, desabilitarlos o eliminarlos."
+                );
                 return "step2";
               case "agregarproductos":
+                await params.injectMessage(
+                  "Aquí puedes agregar los productos con sus subproductos."
+                );
                 router.push(urlLocal + "/dashboard/administrador/productAdd");
                 return "step2";
               case "verlistadeusuarios":
+                await params.injectMessage(
+                  "Aquí puedes ver la lista de usuarios, convertirlos en clientes y viceversa. Ademas ver la situacion de los clientes."
+                );
                 router.push(urlLocal + "/dashboard/administrador/users");
                 return "step2";
               default:
