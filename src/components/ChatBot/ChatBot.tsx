@@ -229,7 +229,7 @@ console.log(quantity);
   useEffect(() => {
     if (typeof window === "undefined") return; // Evita que el código se ejecute en el servidor
     
-    if (session) {
+    if (session && session.role==="Cliente") {
       setFlow({
         start: {
           message: `Hola ${session.name}!`,
