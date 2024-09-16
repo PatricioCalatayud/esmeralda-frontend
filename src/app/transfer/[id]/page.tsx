@@ -40,14 +40,14 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     const [receiptId, setReceiptId] = useState("");
     const router = useRouter();
     const { token, session, authLoading } = useAuthContext();
-  const [imageFile, setImageFile] = useState<File | null>(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [fileType, setFileType] = useState<string | null>(null);
   const {setCartItemCount} = useCartContext();
   const [openModal, setOpenModal] = useState(false);
   const [totalPrice, setTotalPrice] = useState("");
   //! Estado para almacenar los datos del producto
-  const [dataProduct, setDataProduct] = useState({
-    imgUrl: "",
-  });
+
 
   //! Estado para almacenar los errores
   const [errors, setErrors] = useState({
@@ -82,30 +82,27 @@ const Transfer = ({ params }: { params: { id: string } }) => {
   }, [authLoading]);
 
   //! Función para manejar los cambios en la imagen
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setFileType(selectedFile.type);
 
-      const imageUrl = URL.createObjectURL(file);
-
-      // Copiar el estado anterior y actualizar solo imgUrl
-      setDataProduct((prevDataProduct) => ({
-        ...prevDataProduct,
-        imgUrl: imageUrl,
-      }));
+      // Crear URL de previsualización
+      const fileUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(fileUrl);
     }
   };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(imageFile);
-    const formData = new FormData();
-    // Añadir la imagen al FormData si existe
-    formData.append("id", receiptId);
+    if (!file) {
+      Swal.fire("Error", "Debes seleccionar un archivo.", "error");
+      return;
+    }
 
-    if (imageFile) {
-      formData.append("file", imageFile);
-    } 
+    const formData = new FormData();
+    formData.append("id", receiptId);
+    formData.append("file", file);
 
     //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
@@ -143,7 +140,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
   };
   //!Validar formulario
   useEffect(() => {
-    if (!dataProduct.imgUrl) {
+    if (!file) {
       errors.imgUrl = "La imagen es obligatoria";
     } else {
       errors.imgUrl = "";
@@ -153,8 +150,6 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     setErrors(errors);
   }, []);
 
-  
-    const Router = useRouter();
   
     const initialUserData: ILogin = {
       email: "",
@@ -541,24 +536,35 @@ const Transfer = ({ params }: { params: { id: string } }) => {
                   id="dropzone-file"
                   type="file"
                   className="hidden"
-                  onChange={handleImageChange}
+                  onChange={handleFileChange}
                 />
               </label>
             </div>
-            {!dataProduct.imgUrl ? (
+            {!file ? (
               <span className="text-red-500">{errors.imgUrl}</span>
             ) : null}
-            {imageFile && (
-              <div className="mt-4 flex justify-center">
-                <Image
-                  src={URL.createObjectURL(imageFile)}
-                  alt="Imagen del producto"
-                  width={500} // debes especificar un ancho
-                  height={300} // y una altura
-                  className="max-w-44 h-auto "
-                />
-              </div>
-            )}
+             {/* Mostrar previsualización */}
+        {previewUrl && (
+          <div className="preview mt-4 w-full flex justify-center">
+            {fileType?.includes("image") ? (
+              <Image
+                src={previewUrl}
+                alt="Preview"
+                width={300}
+                height={300}
+                className="object-contain"
+              />
+            ) : fileType?.includes("pdf") ? (
+              <iframe
+                src={previewUrl}
+                width="300"
+                height="400"
+                title="PDF Preview"
+                className="border"
+              />
+            ) : null}
+          </div>
+        )}
           </div>
         </div>
       </DashboardAddModifyComponent>

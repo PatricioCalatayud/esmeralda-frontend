@@ -194,7 +194,6 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handleRouteChange = (url: string) => {
-      console.log(url);
       if (url === "/categories") {
         setTooltipText("Elige lo que quieras");
       } else {
@@ -581,7 +580,7 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
         },
       });
     }
-  }, [session, filteredProducts, form, optionForm, address,totalPrice]);
+  }, [session, filteredProducts, form, optionForm, address,totalPrice, receiptId]);
 
 
   const settings ={
