@@ -8,6 +8,7 @@ export interface IOrders {
     orderDetail:   OrderDetail;
     receipt?:      Receipt;
     status:    string;
+    invoiceType?: string;
 }
 
 export interface IOrderCheckout {
