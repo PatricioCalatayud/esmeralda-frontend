@@ -101,6 +101,14 @@ const OrderList = () => {
         confirmButtonText: "Si, Es correcto",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          Swal.fire({
+            title: "Actualizando...",
+            text: "Por favor espera.",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
           const response = await putOrder(id,{transferStatus:"Comprobante verificado", orderStatus:true}, token);
           if (response && (response?.status === 200 || response?.status === 201)) {
             setOrders(orders.map((order) => 
@@ -142,6 +150,14 @@ const OrderList = () => {
             confirmButtonText: "Si, Es incorrecto",
           }).then(async (result) => {
             if (result.isConfirmed) {
+              Swal.fire({
+                title: "Actualizando...",
+                text: "Por favor espera.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                  Swal.showLoading();
+                },
+              });
               const response = await putOrder(id,{transferStatus:"Rechazado"}, token);
               if (response && (response?.status === 200 || response?.status === 201)) {
                 setOrders(orders.map((order) => 
@@ -408,7 +424,7 @@ const renderFileActionsColumn = (order: IOrders) => {
                 name="status"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 onChange={(e) => handleChange(e, order.id)}
-                defaultValue={order.orderDetail?.transactions.status }
+                value={order.orderDetail?.transactions?.status || ""}
               >
                 <option value="">--Seleccione--</option>
                 <option value={"Pendiente de pago"}>Pendiente de pago</option>

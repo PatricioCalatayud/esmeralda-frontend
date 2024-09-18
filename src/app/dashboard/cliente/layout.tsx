@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
@@ -27,7 +27,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const { session, authLoading } = useAuthContext();
-
+  const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
     console.log(authLoading);
@@ -38,12 +38,12 @@ console.log(session);
           "¡Error!",
           "Sesión de usuario no encontrada. Por favor, inicia sesión.",
           "error"
-        ).then(() => {
-          redirect("/login");
-        });
+        )
+          router.push("/login")
+        };
         
       }
-    }
+    
   }, [authLoading, session]);
 
   return (
