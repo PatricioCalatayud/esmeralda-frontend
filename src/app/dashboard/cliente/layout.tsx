@@ -5,6 +5,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
 
 const links = [
   {
@@ -29,10 +30,18 @@ export default function DashboardLayout({
 
   //! Obtener token de usuario-Session
   useEffect(() => {
+    console.log(authLoading);
+console.log(session);
     if (!authLoading) {
       if (!session) {
-        console.log("Session no exists:");
-        redirect("/login");
+        Swal.fire(
+          "¡Error!",
+          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
+          "error"
+        ).then(() => {
+          redirect("/login");
+        });
+        
       }
     }
   }, [authLoading, session]);

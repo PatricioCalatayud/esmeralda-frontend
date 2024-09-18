@@ -11,9 +11,9 @@ import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDownload, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faDownload, faEdit, faX } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "flowbite-react";
-
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 const OrderList = () => {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,26 +21,10 @@ const OrderList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const { token, session } = useAuthContext();
-  const ORDERS_PER_PAGE = 5;
+  const ORDERS_PER_PAGE = 7;
   const [loading, setLoading] = useState(true);
   const [dataStatus, setDataStatus] = useState("");
-  
 
-  //! Obtener token de usuario
-  useEffect(() => {
-
-      if (!session) {
-        
-        Swal.fire(
-          "¡Error!",
-          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
-          "error"
-        ).then(() => {
-          router.push("/login");
-        });
-      }
-    
-  }, [router]);
 
   //! Obtener las Ordenes
   useEffect(() => {
@@ -122,7 +106,14 @@ const OrderList = () => {
             setOrders(orders.map((order) => 
               order.id === id 
                 ? { 
-                    ...order, 
+                    ...order,
+                    orderDetail:{
+                      ...order.orderDetail,
+                      transactions:{
+                        ...order.orderDetail.transactions,
+                        status: "En preparación"
+                      },
+                    } ,
                     receipt: { 
                       ...order.receipt, 
                       status: "Comprobante verificado" 
@@ -175,6 +166,124 @@ const OrderList = () => {
           })
           }
 
+           //! Función para subir un archivo de factura
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>, orderId: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`${apiURL}/mail/bill/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        Swal.fire("¡Archivo subido!", "El archivo ha sido subido correctamente.", "success");
+      } else {
+        Swal.fire("¡Error!", "No se pudo subir el archivo.", "error");
+      }
+    }
+  };
+
+  //! Función para eliminar el archivo de factura
+  const handleDeleteFile = async (orderId: string) => {
+    const response = await fetch(`${apiURL}/mail/bill/${orderId}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imgUrl: null }), 
+    });
+
+    if (response.ok) {
+      Swal.fire("¡Archivo eliminado!", "El archivo ha sido eliminado correctamente.", "success");
+    } else {
+      Swal.fire("¡Error!", "No se pudo eliminar el archivo.", "error");
+    }
+  };
+
+  //! Función para modificar el archivo de factura
+  const handleEditFile = async (orderId: string) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const response = await fetch(`${apiURL}/mail/bill/${orderId}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          Swal.fire("¡Archivo actualizado!", "El archivo ha sido actualizado correctamente.", "success");
+        } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el archivo.", "error");
+        }
+      }
+    };
+    fileInput.click();
+  };
+//! Función para mostrar si hay una factura en la orden
+const renderInvoiceColumn = (order: IOrders) => {
+  return order.bill ? "Sí" : "No"; 
+};
+
+//! Función para mostrar el manejo de archivos
+const renderFileActionsColumn = (order: IOrders) => {
+
+            if (order.bill) {
+              return (
+                <div className="flex justify-center items-center gap-4">
+                  {order.bill.imgUrl ? (
+                    <>
+                      <a href={order.bill.imgUrl} target="_blank" rel="noopener noreferrer">
+                        <FontAwesomeIcon
+                          icon={faDownload}
+                          style={{ color: "teal", width: "20px", height: "20px" }}
+                        />
+                      </a>
+                      <Tooltip content="Modificar archivo">
+                        <button
+                          type="button"
+                          onClick={() => handleEditFile(order.id)}
+                          className="py-2 px-3 flex items-center text-sm text-yellow-600 border-yellow-600 border rounded-lg hover:bg-yellow-600 hover:text-white"
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Eliminar archivo">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFile(order.id)}
+                          className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
+                        >
+                          <FontAwesomeIcon icon={faX} />
+                        </button>
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <>
+                      <input type="file" onChange={(e) => handleUploadFile(e, order.id)} />
+                    </>
+                  )}
+                </div>
+              );
+            } else {
+              return "--";
+            }
+          };
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
@@ -195,6 +304,8 @@ const OrderList = () => {
         "Productos",
         "Estado",
         "Acciones",
+        "Necesita Factura?", 
+        "Archivo Factura",
       ]}
       noContent="No hay Ordenes disponibles"
     >
@@ -263,7 +374,7 @@ const OrderList = () => {
  
       ) : null}
       </div>
-       <Tooltip content="Aceptar" >
+       {order.receipt.status !== "Pendiente de subir comprobante" && <> <Tooltip content="Aceptar" >
         <button
           type="button"
           onClick={() => handleTransferOk(order.id)}
@@ -280,13 +391,13 @@ const OrderList = () => {
                       >
                         <FontAwesomeIcon icon={faX} />
                       </button>
-                    </Tooltip>
+                    </Tooltip></>}
     </div>
   )}
 </td>
           <td
             className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
-              order.orderDetail?.transactions.status === "Recibido"
+              order.orderDetail?.transactions.status === "En preparación"
                 ? "text-teal-500"
                 : "text-red-500"
             } `}
@@ -301,12 +412,21 @@ const OrderList = () => {
               >
                 <option value="">--Seleccione--</option>
                 <option value={"Pendiente de pago"}>Pendiente de pago</option>
-                <option value={"Recibido"}>Recibido</option>
+                <option value={"En preparación"}>En preparación</option>
                 <option value={"Empaquetado"}>Empaquetado</option>
                 <option value={"Transito"}>Transito</option>
                 <option value={"Entregado"}>Entregado</option>
               </select>
 
+          </td>
+          {/* Columna Necesita Factura */}
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {renderInvoiceColumn(order)}
+          </td>
+
+          {/* Columna Archivo Factura */}
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {renderFileActionsColumn(order)}
           </td>
         </tr>
       ))}

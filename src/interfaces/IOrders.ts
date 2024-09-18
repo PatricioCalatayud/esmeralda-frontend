@@ -8,6 +8,7 @@ export interface IOrders {
     orderDetail:   OrderDetail;
     receipt?:      Receipt;
     status:    string;
+    bill?: Bill;
 }
 
 export interface IOrderCheckout {
@@ -29,16 +30,18 @@ export interface Receipt {
 export interface OrderDetail {
     deliveryDate: string;
     totalPrice:   string;
-    transactions: Transaction;
+    transactions: Transactions;
     addressDelivery: string;
 
 }
 
-export interface Transaction {
+export interface Transactions {
     status:    string;
     timestamp: string;
 }
-
+export interface Bill {
+    imgUrl: string;
+}
 export interface ProductsOrder {
     id?: string;
     quantity: string;
