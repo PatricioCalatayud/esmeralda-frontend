@@ -541,13 +541,7 @@ const Navbar = () => {
             </li>
           </ul>
         </nav>
-        <div className="absolute bottom-0 w-full h-40 overflow-hidden">
-          <div className="relative w-full h-full">
-            <div className="absolute left-0 top-0 w-20 h-20 bg-hamburger bg-contain bg-no-repeat animate-bounce"></div>
-            <div className="absolute left-1/3 top-0 w-20 h-20 bg-fries bg-contain bg-no-repeat animate-bounce delay-150"></div>
-            <div className="absolute left-2/3 top-0 w-20 h-20 bg-delivery bg-contain bg-no-repeat animate-bounce delay-300"></div>
-          </div>
-        </div>
+
       </div>
     </header>
   );
