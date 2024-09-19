@@ -6,7 +6,7 @@ const SobreNosotros: React.FC = () => {
   return (
     <section className="text-gray-600 body-font">
       <div className="container mx-auto flex px-5 py-24 items-center justify-center flex-col">
-        <div className="flex flex-col md:flex-row md:justify-center mb-10">
+        <div className="flex flex-col md:flex-row md:justify-center items-center mb-10">
           <Image width={500} height={500} priority={true} className="lg:w-1/3 md:w-1/2 w-5/6 mb-4 md:mb-0 object-cover object-center rounded" alt="historical photo 1" src="https://images.pexels.com/photos/19973361/pexels-photo-19973361/free-photo-of-warehouse-of-coffee-beans.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" />
           <Image width={500} height={500} priority={true} className="lg:w-1/3 md:w-1/2 w-5/6 md:ml-4 object-cover object-center rounded" alt="historical photo 2" src="https://images.pexels.com/photos/4820660/pexels-photo-4820660.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" />
         </div>

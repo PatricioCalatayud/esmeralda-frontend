@@ -1,4 +1,4 @@
-"use client"; // Asegura que este componente solo se ejecute en el cliente
+"use client"; 
 
 import { useAuthContext } from "@/context/auth.context";
 import { usePathname } from "next/navigation";
@@ -365,7 +365,11 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
           options: ["Ver mis ordenes", "Volver al inicio"],
           path: "process_options",
         },
-
+        stepWtp: {
+          message: "Los horarios de atención son de Lunes a Viernes de 9:00 a 13:30." + " " + "El tiempo de expera es de 30 minutos a 1 hora.",
+          options:["Ir a WhatsApp", "Volver al inicio"],
+          path: "process_options",
+        },
         process_options: {
           transition: { duration: 0 },
           chatDisabled: true,
@@ -434,11 +438,16 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 case "calificarlocal":
                 router.push(urlLocal + "/contact");
                 return "step3c";
-              case "quierohablarconunapersona":
-                link = "https://api.whatsapp.com/send?phone=541158803709";
-                window.open(link, "_blank");
-                await params.injectMessage("Aquí puedes hablar con una persona.");
-                return "step2";
+                case "irawhatsapp":
+                  link = "https://api.whatsapp.com/send?phone=541158803709";
+                  window.open(link, "_blank");
+                  await params.injectMessage("Aquí puedes talk con una persona.");
+                  return "step2";
+                case "quierohablarconunapersona":
+                  await params.injectMessage(
+                    "Puedes, comunicarte por WhatsApp."
+                  )
+                  return "stepWtp";
               case "sabermasdelaesmeralda":
                 await params.injectMessage(
                   "Aquí puedes ver mas sobre la esmeralda."
@@ -547,6 +556,11 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
           options: helpShopOptions,
           path: "process_options",
         },
+        stepWtp: {
+          message: "Los horarios de atención son de Lunes a Viernes de 9:00 a 13:30." + " " + "El tiempo de expera es de 30 minutos a 1 hora.",
+          options:["Ir a WhatsApp", "Volver al inicio"],
+          path: "process_options",
+        },
         process_options: {
           transition: { duration: 0 },
           chatDisabled: true,
@@ -584,11 +598,16 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 return "step2";
               case "masopciones":
                 return "step3c";
-              case "quierohablarconunapersona":
+              case "irawhatsapp":
                 link = "https://api.whatsapp.com/send?phone=541158803709";
                 window.open(link, "_blank");
                 await params.injectMessage("Aquí puedes talk con una persona.");
                 break;
+              case "quierohablarconunapersona":
+                await params.injectMessage(
+                  "Puedes, comunicarte por WhatsApp."
+                )
+                return "stepWtp"
               case "sabermasdelaesmeralda":
                 await params.injectMessage(
                   "Aquí puedes ver mas sobre la esmeralda."
@@ -651,19 +670,10 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
     botAvatarStyle: {
       backgroundColor: "#00796b",
     },
-    chatButtonStyle: {
-      position: "fixed" as const,
-      bottom: "20px",
-      right: "120px",
-      zIndex: 50,
-    },
-    tooltipStyle: {
-      position: "fixed" as const,
-      bottom: "20px",
-      right: "210px",
-      zIndex: 50,
-      fontSize: "15px",
-    },
+
+
+      tooltipStyle:  { fontSize: "15px" } ,
+    
   };
 
   return <ChatBot styles={styles} settings={settings} flow={flow} />;
