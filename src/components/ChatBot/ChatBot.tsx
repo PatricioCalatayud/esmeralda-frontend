@@ -1,4 +1,4 @@
-"use client"; // Asegura que este componente solo se ejecute en el cliente
+"use client"; 
 
 import { useAuthContext } from "@/context/auth.context";
 import { usePathname } from "next/navigation";
@@ -672,7 +672,7 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
     },
 
 
-      tooltipStyle: window.innerWidth > 768 ? { fontSize: "15px" } : { display: "none" },
+      tooltipStyle:  { fontSize: "15px" } ,
     
   };
 
