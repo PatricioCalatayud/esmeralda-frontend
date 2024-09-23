@@ -117,7 +117,7 @@ const Footer: React.FC = () => {
               <div>Preguntas Frecuentes</div>
             </Link>
           </FooterList>
-          <div className="justify-between flex flex-col text-center h-60 lg:w-2/4 w-full ">
+          <div className="justify-between flex flex-col text-center  lg:w-2/4 w-full ">
             <h3 className="text-xl font-bold mb-3 text-teal-600">Sobre Nosotros</h3>
             <p className="h-full mb-2 max-lg:w-full">
               ¡Bienvenido a Café La Esmeralda, tu destino para los mejores cafés en grano y accesorios! Nos enfocamos en granos seleccionados y productos de alta calidad para ofrecerte una experiencia de café única. Disfruta de nuestra variedad de productos y ofertas hoy. ©2024 Café La Esmeralda. Todos los Derechos Reservados.

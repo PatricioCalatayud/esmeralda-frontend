@@ -30,11 +30,11 @@ export interface Receipt {
 export interface OrderDetail {
     deliveryDate:    string;
     totalPrice:      string;
-    transactions:    Transaction;
+    transactions:    Transactions;
     addressDelivery: string;
 }
 
-export interface Transaction {
+export interface Transactions {
     status:    string;
     timestamp: string;
 }

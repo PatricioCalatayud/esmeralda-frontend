@@ -1,4 +1,4 @@
-"use client"; // Asegura que este componente solo se ejecute en el cliente
+"use client"; 
 
 import { useAuthContext } from "@/context/auth.context";
 import { usePathname } from "next/navigation";
@@ -37,6 +37,7 @@ const ChatBotEsmeralda = () => {
     "Mas opciones",
   ];
   const helpClientOptions = [
+    "Hacer el pedido por aca",
     "Quiero comprar",
     "Ver ofertas",
     "Ver mis ordenes",
@@ -163,9 +164,20 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
       address: address,
     };
     if (session) {
-      
+      Swal.fire({
+        title: "Preparando orden para transferencia...",
+        text: "Por favor espera.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const order = await postOrder(orderCheckout, token);
+      
       if(order?.status === 200 || order?.status === 201) {
+        Swal.close();
+        
+        router.push("/");
         setReceiptId(order.data.receipt.id);
       router.push(`/transfer/${order.data.id}`);
     }
@@ -175,14 +187,23 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
     // Añadir la imagen al FormData si existe
     formData.append("id", receiptId);
       formData.append("file", params.files[0]);
+      Swal.fire({
+        title: "Enviando comprobante...",
+        text: "Por favor espera.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await putOrderTransaction( formData, token);
             if (response && ( response.status === 201 || response.status === 200)) {
+              Swal.close();
               Swal.fire({
                 icon: "success",
                 title: "¡Comprobante agregado!",
                 text: "El comprobante ha sido agregado con éxito.",
               })
-              router.push("/");
+              router.push("/dashboard/cliente/order");
           } else {
             Swal.fire({
               icon: "error",
@@ -277,26 +298,32 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
        
         step10: {
           message: "Dime cuantas quieres.",
-          function: async(params: any) =>{  const newInput = params.userInput; // Número que vas a sumar
-
-            // Encuentra el índice de la opción que debe ser reemplazada
+          function: async (params: any) => {  
+            const newInput = params.userInput; // El nuevo número que vas a agregar o reemplazar
             const index = form?.findIndex(option => option === optionForm);
-          
+            
             if (index !== -1) {
-              // Si la opción existe, creamos una copia del array form
-              const updatedForm = [ ...form as any];
+              // Copiamos el array form
+              const updatedForm = [...form as any];
               
-              // Reemplazamos el valor en ese índice con `optionForm + newInput`
-              updatedForm[index as any] = `${optionForm} - ${newInput}`;
-          
+              // Verificamos si la opción ya tiene 3 partes separadas por "-"
+              
+              const parts = optionForm?.split(" - ");
+              if (parts?.length === 3) {
+                // Si ya tiene 3 partes, reemplazamos la última parte por `newInput`
+                parts[2] = newInput;
+                updatedForm[index as any] = parts.join(" - ");
+              } else {
+                // Si no tiene 3 partes, simplemente agregamos el nuevo número al final
+                updatedForm[index as any] = `${optionForm} - ${newInput}`;
+              }
+              
               // Actualizamos el estado con el nuevo array
               setForm(updatedForm);
             } else {
               console.error("Opción no encontrada en form");
             }
-            await params.injectMessage(
-             `${optionForm} - ${params.userInput}`
-            );
+
 
           },
           path: "preStep9",
@@ -325,7 +352,7 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
               <p>Precio total con iva: $ {totalPrice}</p>
             </div>
           ),
-          options: ["Listo, transferir", "Volver al inicio"],
+          options: ["Listo, transferir", "Volver al inicio", "Cambiar dirección","Quiero cambiar mi compra"],
           path: "process_options",
         },
         step13: {
@@ -338,7 +365,11 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
           options: ["Ver mis ordenes", "Volver al inicio"],
           path: "process_options",
         },
-
+        stepWtp: {
+          message: "Los horarios de atención son de Lunes a Viernes de 9:00 a 13:30." + " " + "El tiempo de expera es de 30 minutos a 1 hora.",
+          options:["Ir a WhatsApp", "Volver al inicio"],
+          path: "process_options",
+        },
         process_options: {
           transition: { duration: 0 },
           chatDisabled: true,
@@ -407,11 +438,16 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 case "calificarlocal":
                 router.push(urlLocal + "/contact");
                 return "step3c";
-              case "quierohablarconunapersona":
-                link = "https://api.whatsapp.com/send?phone=541158803709";
-                window.open(link, "_blank");
-                await params.injectMessage("Aquí puedes hablar con una persona.");
-                return "step2";
+                case "irawhatsapp":
+                  link = "https://api.whatsapp.com/send?phone=541158803709";
+                  window.open(link, "_blank");
+                  await params.injectMessage("Aquí puedes talk con una persona.");
+                  return "step2";
+                case "quierohablarconunapersona":
+                  await params.injectMessage(
+                    "Puedes, comunicarte por WhatsApp."
+                  )
+                  return "stepWtp";
               case "sabermasdelaesmeralda":
                 await params.injectMessage(
                   "Aquí puedes ver mas sobre la esmeralda."
@@ -459,6 +495,8 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 );
                 router.push(urlLocal + "/dashboard/administrador/users");
                 return "step2";
+              case "cambiardirección":
+                return "step11";
               default:
                 return "unknown_input";
             }
@@ -518,6 +556,11 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
           options: helpShopOptions,
           path: "process_options",
         },
+        stepWtp: {
+          message: "Los horarios de atención son de Lunes a Viernes de 9:00 a 13:30." + " " + "El tiempo de expera es de 30 minutos a 1 hora.",
+          options:["Ir a WhatsApp", "Volver al inicio"],
+          path: "process_options",
+        },
         process_options: {
           transition: { duration: 0 },
           chatDisabled: true,
@@ -555,11 +598,16 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 return "step2";
               case "masopciones":
                 return "step3c";
-              case "quierohablarconunapersona":
+              case "irawhatsapp":
                 link = "https://api.whatsapp.com/send?phone=541158803709";
                 window.open(link, "_blank");
                 await params.injectMessage("Aquí puedes talk con una persona.");
                 break;
+              case "quierohablarconunapersona":
+                await params.injectMessage(
+                  "Puedes, comunicarte por WhatsApp."
+                )
+                return "stepWtp"
               case "sabermasdelaesmeralda":
                 await params.injectMessage(
                   "Aquí puedes ver mas sobre la esmeralda."
@@ -622,19 +670,10 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
     botAvatarStyle: {
       backgroundColor: "#00796b",
     },
-    chatButtonStyle: {
-      position: "fixed" as const,
-      bottom: "20px",
-      right: "120px",
-      zIndex: 50,
-    },
-    tooltipStyle: {
-      position: "fixed" as const,
-      bottom: "20px",
-      right: "210px",
-      zIndex: 50,
-      fontSize: "15px",
-    },
+
+
+      tooltipStyle:  { fontSize: "15px" } ,
+    
   };
 
   return <ChatBot styles={styles} settings={settings} flow={flow} />;
