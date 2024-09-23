@@ -29,27 +29,25 @@ const OrderList = () => {
   //! Obtener las Ordenes
   useEffect(() => {
     async function fetchOrders() {
-      const limit = ORDERS_PER_PAGE;
-      const page = currentPage;
       if (token) {
-        const response = await getAllOrders(token );
+        const response: IOrders[] | undefined = await getAllOrders(token);
         if (response) {
-        const orders = response;
-
-        setOrders(orders);
-        setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
-        setLoading(false);}
+          setOrders(response);
+          setTotalPages(Math.ceil(response.length / ORDERS_PER_PAGE));
+        } else {
+          setOrders([]);
+        }
+        setLoading(false);
       }
-        
     }
     if (token) {
       fetchOrders();
     }
   }, [token]);
+
   const onPageChange = (page: number) => setCurrentPage(page);
 
-
-  //! Función para calcular las ordenes a mostrar en la página actual
+  //! Función para calcular las órdenes a mostrar en la página actual
   const getCurrentPageOrders = () => {
     const filteredOrders = filterOrders();
     const startIndex = (currentPage - 1) * ORDERS_PER_PAGE;
@@ -57,10 +55,9 @@ const OrderList = () => {
     return filteredOrders.slice(startIndex, endIndex);
   };
 
-  //! Función para filtrar las ordenes
+  //! Función para filtrar las órdenes
   const filterOrders = () => {
     if (searchTerm === "") {
-      console.log(orders);
       return orders;
     } else {
       return orders.filter((order) =>
@@ -70,16 +67,15 @@ const OrderList = () => {
   };
 
   //! Función para manejar el cambio en el estado de la orden
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, id: string) => {
-
-    const newStatus = {status: e.target.value}
-    console.log(newStatus);
-
-      const response = await putOrder(id, newStatus, token as string);
-      if(response && (response?.status === 200 || response?.status === 201)){
-        console.log("response", response);
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    const newStatus = { status: e.target.value };
+    const response = await putOrder(id, newStatus, token as string);
+    if (response && (response?.status === 200 || response?.status === 201)) {
       Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
-      }else {
+    } else {
       console.error("Error updating order:", response);
       Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
     }
@@ -302,12 +298,11 @@ const renderFileActionsColumn = (order: IOrders) => {
           };
   return loading ? (
     <div className="flex items-center justify-center h-screen">
-      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
-      onPointerLeaveCapture={() => {}}/>
+      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
     </div>
   ) : (
     <DashboardComponent
-    setCurrentPage={onPageChange}
+      setCurrentPage={onPageChange}
       titleDashboard="Listado de Ordenes"
       searchBar="Buscar cliente"
       handleSearchChange={handleSearchChange}
@@ -336,45 +331,43 @@ const renderFileActionsColumn = (order: IOrders) => {
           >
             <div className="flex items-center w-full justify-center">
               {order.user?.name}
-             
             </div>
           </th>
 
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-          $ {order.orderDetail?.totalPrice}
+            $ {order.orderDetail?.totalPrice}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-          <div className="flex justify-center items-center">
-              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", {
-                locale: es,
-              })}
-            </div>
-            {order.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", {
-              locale: es,
-            })}
-          </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {order.orderDetail?.addressDelivery
-            }
-          </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white gap-4">
-            {order.productsOrder && order.productsOrder.map((product, productIndex) => (
-              <div key={productIndex} className=" text-start flex items-center">
-                 <Image
-                      width={500}
-                      height={500}
-                      priority={true}
-                      src={product.subproduct.product  ? product.subproduct?.product.imgUrl : ""}
-                      alt={product.subproduct.product ? product.subproduct?.product.description : ""}
-                      className="w-10 h-10 inline-block mr-2 rounded-full"
-                    />
-                    <div className="flex flex-row gap-1">
-                    <span> {product.subproduct.product && product.subproduct?.product.description}</span>
 
-                    <span>  x {product.subproduct?.amount}</span>
-                    </div>
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            <div className="flex justify-center items-center">
+              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", { locale: es })}
+            </div>
+            {order.orderDetail?.deliveryDate &&
+              format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}
+          </td>
+
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+            {order.orderDetail?.addressDelivery}
+          </td>
+
+          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white gap-4">
+            {order.productsOrder &&
+              order.productsOrder.map((product, productIndex) => (
+                <div key={productIndex} className="text-start flex items-center">
+                  <Image
+                    width={500}
+                    height={500}
+                    priority={true}
+                    src={product.subproduct.product ? product.subproduct?.product.imgUrl : ""}
+                    alt={product.subproduct.product ? product.subproduct?.product.description : ""}
+                    className="w-10 h-10 inline-block mr-2 rounded-full"
+                  />
+                  <div className="flex flex-row gap-1">
+                    <span>{product.subproduct.product && product.subproduct?.product.description}</span>
+                    <span> x {product.subproduct?.amount}</span>
                   </div>
-            ))}
+                </div>
+              ))}
           </td>
           <td>
   {order.receipt && (

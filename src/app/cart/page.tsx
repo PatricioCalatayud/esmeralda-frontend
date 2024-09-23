@@ -31,7 +31,12 @@ const Cart = () => {
   const { setCartItemCount } = useCartContext();
   const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [account, setAccount] = useState<IAccountProps>();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+
+  // Variables agregadas
+  const [needsInvoice, setNeedsInvoice] = useState(false);
+  const [invoiceType, setInvoiceType] = useState<string>("");
+
   //! Obtiene los datos del carro
   useEffect(() => {
     const fetchCart = () => {
@@ -149,7 +154,7 @@ const Cart = () => {
       subproductId: product.idSubProduct,
       quantity: product.quantity,
     }));
-    setLoading(true)
+    setLoading(true);
     const orderCheckout = {
       userId: session?.id,
       products,
@@ -159,11 +164,11 @@ const Cart = () => {
         boton === "Cliente Transferencia" && { account: "Transferencia" }),
       ...(session?.role === "Cliente" &&
         boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
+      ...(needsInvoice && { invoiceType }), // Agregar tipo de factura si está seleccionada
     };
-    console.log(orderCheckout);
+    console.log( "Esto es orderCheckout", orderCheckout);
     const order = await postOrder(orderCheckout, token);
     console.log(order);
-    
 
     if (order?.status === 200 || order?.status === 201) {
       if (session?.role === "Usuario") {
@@ -189,7 +194,7 @@ const Cart = () => {
         showConfirmButton: false,
         timer: 1500,
       });
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -393,38 +398,105 @@ const Cart = () => {
             >
               <Modal.Header>Detalle de envio</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
-                {loading === false ? <><div className="w-full h-20 gap-4 flex flex-col">
-                  <label
-                    htmlFor="addresOrder"
-                    className="block text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Dirección de envio
-                  </label>
-                  <input
-                    type="text"
-                    name="addresOrder"
-                    id="addresOrder"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-                    placeholder="Avenida San Martin 123"
-                    value={addresOrder}
-                    onChange={(e) => setAddresOrder(e.target.value)}
-                    disabled={isDelivery === true}
-                  />
-                </div>
-                <div className="flex gap-4 items-center h-20">
-                  <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                    Retiro en local
-                  </h4>
-                  <input
-                    type="checkbox"
-                    name="isDelivery"
-                    id="isDelivery"
-                    onChange={(e) => setIsDelivery(e.target.checked)}
-                  />
-                </div></>: <div className="flex items-center justify-center h-40">
-      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
-      onPointerLeaveCapture={() => {}}/>
-    </div> }
+                {loading === false ? (
+                  <>
+                    <div className="w-full h-20 gap-4 flex flex-col">
+                      <label
+                        htmlFor="addresOrder"
+                        className="block text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Dirección de envio
+                      </label>
+                      <input
+                        type="text"
+                        name="addresOrder"
+                        id="addresOrder"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
+                        placeholder="Avenida San Martin 123"
+                        value={addresOrder}
+                        onChange={(e) => setAddresOrder(e.target.value)}
+                        disabled={isDelivery === true}
+                      />
+                    </div>
+                    <div className="flex gap-4 items-center h-20">
+                      <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+                        Retiro en local
+                      </h4>
+                      <input
+                        type="checkbox"
+                        name="isDelivery"
+                        id="isDelivery"
+                        onChange={(e) => setIsDelivery(e.target.checked)}
+                      />
+                    </div>
+
+                    {/* Agregado: Botón para preguntar si necesita factura */}
+                    <div className="flex gap-4 items-center h-20">
+                      <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+                        ¿Necesitas Factura?
+                      </h4>
+                      <input
+                        type="checkbox"
+                        name="needsInvoice"
+                        id="needsInvoice"
+                        onChange={(e) => setNeedsInvoice(e.target.checked)}
+                      />
+                    </div>
+
+                    {/* Agregado: Si necesita factura, mostrar los tipos A, B, C */}
+                    {needsInvoice && (
+                      <div className="flex flex-col gap-4">
+                        <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+                          ¿Qué tipo de factura necesitas?
+                        </h4>
+                        <div className="flex gap-4">
+                          <button
+                            type="button"
+                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                              invoiceType === "A"
+                                ? "bg-teal-600 text-white"
+                                : "bg-gray-200"
+                            }`}
+                            onClick={() => setInvoiceType("A")}
+                          >
+                            A
+                          </button>
+                          <button
+                            type="button"
+                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                              invoiceType === "B"
+                                ? "bg-teal-600 text-white"
+                                : "bg-gray-200"
+                            }`}
+                            onClick={() => setInvoiceType("B")}
+                          >
+                            B
+                          </button>
+                          <button
+                            type="button"
+                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                              invoiceType === "C"
+                                ? "bg-teal-600 text-white"
+                                : "bg-gray-200"
+                            }`}
+                            onClick={() => setInvoiceType("C")}
+                          >
+                            C
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-40">
+                    <Spinner
+                      color="teal"
+                      className="h-12 w-12"
+                      onPointerEnterCapture={() => {}}
+                      onPointerLeaveCapture={() => {}}
+                    />
+                  </div>
+                )}
               </Modal.Body>
               <Modal.Footer>
                 {session && session.role === "Cliente" ? (
