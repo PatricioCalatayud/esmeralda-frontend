@@ -19,9 +19,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 import Link from "next/link";
-import { NewUser } from "@/helpers/Autenticacion.helper";
 import { IUserProps } from "@/interfaces/IUser";
-import { validateRegisterUserForm } from "@/utils/userFormValidation";
 import axios from "axios";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 

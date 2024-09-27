@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ICart, IProductList } from "@/interfaces/IProductList";
+import { ICart } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,7 +29,6 @@ const Cart = () => {
   const [addresOrder, setAddresOrder] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
-  const [selectedPrice, setSelectedPrice] = useState<string>("");
   const [account, setAccount] = useState<IAccountProps>();
   const [loading, setLoading] = useState(false);
 

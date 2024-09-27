@@ -26,6 +26,11 @@ const links = [
     name: "Usuarios",
     href: "/dashboard/administrador/users",
     hrefActive: "/dashboard/administrador/users",
+  },
+  {
+    name: "Metricas",
+    href: "/dashboard/administrador/metricas",
+    hrefActive: "/dashboard/administrador/metricas",
   }
 ];
 

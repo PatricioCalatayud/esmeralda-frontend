@@ -16,7 +16,7 @@ const Banner = () => {
             <Image
               width={500}
               height={500}
-              src="/esmeralda1.png"
+              src="/esmeralda1.webp"
               alt="Café en Grano"
               className="w-3/4 sm:w-3/4 lg:w-3/4 h-auto mx-auto mb-11 drop-shadow-[-10px_10px_12px_rgba(0,0,0,1)] object-cover"
             />

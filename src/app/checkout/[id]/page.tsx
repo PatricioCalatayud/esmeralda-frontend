@@ -7,17 +7,14 @@ import { postMarketPay } from "@/helpers/MarketPay.helper";
 import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
-import Link from "next/link";
-
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [cart, setCart] = useState<ICart[]>([]);
   const [user, setUser] = useState<{ name: string; email: string }>({
     name: "",
     email: "",
   });
-  const [address, setAddress] = useState<string | null>(null);
   const [preferenceId, setPreferenceId] = useState<string>("");
-  const { session, authLoading } = useAuthContext();
+  const {  authLoading } = useAuthContext();
 
   useEffect(() => {
     const cartData = JSON.parse(
