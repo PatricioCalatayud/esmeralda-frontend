@@ -8,7 +8,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -22,7 +22,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -36,7 +36,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -50,7 +50,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -64,7 +64,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -78,7 +78,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -92,7 +92,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -106,7 +106,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
@@ -120,7 +120,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
-      const products = response.data.data;
+      const products = response.data;
       return products;
     } catch (error: any) {
       console.log(error);
