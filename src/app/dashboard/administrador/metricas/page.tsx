@@ -17,27 +17,34 @@ const Metricas = () => {
     const [productMostSold, setProductMostSold] = useState<any>();
     useEffect(() => {
         const fetchData = async () => {
-            const response = await getOrdersByUserMonth(token as string);
-            setOrdersByUserMonth(response);
-        console.log(response);
-        const response1 = await  getWorstProducts(token as string);
-        setWorstProducts(response1);
-        console.log(response1);
-        const response2 = await  getBestProducts(token as string);
-        setBestProducts(response2);
-        console.log(response2);
-        const response3 = await  getDebts(token as string);
-        setDebts(response3);
-        console.log(response3);
-        const response4 = await  getProductLeastSold(token as string);
-        setProductLeastSold(response4);
-        console.log(response4);
-        const response5 = await  getProductMostSold(token as string);
-        setProductMostSold(response5);
-        console.log(response5);
-        }
+            if (token) {  // Asegúrate de que `token` esté definido antes de hacer la llamada
+                const response = await getOrdersByUserMonth(token );
+                setOrdersByUserMonth(response);
+                console.log(response);
+    
+                const response1 = await getWorstProducts(token );
+                setWorstProducts(response1);
+                console.log(response1);
+    
+                const response2 = await getBestProducts(token );
+                setBestProducts(response2);
+                console.log(response2);
+    
+                const response3 = await getDebts(token );
+                setDebts(response3);
+                console.log(response3);
+    
+                const response4 = await getProductLeastSold(token );
+                setProductLeastSold(response4);
+                console.log(response4);
+    
+                const response5 = await getProductMostSold(token );
+                setProductMostSold(response5);
+                console.log(response5);
+            }
+        };
         fetchData();
-    },[])
+    }, [token]);
     return (
         <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="w-full ">
@@ -53,22 +60,20 @@ const Metricas = () => {
       </Tabs.Item>
       <Tabs.Item title="Productos menos vendidos" icon={HiMinus}>
       {productLeastSold?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}>{product.description}</div>
+          <div className="flex justify-center" key={index}><p>{product.description}</p></div>
         ))}
       </Tabs.Item>
       <Tabs.Item title="Productos por mes" icon={HiCalendar}>
-        This is <span className="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</span>.
-        Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to
-        control the content visibility and styling.
+        <h1>hola</h1>
       </Tabs.Item>
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
       {bestProducts?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}>{product.description}</div>
+          <div className="flex justify-center" key={index}><p>{product.description}</p></div>
         ))}
       </Tabs.Item>
       <Tabs.Item title="Peores productos" icon={HiClipboardList}>
         {worstProducts?.map ((product: any , index: number) => (
-          <div className="flex justify-center" key={index}>{product.description}</div>
+          <div className="flex justify-center" key={index}><p>{product.description}</p></div>
         ))}
       </Tabs.Item>
       <Tabs.Item title="Pedidos de usuarios por mes" icon={HiCalendar}>
