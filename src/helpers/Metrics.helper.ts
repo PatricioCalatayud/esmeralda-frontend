@@ -3,7 +3,7 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getProductMostSold( token: string | undefined ) {
     try {
-      const response = await axios.get(`${apiURL}/metrics/producto-mas-vendido`,{
+      const response = await axios.get(`${apiURL}/metrics/productos-mas-vendidos`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -17,7 +17,7 @@ export async function getProductMostSold( token: string | undefined ) {
 
   export async function getProductLeastSold( token: string | undefined ) {
     try {
-      const response = await axios.get(`${apiURL}/metrics/producto-menos-vendido`,{
+      const response = await axios.get(`${apiURL}/metrics/productos-menos-vendidos`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -113,11 +113,12 @@ export async function getProductMostSold( token: string | undefined ) {
     }
   }
 
-  export async function getCvs( token: string | undefined ) {
+  export async function getCsv( token: string | undefined ) {
     try {
-      const response = await axios.get(`${apiURL}/cvs/download`,{
+      const response = await axios.get(`${apiURL}/csv/download`,{
+        responseType: 'blob',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,'Content-Type': 'text/csv',
         },
         });
       const products = response.data;
@@ -127,9 +128,9 @@ export async function getProductMostSold( token: string | undefined ) {
     }
   }
 
-  export async function uploadCvs( token: string | undefined ) {
+  export async function uploadCsv( token: string | undefined, file: any) {
     try {
-      const response = await axios.post(`${apiURL}/cvs/upload`,{
+      const response = await axios.post(`${apiURL}/csv/upload`,file,{
         headers: {
           contentType: "multipart/form-data",
           Authorization: `Bearer ${token}`,
