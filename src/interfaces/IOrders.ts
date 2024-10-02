@@ -65,6 +65,7 @@ export interface Product {
 export interface User {
     id:   string;
     name: string;
+    email?: string;
 }
 
 export interface IAccountPayment {
@@ -74,7 +75,7 @@ export interface IAccountPayment {
 
 // Agregamos el módulo Bill
 export interface Bill {
-    id:     string;
-    type:   string;  // Tipo de factura (A, B, etc.)
-    imgUrl: string | null;  // Puede ser null si no hay imagen
-}
+    id: string;  // Aseguramos que 'id' sea siempre un 'string'
+    type: string;
+    imgUrl: string | null;
+  }
