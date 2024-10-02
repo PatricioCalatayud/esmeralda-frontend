@@ -118,6 +118,7 @@ const VisuallyHiddenInput = styled('input')({
       {productMostSold?.map ((product: any, index: number) => (
           <div className="flex justify-center" key={index}>{product.productId}</div>
         ))}
+        
       </Tabs.Item>
       <Tabs.Item title="Productos menos vendidos" icon={HiMinus}>
       {productLeastSold?.map ((product: any, index: number) => (
@@ -179,12 +180,23 @@ const VisuallyHiddenInput = styled('input')({
       </Tabs.Item>
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
       {bestProducts?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}><p>{product.description}</p></div>
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating < 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
         ))}
+        
       </Tabs.Item>
       <Tabs.Item title="Peores productos" icon={HiClipboardList}>
         {worstProducts?.map ((product: any , index: number) => (
-          <div className="flex justify-center" key={index}><p>{product.description}</p></div>
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating < 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
         ))}
       </Tabs.Item>
       <Tabs.Item title="Pedidos de usuarios por mes" icon={HiCalendar}>
@@ -242,7 +254,12 @@ const VisuallyHiddenInput = styled('input')({
       </Tabs.Item>
       <Tabs.Item title="Deudores" icon={HiCash}>
       {debts?.map ((debt: any, index: number) => (
-          <div className="flex justify-center" key={index}>{debt.userName}</div>
+        <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {debt.userName}</p>
+           <p className="text-red-800 font-semibold">Deuda de $ {debt.balance}</p>
+            </div>
+            <hr /></>
         ))}
       </Tabs.Item>
 
