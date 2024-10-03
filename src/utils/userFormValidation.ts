@@ -5,8 +5,10 @@ export function validateRegisterUserForm(values: IUserProps): IUserProps {
     name: "",
     email: "",
     password: "",
-    //address: "",
+    address: "",
     phone: "",
+    province: "",
+    locality: ""
   };
 
   if (!values.name.trim()) {
