@@ -7,7 +7,7 @@ export interface IOrders {
     receipt?:      Receipt;
     status:        string;
     invoiceType?:  string;
-    bill?:         Bill; // Estructura del módulo Bill
+    bill?:         Bill; // Estructura del módulo Bill 
 }
 
 export interface IOrderCheckout {
@@ -22,11 +22,10 @@ export interface IOrderCheckout {
 }
 
 export interface Receipt {
-    id: string;
+    id: string | undefined; // Cambiado para permitir `undefined`
     image: string;
     status: string;
-}
-
+  }
 export interface OrderDetail {
     deliveryDate:    string;
     totalPrice:      string;
@@ -65,6 +64,7 @@ export interface Product {
 export interface User {
     id:   string;
     name: string;
+    email?: string;
 }
 
 export interface IAccountPayment {
@@ -74,7 +74,7 @@ export interface IAccountPayment {
 
 // Agregamos el módulo Bill
 export interface Bill {
-    id:     string;
-    type:   string;  // Tipo de factura (A, B, etc.)
-    imgUrl: string | null;  // Puede ser null si no hay imagen
-}
+    id: string;  
+    type: string;
+    imgUrl: string | null;
+  }

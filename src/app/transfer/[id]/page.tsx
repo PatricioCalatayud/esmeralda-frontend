@@ -74,7 +74,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
       if (response && response.receipt) {
         console.log(response);
         setTotalPrice(response.orderDetail.totalPrice);
-        setReceiptId(response.receipt.id);
+        setReceiptId(response.receipt?.id ?? "");
       }
     };
     fetchProduct();
