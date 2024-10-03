@@ -112,18 +112,40 @@ const VisuallyHiddenInput = styled('input')({
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden ">
     <Tabs aria-label="Tabs with underline" variant="underline">
       <Tabs.Item active title="Productos vendidos" icon={HiOutlineChartPie}>
-        <div className="flex justify-center"><PieChart /></div>
+        <div className="flex justify-center">
+          {productsSold && productsSold.length > 0 ? <PieChart /> : <p className="flex justify-center my-20">No hay productos vendidos</p>}
+          </div>
       </Tabs.Item>
       <Tabs.Item title="Productos mas vendidos" icon={HiPlus}>
-      {productMostSold?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}>{product.productId}</div>
-        ))}
+      {productMostSold && productMostSold.length > 0 ? productMostSold?.map ((product: any, index: number) => (
+          <div >
+          <div className="flex justify-between p-4" key={index}>
+            <p>{product.product.description}</p>
+            <div className="flex gap-2">
+            <p>{product.subproducts[0].amount}</p>
+            <p>{product.subproducts[0].unit}</p>
+            </div>
+            <p>Total vendidos: {product.totalQuantity}</p>
+          </div>
+          <hr />
+          </div>
+        )) : <p className="flex justify-center my-20">No hay productos mas vendidos</p>}
         
       </Tabs.Item>
       <Tabs.Item title="Productos menos vendidos" icon={HiMinus}>
-      {productLeastSold?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}><p>{product.productId}</p></div>
-        ))}
+      {productLeastSold && productLeastSold.length > 0 ? productLeastSold?.map ((product: any, index: number) => (
+        <div >
+          <div className="flex justify-between p-4" key={index}>
+            <p>{product.product.description}</p>
+            <div className="flex gap-2">
+            <p>{product.subproducts[0].amount}</p>
+            <p>{product.subproducts[0].unit}</p>
+            </div>
+            <p>Total vendidos: {product.totalQuantity}</p>
+          </div>
+          <hr />
+          </div>
+        )): <p className="flex justify-center my-20">No hay productos menos vendidos</p>}
       </Tabs.Item>
       <Tabs.Item title="Productos por mes" icon={HiCalendar}>
         <div className="flex justify-center w-full gap-4 px-4">
@@ -264,7 +286,7 @@ const VisuallyHiddenInput = styled('input')({
       </Tabs.Item>
 
     </Tabs>
-    <hr className="mt-20"/>
+    <hr className="mt-4"/>
     <div className="mt-4 mb-4 mx-4 flex gap-4">
     <button
               type="submit"
