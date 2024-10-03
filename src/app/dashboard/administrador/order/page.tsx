@@ -85,100 +85,147 @@ const OrderList = () => {
     setCurrentPage(1);
   };
 
-  //! Función para subir archivo
-  const handleUploadFile = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    orderId: string,
-    userEmail: string,
-    billId: string | undefined
-  ) => {
-    if (billId === undefined) {
-      billId = "default-id";  // Asignamos un valor por defecto en caso de que sea 'undefined'
-    }
-  
-    const file = e.target.files?.[0];
-    if (file && billId) {
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("to", userEmail);
-      formData.append("id", billId);
-  
-      const response = await fetch(`${apiURL}/image/bill`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-  
-      if (response.ok) {
-        Swal.fire("¡Archivo subido!", "El archivo ha sido subido correctamente.", "success");
-  
-        const updatedOrders = orders.map((order) => {
-          if (order.id === orderId && order.bill) {
-            return {
-              ...order,
-              bill: {
-                ...order.bill,
-                imgUrl: URL.createObjectURL(file),
-                id: order.bill.id || billId,  // Garantizamos que 'id' sea string
-              },
-            } as IOrders;
-          }
-          return order;
+  //! Funciones para el manejo del comprobante de pago
+  const handleTransferOk = async (id: string) => {
+    Swal.fire({
+      title: "¿Estás seguro que el comprobante es correcto?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, es correcto",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Actualizando...",
+          text: "Por favor espera.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
         });
-  
-        setOrders(updatedOrders);
-      } else {
-        Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
-      }
-    }
-  };
 
-  //! Función para eliminar archivo
-  const handleDeleteFile = async (orderId: string, userEmail: string, billId: string | undefined) => {
-    if (!billId) {
-      Swal.fire("¡Error!", "No se encontró la ID de la factura.", "error");
-      return;
-    }
-  
-    const response = await fetch(`${apiURL}/image/bill`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        to: userEmail,
-        id: billId, // Sabemos que billId no es undefined
-        imgUrl: null,
-      }),
-    });
-  
-    if (response.ok) {
-      Swal.fire("¡Archivo eliminado!", "El archivo ha sido eliminado correctamente.", "success");
-  
-      const updatedOrders = orders.map((order) => {
-        if (order.id === orderId && order.bill) {
-          return {
-            ...order,
-            bill: {
-              ...order.bill,
-              imgUrl: null,
-              id: order.bill.id || billId, // Aseguramos que id sea siempre un string
-            },
-          } as IOrders; // Aserción de tipo para forzar que cumple con IOrders
+        const response = await putOrder(
+          id,
+          { transferStatus: "Comprobante verificado", orderStatus: true },
+          token
+        );
+        if (response && (response?.status === 200 || response?.status === 201)) {
+          setOrders(
+            orders.map((order) =>
+              order.id === id
+                ? {
+                    ...order,
+                    orderDetail: {
+                      ...order.orderDetail,
+                      transactions: {
+                        ...order.orderDetail.transactions,
+                        status: "En preparación",
+                        
+                      },
+                    },
+                    receipt: {
+                      ...order.receipt,
+                      status: "Comprobante verificado",
+                      id: order.receipt?.id || undefined,
+            image: order.receipt?.image || "",
+                    },
+                  } 
+                : order
+            )
+          );
+          Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.");
+        } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
         }
-        return order;
-      });
-  
-      setOrders(updatedOrders); // Actualizamos el estado
-    } else {
-      Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
-    }
+      }
+    });
   };
 
-  //! Renderizar columna de "Acciones"
+  const handleTransferReject = async (id: string) => {
+    Swal.fire({
+      title: "¿Estás seguro que el comprobante es incorrecto?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, es incorrecto",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Actualizando...",
+          text: "Por favor espera.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const response = await putOrder(id, { transferStatus: "Rechazado" }, token);
+        if (response && (response?.status === 200 || response?.status === 201)) {
+          setOrders(
+            orders.map((order) =>
+              order.id === id
+                ? {
+                    ...order,
+                    receipt: {
+                      id: order.receipt?.id ?? undefined, // Si `id` no existe, será undefined
+                      image: order.receipt?.image ?? "", // Usamos valores por defecto si no están definidos
+                      status: "Rechazado", // Actualizamos el estado
+                    },
+                  }
+                : order
+            ))
+          
+          Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
+        } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+        }
+      }
+    });
+  };
+
+  //! Renderizar columna de "Estado" (Comprobante)
+  const renderStatusColumn = (order: IOrders) => {
+    return order.receipt ? (
+      <div className="flex justify-center items-center gap-4">
+        <div>
+          {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
+          {order.receipt.image ? (
+            <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
+              <FontAwesomeIcon icon={faDownload} style={{ color: "teal", width: "20px", height: "20px" }} />
+            </a>
+          ) : null}
+        </div>
+        {order.receipt.status !== "Pendiente de subir comprobante" && (
+          <>
+            <Tooltip content="Aceptar">
+              <button
+                type="button"
+                onClick={() => handleTransferOk(order.id)}
+                className="py-2 px-3 flex items-center text-sm text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 hover:text-white"
+              >
+                <FontAwesomeIcon icon={faCheck} />
+              </button>
+            </Tooltip>
+            <Tooltip content="Rechazar">
+              <button
+                type="button"
+                onClick={() => handleTransferReject(order.id)}
+                className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
+              >
+                <FontAwesomeIcon icon={faX} />
+              </button>
+            </Tooltip>
+          </>
+        )}
+      </div>
+    ) : (
+      "--"
+    );
+  };
+
+  //! Renderizar columna de "Acciones" (Cambio de estado)
   const renderActionsColumn = (order: IOrders) => {
     return (
       <select
@@ -195,6 +242,11 @@ const OrderList = () => {
         <option value="Entregado">Entregado</option>
       </select>
     );
+  };
+
+  //! Renderizar columna de "Necesita Factura"
+  const renderInvoiceColumn = (order: IOrders) => {
+    return order.bill ? "Sí" : "No";
   };
 
   //! Renderizar columna de "Archivo Factura"
@@ -236,9 +288,92 @@ const OrderList = () => {
     }
   };
 
-  //! Renderizar columna de "Necesita Factura"
-  const renderInvoiceColumn = (order: IOrders) => {
-    return order.bill ? "Sí" : "No";
+  //! Funciones para subir/eliminar archivos de factura
+  const handleUploadFile = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    orderId: string,
+    userEmail: string,
+    billId: string | undefined
+  ) => {
+    const file = e.target.files?.[0];
+    if (file && billId) {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("to", userEmail);
+      formData.append("id", billId);
+
+      const response = await fetch(`${apiURL}/image/bill`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        Swal.fire("¡Archivo subido!", "El archivo ha sido subido correctamente.", "success");
+
+        const updatedOrders = orders.map((order) => {
+          if (order.id === orderId && order.bill) {
+            return {
+              ...order,
+              bill: {
+                ...order.bill,
+                imgUrl: URL.createObjectURL(file),
+                id: order.bill.id || billId,
+              },
+            } as IOrders;
+          }
+          return order;
+        });
+
+        setOrders(updatedOrders);
+      } else {
+        Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+      }
+    }
+  };
+
+  const handleDeleteFile = async (orderId: string, userEmail: string, billId: string | undefined) => {
+    if (!billId) {
+      Swal.fire("¡Error!", "No se encontró la ID de la factura.", "error");
+      return;
+    }
+  
+    const response = await fetch(`${apiURL}/image/bill`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json', // Asegura que se envíe como JSON
+      },
+      body: JSON.stringify({
+        to: userEmail,
+        id: billId,
+        imgUrl: null, // Enviar el valor nulo en JSON
+      }),
+    });
+  
+    if (response.ok) {
+      Swal.fire("¡Archivo eliminado!", "El archivo ha sido eliminado correctamente.", "success");
+  
+      const updatedOrders = orders.map((order) => {
+        if (order.id === orderId && order.bill) {
+          return {
+            ...order,
+            bill: {
+              ...order.bill,
+              imgUrl: null,
+              id: order.bill.id || billId,
+            },
+          } as IOrders;
+        }
+        return order;
+      });
+  
+      setOrders(updatedOrders);
+    } else {
+      Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+    }
   };
 
   return loading ? (
@@ -258,8 +393,8 @@ const OrderList = () => {
         "Fecha de pedido - entrega",
         "Lugar de envio",
         "Productos",
-        "Estado", // El estado de la orden
-        "Acciones", // Select para cambiar el estado
+        "Estado", // Comprobante (aceptar o rechazar)
+        "Acciones", // Menú desplegable para cambiar el estado
         "Necesita Factura?", // "Sí" o "No" dependiendo de la factura
         "Archivo Factura", // Subir/eliminar archivo de factura
       ]}
@@ -301,7 +436,7 @@ const OrderList = () => {
           </td>
           {/* Columna de "Estado" */}
           <td className="px-4 py-3 text-center">
-            {order.orderDetail.transactions.status}
+            {renderStatusColumn(order)}
           </td>
           {/* Columna de "Acciones" */}
           <td className="px-4 py-3 text-center">

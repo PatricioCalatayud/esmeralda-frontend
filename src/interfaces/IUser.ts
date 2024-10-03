@@ -4,6 +4,9 @@ export interface IUserProps {
   password: string;
   phone: string;
   account?: IAccountProps;
+  province: string;
+  locality: string;
+  address: string;
 }
 export interface IUserUpdateProps {
   name?: string;
