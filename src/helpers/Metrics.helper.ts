@@ -107,13 +107,18 @@ export async function getProductMostSold( token: string | undefined ) {
     }
   }
 
-  export async function getProductsSold( token: string | undefined ) {
+  export async function getProductsSold( token: string | undefined, productId: string, limit: number) {
+    const body = {
+      productId: productId,
+      limit: limit
+    }
     try {
-      const response = await axios.post(`${apiURL}/metrics/productos-vendidos`,{
+      const response = await axios.post(`${apiURL}/metrics/productos-vendidos`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
         });
+        console.log(response.data);
       const products = response.data;
       return products;
     } catch (error: any) {

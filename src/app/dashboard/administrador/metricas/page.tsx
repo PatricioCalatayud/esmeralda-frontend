@@ -57,9 +57,6 @@ const Metricas = () => {
                 setUsers(response6);  
 
 
-                const response7 = await getProductsSold(token );
-                setProductsSold(response7);
-                console.log(response7);
 
             }
         };
@@ -106,14 +103,61 @@ const VisuallyHiddenInput = styled('input')({
     setOrdersByUserMonth(response7);
     console.log(response7);
   }
+  const handleSeachProducts = async() => {
+    const response8 = await getProductsSold(token, productId, 10 );
+    setProductsSold(response8);
+    console.log(response8);
+  }
     return (
         <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="w-full ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden ">
     <Tabs aria-label="Tabs with underline" variant="underline">
       <Tabs.Item active title="Productos vendidos" icon={HiOutlineChartPie}>
-        <div className="flex justify-center">
-          {productsSold && productsSold.length > 0 ? <PieChart /> : <p className="flex justify-center my-20">No hay productos vendidos</p>}
+        <div className="flex justify-center flex-col p-4 gap-4">
+        <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Producto
+              </label>
+        <select
+                name="productID"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setProductId(e.target.value)}
+              >
+                <option value="">--Seleccione--</option>
+                {allProducts?.map((product: any) => (
+                  <option key={product.id} value={product.id}>
+                    {product.description}
+                  </option>
+                ))}
+              </select>
+              <button
+              type="submit"
+              className="w-1/2 sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        onClick={handleSeachProducts}
+            >
+                Buscar productos en este mes
+            </button>
+              <hr />
+          {productsSold && productsSold.length > 0 ? 
+          <div>
+          {productsSold.map ((product: any, index: number) => (
+          <div >
+          <div className="flex justify-between p-4" key={index}>
+            <p>{product?.subproduct?.product.description}</p>
+            <div className="flex gap-2">
+            <p>{product.subproduct?.amount}</p>
+            <p>{product.subproduct?.unit}</p>
+            </div>
+            <p>Total vendidos: <b className="text-teal-800"> {product?.quantity}</b></p>
+          </div>
+          <hr />
+          </div>
+        ))}
+          </div>
+          : <p className="flex justify-center my-20">No hay productos vendidos</p>}
           </div>
       </Tabs.Item>
       <Tabs.Item title="Productos mas vendidos" icon={HiPlus}>
