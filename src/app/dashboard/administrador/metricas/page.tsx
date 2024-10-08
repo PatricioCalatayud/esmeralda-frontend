@@ -144,8 +144,8 @@ const VisuallyHiddenInput = styled('input')({
           {productsSold && productsSold.length > 0 ? 
           <div>
           {productsSold.map ((product: any, index: number) => (
-          <div >
-          <div className="flex justify-between p-4" key={index}>
+          <div key={index} >
+          <div className="flex justify-between p-4" >
             <p>{product?.subproduct?.product.description}</p>
             <div className="flex gap-2">
             <p>{product.subproduct?.amount}</p>
@@ -162,8 +162,8 @@ const VisuallyHiddenInput = styled('input')({
       </Tabs.Item>
       <Tabs.Item title="Productos mas vendidos" icon={HiPlus}>
       {productMostSold && productMostSold.length > 0 ? productMostSold?.map ((product: any, index: number) => (
-          <div >
-          <div className="flex justify-between p-4" key={index}>
+          <div key={index}>
+          <div className="flex justify-between p-4" >
             <p>{product.product.description}</p>
             <div className="flex gap-2">
             <p>{product.subproducts[0].amount}</p>
@@ -178,8 +178,8 @@ const VisuallyHiddenInput = styled('input')({
       </Tabs.Item>
       <Tabs.Item title="Productos menos vendidos" icon={HiMinus}>
       {productLeastSold && productLeastSold.length > 0 ? productLeastSold?.map ((product: any, index: number) => (
-        <div >
-          <div className="flex justify-between p-4" key={index}>
+        <div key={index}>
+          <div className="flex justify-between p-4" >
             <p>{product.product.description}</p>
             <div className="flex gap-2">
             <p>{product.subproducts[0].amount}</p>
