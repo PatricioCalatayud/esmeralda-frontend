@@ -107,12 +107,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const newUser = {
           email: sessionGoogle.user.email as string,
           name: sessionGoogle.user.name as string,
-          password: "", // Add a password property
-          phone: "", // Add a phone property
-          province: "", // Add a province property
-          locality: "", // Add a locality property
-          address: "", // Add an address property
-        }
+          password: "", // Puedes agregar el password aquí o usar uno por defecto
+          phone: "", // Agregar un valor para el número de teléfono
+          address: {
+            province: 0, // Aquí deberías asignar el número de la provincia
+            localidad: "", // Agregar la localidad
+            deliveryNumber: 0, // Asignar un número de delivery o mantenerlo como 0 por defecto
+            address: "", // Agregar una dirección
+          }
+        };
         const response = await NewUser(newUser);
         if (response && (response.status === 200 || response.status === 201)) {
           const token = response.data.accessToken;

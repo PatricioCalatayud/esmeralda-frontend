@@ -42,20 +42,28 @@ const Cart = () => {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
       setCart(cartItems);
     };
-
+  
     const fetchUser = async () => {
       if (token && session) {
         const response = await getUser(session.id, token);
         console.log(response);
+  
         if (response) {
-          setAccount(response.account || undefined);
+          const accountData = response.account;
+  
+          // Verificamos que el accountData sea del tipo esperado (un objeto de tipo IAccountProps)
+          if (typeof accountData === "object" && accountData !== null) {
+            setAccount(accountData as IAccountProps); // Asignamos solo si es del tipo IAccountProps
+          } else {
+            setAccount(undefined); // Si no es un objeto válido, seteamos undefined
+          }
         }
       }
     };
+  
     fetchUser();
     fetchCart();
   }, [token]);
-
   //! Función para aumentar la cantidad
   const handleIncrease = (article_id: string) => {
     const newCart = cart.map((item) => {
