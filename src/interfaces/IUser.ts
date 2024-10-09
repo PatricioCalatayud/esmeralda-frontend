@@ -4,6 +4,7 @@ export interface IUserProps {
   password: string;
   phone: string;
   address: IAddressProps;
+  account?: string;
 }
 
 export interface IAddressProps {
@@ -24,4 +25,18 @@ export interface IUserErrorProps {
     deliveryNumber: string;
     address: string;
   };
+}
+
+export interface IAccountProps {
+  balance: number;
+creditLimit: number;
+id: string;
+}
+
+export interface IUserUpdateProps {
+  name?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+  accountLimit?: number;
 }
