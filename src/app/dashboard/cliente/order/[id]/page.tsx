@@ -34,7 +34,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
     fetchOrder();
   }, [params.id, token]);
 
-  const statusDefault = ["Recibido", "Empaquetado", "Transito", "Entregado"];
+  const statusDefault = ["En preparación", "Empaquetado", "Transito", "Entregado"];
   
   const handleRatingChange = (rating: number, productId: string) => {
     setRatings((prevRatings) => ({
@@ -101,7 +101,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                   {statusDefault.map((status, index) => (
                     <div key={index} className="flex gap-4">
                       <h1
-                        className={`text-xl w-40 ${
+                        className={`text-xl w-40 text-nowrap ${
                           order.orderDetail.transactions.status === status
                             ? "text-teal-800 font-bold"
                             : "text-gray-500 font-medium"
@@ -139,7 +139,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                 })}
               </b>
             </h4>
-            {order.orderDetail.transactions.status === "Recibido" && (
+            {order.orderDetail.transactions.status === "En preparación" && (
               <p className="text-center">
                 Proximamente sabras la fecha de entrega
               </p>
@@ -161,7 +161,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
           </div>
           
           {/* Aquí movemos la sección de calificación al final */}
-          {order.orderDetail.transactions.status !== "Recibido" &&
+          {order.orderDetail.transactions.status !== "En preparación" &&
           <div className="p-4 w-full flex flex-col justify-center items-center">
             <h2 className="text-xl font-medium mb-4">Califica los productos:</h2>
             {order.productsOrder &&

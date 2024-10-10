@@ -108,7 +108,7 @@ const DashboardComponent = ({
               </tbody>
             </table>
           </div>
-          <div className="flex overflow-x-auto sm:justify-center py-5 ">
+          <div className="flex overflow-x-auto justify-center py-5 ">
             <Pagination
               count={totalPages}
               page={currentPage}

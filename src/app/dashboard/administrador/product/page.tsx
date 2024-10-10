@@ -338,7 +338,8 @@ const ProductList = () => {
         unit: addSubproductId.unit,
         price: addSubproductId.price,
         stock: addSubproductId.stock,
-        discount: addSubproductId.discount
+        discount: addSubproductId.discount,
+        isAvailable: true
       }
       setProducts((prevProducts) =>
         prevProducts?.map((product) => {

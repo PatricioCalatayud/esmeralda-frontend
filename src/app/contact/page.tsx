@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Textarea } from "flowbite-react";
 import RatingStars from "@/components/ratingStars/ratingStars";
 import { useRouter } from "next/navigation";

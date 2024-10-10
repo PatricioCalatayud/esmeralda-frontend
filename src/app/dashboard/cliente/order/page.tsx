@@ -22,14 +22,7 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedPrice, setSelectedPrice] = useState<string>("");
 console.log(orders);
-  useEffect(() => {
-    if (!authLoading) {
-      if (!session) {
-        console.log("Session no exists:");
-        redirect("/login");
-      }
-    }
-  }, [authLoading, session]);
+
 
   useEffect(() => {
     const listOrders = async (userId: string) => {
@@ -135,11 +128,22 @@ console.log(orders);
             $ {order.orderDetail.totalPrice}
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-
+                {session?.role === "Usuario" && order.orderDetail.transactions.status === "Pendiente de pago" &&
                 <div  className={`flex items-center justify-center ${order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"}`}>
                   <p>{order.orderDetail.transactions.status}</p>
-                </div>
-
+                </div>} 
+                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status !== "Pendiente de revisión de comprobante" &&
+                <div  className={`flex items-center justify-center ${order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"}`}>
+                  <p>{order.orderDetail.transactions.status}</p>
+                </div>} 
+                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status === "Pendiente de revisión de comprobante" && 
+                <div  className={`flex items-center justify-center text-teal-500`}>
+                  <p>{order?.receipt?.status}</p>
+                  </div> }
+                  {session?.role === "Cliente" && order.orderDetail.transactions.status !== "Pendiente de pago" && order?.receipt?.status === "Comprobante verificado" && 
+                <div  className={`flex items-center justify-center text-teal-500`}>
+                  <p>{order.orderDetail.transactions.status}</p>
+                  </div> }
 
           </td>
           
@@ -157,7 +161,20 @@ console.log(orders);
                   Ver detalle
                 </Link>
                  }
-              {order.orderDetail.transactions.status === "Pendiente de pago" &&  order?.receipt?.status === "Pendiente de revisión de comprobante" &&
+              {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" &&  order?.receipt?.status === "Pendiente de subir comprobante" &&
+          <Link
+                  type="button"
+                  data-drawer-target="drawer-update-product"
+                  data-drawer-show="drawer-update-product"
+                  aria-controls="drawer-update-product"
+                  className="py-2 px-3 w-min flex gap-2 items-center text-sm hover:text-white font-medium text-center text-white bg-teal-600 border rounded-lg hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  href={`/transfer/${order.id}`}
+                >
+                  <FontAwesomeIcon icon={faMoneyCheck} />
+                  Ir a pagar
+                </Link>
+                 }   
+                {session?.role === "Usuario" && order.orderDetail.transactions.status === "Pendiente de pago" &&
           <Link
                   type="button"
                   data-drawer-target="drawer-update-product"
@@ -169,7 +186,7 @@ console.log(orders);
                   <FontAwesomeIcon icon={faMoneyCheck} />
                   Ir a pagar
                 </Link>
-                 }    
+                 }      
           </td>
         </tr>
      ))}

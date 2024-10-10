@@ -11,8 +11,11 @@ import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDownload, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faDownload, faEdit, faX } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "flowbite-react";
+
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
+const ORDERS_PER_PAGE = 7;
 
 const OrderList = () => {
   const router = useRouter();
@@ -20,52 +23,29 @@ const OrderList = () => {
   const [orders, setOrders] = useState<IOrders[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const { token, session } = useAuthContext();
-  const ORDERS_PER_PAGE = 5;
+  const { token } = useAuthContext();
   const [loading, setLoading] = useState(true);
-  const [dataStatus, setDataStatus] = useState("");
-  
-
-  //! Obtener token de usuario
-  useEffect(() => {
-
-      if (!session) {
-        
-        Swal.fire(
-          "¡Error!",
-          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
-          "error"
-        ).then(() => {
-          router.push("/login");
-        });
-      }
-    
-  }, [router]);
 
   //! Obtener las Ordenes
   useEffect(() => {
     async function fetchOrders() {
-      const limit = ORDERS_PER_PAGE;
-      const page = currentPage;
       if (token) {
-        const response = await getAllOrders(token );
+        const response: IOrders[] | undefined = await getAllOrders(token);
         if (response) {
-        const orders = response;
-
-        setOrders(orders);
-        setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
-        setLoading(false);}
+          setOrders(response);
+          setTotalPages(Math.ceil(response.length / ORDERS_PER_PAGE));
+        } else {
+          setOrders([]);
+        }
+        setLoading(false);
       }
-        
     }
-    if (token) {
-      fetchOrders();
-    }
+    fetchOrders();
   }, [token]);
+
   const onPageChange = (page: number) => setCurrentPage(page);
 
-
-  //! Función para calcular las ordenes a mostrar en la página actual
+  //! Función para calcular las órdenes a mostrar en la página actual
   const getCurrentPageOrders = () => {
     const filteredOrders = filterOrders();
     const startIndex = (currentPage - 1) * ORDERS_PER_PAGE;
@@ -73,10 +53,9 @@ const OrderList = () => {
     return filteredOrders.slice(startIndex, endIndex);
   };
 
-  //! Función para filtrar las ordenes
+  //! Función para filtrar las órdenes
   const filterOrders = () => {
     if (searchTerm === "") {
-      console.log(orders);
       return orders;
     } else {
       return orders.filter((order) =>
@@ -86,16 +65,15 @@ const OrderList = () => {
   };
 
   //! Función para manejar el cambio en el estado de la orden
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, id: string) => {
-
-    const newStatus = {status: e.target.value}
-    console.log(newStatus);
-
-      const response = await putOrder(id, newStatus, token as string);
-      if(response && (response?.status === 200 || response?.status === 201)){
-        console.log("response", response);
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    const newStatus = { status: e.target.value };
+    const response = await putOrder(id, newStatus, token as string);
+    if (response && (response?.status === 200 || response?.status === 201)) {
       Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
-      }else {
+    } else {
       console.error("Error updating order:", response);
       Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
     }
@@ -106,83 +84,305 @@ const OrderList = () => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-  const handleTransferOk = async (id : string) => {
-    console.log(id);
-      Swal.fire({
-        title: "¿Estás seguro que el comprobante es correcto?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Si, Es correcto",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const response = await putOrder(id,{transferStatus:"Comprobante verificado", orderStatus:true}, token);
-          if (response && (response?.status === 200 || response?.status === 201)) {
-            setOrders(orders.map((order) => 
-              order.id === id 
-                ? { 
-                    ...order, 
-                    receipt: { 
-                      ...order.receipt, 
-                      status: "Comprobante verificado" 
-                    } 
-                  } as IOrders // Asegura que el objeto cumple con el tipo IOrders
+
+  //! Funciones para el manejo del comprobante de pago
+  const handleTransferOk = async (id: string) => {
+    Swal.fire({
+      title: "¿Estás seguro que el comprobante es correcto?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, es correcto",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Actualizando...",
+          text: "Por favor espera.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const response = await putOrder(
+          id,
+          { transferStatus: "Comprobante verificado", orderStatus: true },
+          token
+        );
+        if (response && (response?.status === 200 || response?.status === 201)) {
+          setOrders(
+            orders.map((order) =>
+              order.id === id
+                ? {
+                    ...order,
+                    orderDetail: {
+                      ...order.orderDetail,
+                      transactions: {
+                        ...order.orderDetail.transactions,
+                        status: "En preparación",
+                        
+                      },
+                    },
+                    receipt: {
+                      ...order.receipt,
+                      status: "Comprobante verificado",
+                      id: order.receipt?.id || undefined,
+            image: order.receipt?.image || "",
+                    },
+                  } 
                 : order
-            ));
-            Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
-          } else {
-            console.error("Error updating order:", response);
-            Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-          }
-        } else if (result.isDenied) {
-          Swal.fire("No se realizaron cambios", "", "info");
+            )
+          );
+          Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.");
+        } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
         }
-      })
       }
-      const handleTransferReject = async (id : string) => {
-        console.log(id);
-          Swal.fire({
-            title: "¿Estás seguro que el comprobante es incorrecto?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Si, Es incorrecto",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const response = await putOrder(id,{transferStatus:"Rechazado"}, token);
-              if (response && (response?.status === 200 || response?.status === 201)) {
-                setOrders(orders.map((order) => 
-                  order.id === id 
-                    ? { 
-                        ...order, 
-                        receipt: { 
-                          ...order.receipt, 
-                          status: "Rechazado" 
-                        } 
-                      } as IOrders // Asegura que el objeto cumple con el tipo IOrders
-                    : order
-                ));
-                Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
-              } else {
-                console.error("Error updating order:", response);
-                Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-              }
-            } else if (result.isDenied) {
-              Swal.fire("No se realizaron cambios", "", "info");
-            }
-          })
+    });
+  };
+
+  const handleTransferReject = async (id: string) => {
+    Swal.fire({
+      title: "¿Estás seguro que el comprobante es incorrecto?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, es incorrecto",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Actualizando...",
+          text: "Por favor espera.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const response = await putOrder(id, { transferStatus: "Rechazado" }, token);
+        if (response && (response?.status === 200 || response?.status === 201)) {
+          setOrders(
+            orders.map((order) =>
+              order.id === id
+                ? {
+                    ...order,
+                    receipt: {
+                      id: order.receipt?.id ?? undefined, // Si `id` no existe, será undefined
+                      image: order.receipt?.image ?? "", // Usamos valores por defecto si no están definidos
+                      status: "Rechazado", // Actualizamos el estado
+                    },
+                  }
+                : order
+            ))
+          
+          Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
+        } else {
+          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+        }
+      }
+    });
+  };
+
+  //! Renderizar columna de "Estado" (Comprobante)
+  const renderStatusColumn = (order: IOrders) => {
+    return order.receipt ? (
+      <div className="flex justify-center items-center gap-4">
+        <div>
+          {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
+          {order.receipt.image ? (
+            <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
+              <FontAwesomeIcon icon={faDownload} style={{ color: "teal", width: "20px", height: "20px" }} />
+            </a>
+          ) : null}
+        </div>
+        {order.receipt.status !== "Pendiente de subir comprobante" && (
+          <>
+            <Tooltip content="Aceptar">
+              <button
+                type="button"
+                onClick={() => handleTransferOk(order.id)}
+                className="py-2 px-3 flex items-center text-sm text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 hover:text-white"
+              >
+                <FontAwesomeIcon icon={faCheck} />
+              </button>
+            </Tooltip>
+            <Tooltip content="Rechazar">
+              <button
+                type="button"
+                onClick={() => handleTransferReject(order.id)}
+                className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
+              >
+                <FontAwesomeIcon icon={faX} />
+              </button>
+            </Tooltip>
+          </>
+        )}
+      </div>
+    ) : (
+      "--"
+    );
+  };
+
+  //! Renderizar columna de "Acciones" (Cambio de estado)
+  const renderActionsColumn = (order: IOrders) => {
+    return (
+      <select
+        id="status"
+        name="status"
+        className="bg-gray-50 border text-sm rounded-lg block w-full p-2.5"
+        onChange={(e) => handleChange(e, order.id)}
+        value={order.orderDetail.transactions.status}
+      >
+        <option value="Pendiente de pago">Pendiente de pago</option>
+        <option value="En preparación">En preparación</option>
+        <option value="Empaquetado">Empaquetado</option>
+        <option value="Transito">Transito</option>
+        <option value="Entregado">Entregado</option>
+      </select>
+    );
+  };
+
+  //! Renderizar columna de "Necesita Factura"
+  const renderInvoiceColumn = (order: IOrders) => {
+    return order.bill ? "Sí" : "No";
+  };
+
+  //! Renderizar columna de "Archivo Factura"
+  const renderFileActionsColumn = (order: IOrders) => {
+    const { bill } = order;
+    if (bill) {
+      return (
+        <div className="flex justify-center items-center gap-4">
+          {bill.imgUrl ? (
+            <>
+              <a href={bill.imgUrl} target="_blank" rel="noopener noreferrer">
+                <FontAwesomeIcon
+                  icon={faDownload}
+                  style={{ color: "teal", width: "20px", height: "20px" }}
+                />
+              </a>
+              <Tooltip content="Eliminar archivo">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteFile(order.id, order.user.email ?? "", bill.id)}
+                  className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
+                >
+                  <FontAwesomeIcon icon={faX} />
+                </button>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <input
+                type="file"
+                onChange={(e) => handleUploadFile(e, order.id, order.user.email ?? "", bill.id)}
+              />
+            </>
+          )}
+        </div>
+      );
+    } else {
+      return "--";
+    }
+  };
+
+  //! Funciones para subir/eliminar archivos de factura
+  const handleUploadFile = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    orderId: string,
+    userEmail: string,
+    billId: string | undefined
+  ) => {
+    const file = e.target.files?.[0];
+    if (file && billId) {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("to", userEmail);
+      formData.append("id", billId);
+
+      const response = await fetch(`${apiURL}/image/bill`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        Swal.fire("¡Archivo subido!", "El archivo ha sido subido correctamente.", "success");
+
+        const updatedOrders = orders.map((order) => {
+          if (order.id === orderId && order.bill) {
+            return {
+              ...order,
+              bill: {
+                ...order.bill,
+                imgUrl: URL.createObjectURL(file),
+                id: order.bill.id || billId,
+              },
+            } as IOrders;
           }
+          return order;
+        });
+
+        setOrders(updatedOrders);
+      } else {
+        Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+      }
+    }
+  };
+
+  const handleDeleteFile = async (orderId: string, userEmail: string, billId: string | undefined) => {
+    if (!billId) {
+      Swal.fire("¡Error!", "No se encontró la ID de la factura.", "error");
+      return;
+    }
+  
+    const response = await fetch(`${apiURL}/image/bill`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json', // Asegura que se envíe como JSON
+      },
+      body: JSON.stringify({
+        to: userEmail,
+        id: billId,
+        imgUrl: null, // Enviar el valor nulo en JSON
+      }),
+    });
+  
+    if (response.ok) {
+      Swal.fire("¡Archivo eliminado!", "El archivo ha sido eliminado correctamente.", "success");
+  
+      const updatedOrders = orders.map((order) => {
+        if (order.id === orderId && order.bill) {
+          return {
+            ...order,
+            bill: {
+              ...order.bill,
+              imgUrl: null,
+              id: order.bill.id || billId,
+            },
+          } as IOrders;
+        }
+        return order;
+      });
+  
+      setOrders(updatedOrders);
+    } else {
+      Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+    }
+  };
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
-      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={() => {}}
-      onPointerLeaveCapture={() => {}}/>
+      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
     </div>
   ) : (
     <DashboardComponent
-    setCurrentPage={onPageChange}
+      setCurrentPage={onPageChange}
       titleDashboard="Listado de Ordenes"
       searchBar="Buscar cliente"
       handleSearchChange={handleSearchChange}
@@ -193,8 +393,10 @@ const OrderList = () => {
         "Fecha de pedido - entrega",
         "Lugar de envio",
         "Productos",
-        "Estado",
-        "Acciones",
+        "Estado", // Comprobante (aceptar o rechazar)
+        "Acciones", // Menú desplegable para cambiar el estado
+        "Necesita Factura?", // "Sí" o "No" dependiendo de la factura
+        "Archivo Factura", // Subir/eliminar archivo de factura
       ]}
       noContent="No hay Ordenes disponibles"
     >
@@ -203,110 +405,50 @@ const OrderList = () => {
           key={order.id}
           className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <th
-            scope="row"
-            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-          >
-            <div className="flex items-center w-full justify-center">
-              {order.user?.name}
-             
-            </div>
+          <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {order.user.name}
           </th>
-
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-          $ {order.orderDetail?.totalPrice}
+          <td className="px-4 py-3 text-center">
+            $ {order.orderDetail.totalPrice}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-          <div className="flex justify-center items-center">
-              {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", {
-                locale: es,
-              })}
-            </div>
-            {order.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", {
-              locale: es,
-            })}
+          <td className="px-4 py-3 text-center">
+            {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", { locale: es })}
+            <br />
+            {order.orderDetail.deliveryDate &&
+              format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-            {order.orderDetail?.addressDelivery
-            }
+          <td className="px-4 py-3 text-center">
+            {order.orderDetail.addressDelivery}
           </td>
-          <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white gap-4">
-            {order.productsOrder && order.productsOrder.map((product, productIndex) => (
-              <div key={productIndex} className=" text-start flex items-center">
-                 <Image
-                      width={500}
-                      height={500}
-                      priority={true}
-                      src={product.subproduct.product  ? product.subproduct?.product.imgUrl : ""}
-                      alt={product.subproduct.product ? product.subproduct?.product.description : ""}
-                      className="w-10 h-10 inline-block mr-2 rounded-full"
-                    />
-                    <div className="flex flex-row gap-1">
-                    <span> {product.subproduct.product && product.subproduct?.product.description}</span>
-
-                    <span>  x {product.subproduct?.amount}</span>
-                    </div>
-                  </div>
+          <td className="px-4 py-3">
+            {order.productsOrder.map((product, index) => (
+              <div key={index} className="flex items-center">
+                <Image
+                  width={50}
+                  height={50}
+                  src={product.subproduct.product?.imgUrl || ""}
+                  alt={product.subproduct.product?.description || ""}
+                  className="w-10 h-10 inline-block mr-2 rounded-full"
+                />
+                {product.subproduct.product?.description} x {product.quantity} un de {product.subproduct.amount} {product.subproduct.unit}
+              </div>
             ))}
           </td>
-          <td>
-  {order.receipt && (
-    <div className="flex justify-center items-center gap-4">
-        <div>
-      {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
-      {order.receipt.image ? (
-   
-        <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
-              <FontAwesomeIcon icon={faDownload} style={{color: "teal", width: "20px", height: "20px"}}/>
-        </a>
-        
- 
-      ) : null}
-      </div>
-       <Tooltip content="Aceptar" >
-        <button
-          type="button"
-          onClick={() => handleTransferOk(order.id)}
-          className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-        >
-          <FontAwesomeIcon icon={faCheck} />
-        </button>
-      </Tooltip>
-      <Tooltip content="Rechazar" >
-                      <button
-                        type="button"
-                        onClick={() => handleTransferReject(order.id)}
-                        className="py-2 px-3 flex items-center text-sm hover:text-white font-medium text-center text-red-600 border-red-600 border rounded-lg hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                      >
-                        <FontAwesomeIcon icon={faX} />
-                      </button>
-                    </Tooltip>
-    </div>
-  )}
-</td>
-          <td
-            className={`px-4 py-3 font-medium  whitespace-nowrap  text-center ${
-              order.orderDetail?.transactions.status === "Recibido"
-                ? "text-teal-500"
-                : "text-red-500"
-            } `}
-          >
-
-              <select
-                id="status"
-                name="status"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                onChange={(e) => handleChange(e, order.id)}
-                defaultValue={order.orderDetail?.transactions.status }
-              >
-                <option value="">--Seleccione--</option>
-                <option value={"Pendiente de pago"}>Pendiente de pago</option>
-                <option value={"Recibido"}>Recibido</option>
-                <option value={"Empaquetado"}>Empaquetado</option>
-                <option value={"Transito"}>Transito</option>
-                <option value={"Entregado"}>Entregado</option>
-              </select>
-
+          {/* Columna de "Estado" */}
+          <td className="px-4 py-3 text-center">
+            {renderStatusColumn(order)}
+          </td>
+          {/* Columna de "Acciones" */}
+          <td className="px-4 py-3 text-center">
+            {renderActionsColumn(order)}
+          </td>
+          {/* Columna de "Necesita Factura" */}
+          <td className="px-4 py-3 text-center">
+            {renderInvoiceColumn(order)}
+          </td>
+          {/* Columna de "Archivo Factura" */}
+          <td className="px-4 py-3 text-center">
+            {renderFileActionsColumn(order)}
           </td>
         </tr>
       ))}

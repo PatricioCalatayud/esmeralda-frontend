@@ -88,6 +88,7 @@ formData.append("presentacion", dataProduct.presentacion || "");
 formData.append("tipoGrano", dataProduct.tipoGrano || "");
 formData.append("categoryID", dataProduct.categoryID);
 
+
 // Añadir la imagen al FormData si existe
 if (imageFile) {
   formData.append("file", imageFile);} // Asegúrate de que el campo 'file' coincide con lo que espera el backend
@@ -273,11 +274,9 @@ handleSubmit = {handleSubmit}
                   onChange={handleChange}
                 >
                   <option value="">--Seleccione--</option>
-                  <option value={"Kilo"}>Kilo</option>
-                    <option value={"Gramos"}>Gramos</option>
-                    <option value={"Unidades"}>Unidades</option>
-                    <option value={"Sobres"}>Sobres</option>
-                    <option value={"Cajas"}>Cajas</option>
+                  <option value={"Molido"}>Molido</option>
+                    <option value={"Grano"}>Grano</option>
+                    <option value={"Capsulas"}>Capsulas</option>
                 </select>
                 {errors.presentacion && (
                   <span className="text-red-500">{errors.presentacion}</span>

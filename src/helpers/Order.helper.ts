@@ -49,16 +49,26 @@ export async function getOrder(orderId: string, token: string | undefined ) {
     console.log(error);
   }
 }
-
 export async function postOrder(order: IOrderCheckout, token: string | undefined) { 
   try {
-    const response = await axios.post(`${apiURL}/order`, order,{
+    const response = await axios.post(`${apiURL}/order`, order, {
       headers: {
         Authorization: `Bearer ${token}`,
-      },});
+      },
+    });
     return response;
   } catch (error: any) {
-    console.log(error);
+    if (error.response) {
+      // El servidor respondió con un código de estado fuera del rango 2xx
+      console.error("Error en el servidor:", error.response.data);
+      console.error("Estado HTTP:", error.response.status);
+    } else if (error.request) {
+      // La solicitud fue hecha pero no se recibió respuesta
+      console.error("No se recibió respuesta del servidor:", error.request);
+    } else {
+      // Algo pasó al configurar la solicitud
+      console.error("Error en la configuración de la solicitud:", error.message);
+    }
   }
 }
 
