@@ -430,7 +430,7 @@ const OrderList = () => {
                   alt={product.subproduct.product?.description || ""}
                   className="w-10 h-10 inline-block mr-2 rounded-full"
                 />
-                {product.subproduct.product?.description} x {product.subproduct.amount}
+                {product.subproduct.product?.description} x {product.quantity} un de {product.subproduct.amount} {product.subproduct.unit}
               </div>
             ))}
           </td>

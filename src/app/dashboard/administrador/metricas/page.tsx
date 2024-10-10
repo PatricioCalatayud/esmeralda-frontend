@@ -1,5 +1,5 @@
 "use client";
-import PieChart from "@/components/PieChart/PieChart";
+
 import { useAuthContext } from "@/context/auth.context";
 import { getBestProducts, getCsv, getDebts, getOrdersByUserMonth, getProductLeastSold, getProductMostSold, getProductsByMonth, getProductsSold, getWorstProducts, uploadCsv } from "@/helpers/Metrics.helper";
 import { Tabs } from "flowbite-react";
@@ -10,7 +10,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useProductContext } from "@/context/product.context";
 import { getUsers } from "@/helpers/Autenticacion.helper";
-
+import Image from "next/image";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 
 const Metricas = () => {
@@ -100,8 +102,8 @@ const VisuallyHiddenInput = styled('input')({
   }
   const handleSeachOrdersByMonth = async() => {
     const response7 = await getOrdersByUserMonth(token, date, user);
-    setOrdersByUserMonth(response7);
-    console.log(response7);
+    setOrdersByUserMonth(response7.data);
+    console.log(response7.data);
   }
   const handleSeachProducts = async() => {
     const response8 = await getProductsSold(token, productId, 10 );
@@ -237,33 +239,36 @@ const VisuallyHiddenInput = styled('input')({
               className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
         onClick={handleSeachProductsByMonth}
             >
-                Buscar productos en este mes
+                Buscar producto en este mes
             </button>
             <hr />
-                { productsByMonth && productsByMonth.lengt > 0 ? (productsByMonth?.map ((product: any, index: number) => (
-          <div className="flex justify-center" key={index}><p>{product.productId}</p></div>
+                { productsByMonth && productsByMonth.length > 0 ? (productsByMonth?.map ((product: any, index: number) => (
+          <div className="flex justify-between items-center px-8 py-4" key={index}>
+            <p>Formato: {product.subproduct.product.description} {product.subproduct.amount} {product.subproduct.unit}</p>
+            <p>Cantidad vendidos: {product.quantity}</p>
+            </div>
         ))): <p className="flex justify-center my-20">No hay productos vendidos este mes</p>}
       </Tabs.Item>
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
-      {bestProducts?.map ((product: any, index: number) => (
+      {bestProducts && bestProducts.length > 0 ? bestProducts?.map ((product: any, index: number) => (
           <>
           <div className="flex justify-between w-full px-8 py-4" key={index}>
            <p> {product.description}</p>
-           <p className={`${product.averageRating < 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
             </div>
             <hr /></>
-        ))}
+        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
         
       </Tabs.Item>
       <Tabs.Item title="Peores productos" icon={HiClipboardList}>
-        {worstProducts?.map ((product: any , index: number) => (
+        {worstProducts && worstProducts.length > 0 ? worstProducts?.map ((product: any , index: number) => (
           <>
           <div className="flex justify-between w-full px-8 py-4" key={index}>
            <p> {product.description}</p>
-           <p className={`${product.averageRating < 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
             </div>
             <hr /></>
-        ))}
+        )) : <p className="flex justify-center my-20">No hay productos calificados</p>}
       </Tabs.Item>
       <Tabs.Item title="Pedidos de usuarios por mes" icon={HiCalendar}>
       <div className="flex justify-center w-full gap-4 px-4">
@@ -296,7 +301,7 @@ const VisuallyHiddenInput = styled('input')({
                 Fecha
               </label>
               <input
-                type="date"
+                type="month"
                 placeholder="Fecha"
                 name="date"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -315,18 +320,37 @@ const VisuallyHiddenInput = styled('input')({
             </button>
             <hr />
       {ordersByUserMonth && ordersByUserMonth.length > 0 ? (ordersByUserMonth?.map ((order: any, index: number) => (
-        <div className="flex justify-center" key={index}>{order.description}</div>
+        <div className="flex justify-between w-full px-8 py-4 items-center" key={index}>
+          <div className="flex flex-col gap-2">
+                      {order.productsOrder.map((product:any, index: number) => (
+              <div key={index} className="flex items-center ">
+                <Image
+                  width={50}
+                  height={50}
+                  src={product.subproduct.product?.imgUrl || ""}
+                  alt={product.subproduct.product?.description || ""}
+                  className="w-10 h-10 inline-block mr-2 rounded-full"
+                />
+                <p>{product.subproduct.product?.description} x {product.quantity} un de {product.subproduct.amount} {product.subproduct.unit}</p>
+              </div>
+            ))}
+            </div>
+            <p>Fecha: {order?.orderDetail?.deliveryDate && format(new Date(order.orderDetail?.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}</p>
+            <p>Creado por: {order?.orderDetail?.transactions?.status}</p>
+            <p>Costo: $ {order?.orderDetail?.totalPrice}</p>
+          </div>
       ))): <p className="flex justify-center my-20">No hay pedidos de este mes</p>}
       </Tabs.Item>
       <Tabs.Item title="Deudores" icon={HiCash}>
-      {debts?.map ((debt: any, index: number) => (
+      {debts && debts.length > 0 ? (debts?.map ((debt: any, index: number) => (
         <>
           <div className="flex justify-between w-full px-8 py-4" key={index}>
            <p> {debt.userName}</p>
            <p className="text-red-800 font-semibold">Deuda de $ {debt.balance}</p>
             </div>
-            <hr /></>
-        ))}
+            <hr /></>)
+        )): <p className="flex justify-center my-20">No hay deudas</p>}
+        
       </Tabs.Item>
 
     </Tabs>
