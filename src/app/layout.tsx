@@ -41,7 +41,7 @@ export default function RootLayout({
     />
     <meta
       property="og:image"
-      content="/LogoCafe.png"
+      content="https://img.freepik.com/vector-gratis/fondo-cafe-realista-dibujos_157027-1115.jpg?t=st=1729018210~exp=1729021810~hmac=ee1ed0a5a88ef8691138c444cb827ce8116bed57f9e05b9c7c451ae22fe7ee16&w=1380"
     />
     <meta property="og:url" content="http://www.cafelaesmeralda.com.ar" />
     <meta property="og:type" content="website" />
@@ -59,7 +59,7 @@ export default function RootLayout({
     />
     <meta
       name="twitter:image"
-      content="/LogoCafe.png"
+      content="https://img.freepik.com/vector-gratis/fondo-cafe-realista-dibujos_157027-1115.jpg?t=st=1729018210~exp=1729021810~hmac=ee1ed0a5a88ef8691138c444cb827ce8116bed57f9e05b9c7c451ae22fe7ee16&w=1380"
     />
     <meta name="twitter:site" content="@JupiterDesign" />
 	 {/* Canonical URL */}
@@ -73,8 +73,8 @@ export default function RootLayout({
             "url": "http://www.cafelaesmeralda.com.ar",
             "logo": "/LogoCafe.png",
             "sameAs": [
-              "https://www.instagram.com/jupiterrdesign_/",
-              "https://www.linkedin.com/company/104610019/admin/inbox/"
+              "https://www.instagram.com/cafelaesmeralda/",
+              "https://www.facebook.com/cafelaesmeralda10/"
             ],
             "contactPoint": {
               "@type": "ContactPoint",
