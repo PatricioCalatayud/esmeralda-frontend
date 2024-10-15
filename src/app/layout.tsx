@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "La Esmeralda",
-  description: "La Esmeralda es una tienda de café en línea",
+  description: "Descubre los mejores granos de café en La Esmeralda. Tu tienda en línea de café premium, con una selección exclusiva de los mejores cafés del mundo.",
 };
 
 export default function RootLayout({
@@ -95,10 +95,6 @@ export default function RootLayout({
           }`}
         </script> 
         <meta charSet="UTF-8" />
-    <meta
-      name="description"
-      content="Descubre los mejores granos de café en La Esmeralda. Tu tienda en línea de café premium, con una selección exclusiva de los mejores cafés del mundo."
-    />
     <meta
       name="keywords"
       content="café, café premium, tienda de café, café en línea, granos de café, La Esmeralda, café gourmet, café orgánico, comprar café"
