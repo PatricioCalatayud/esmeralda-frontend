@@ -110,6 +110,7 @@ const VisuallyHiddenInput = styled('input')({
     setProductsSold(response8);
     console.log(response8);
   }
+  
     return (
         <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
       <div className="w-full ">

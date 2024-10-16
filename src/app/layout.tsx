@@ -58,7 +58,7 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="icon" href="/cafe.ico" />
-       {/* Open Graph Meta Tags */}
+       {/* Open Graph Meta Tags 
     <meta
       property="og:title"
       content="La Esmeralda Café"
@@ -74,8 +74,8 @@ export default function RootLayout({
     <meta property="og:url" content="http://www.cafelaesmeralda.com.ar" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="La Esmeralda Cafe" />
-
-    {/*  Twitter Card Meta Tags */}
+*/}
+    {/*  Twitter Card Meta Tags 
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -89,8 +89,8 @@ export default function RootLayout({
       name="twitter:image"
       content="https://img.freepik.com/vector-gratis/fondo-cafe-realista-dibujos_157027-1115.jpg?t=st=1729018210~exp=1729021810~hmac=ee1ed0a5a88ef8691138c444cb827ce8116bed57f9e05b9c7c451ae22fe7ee16&w=1380"
     />
-    <meta name="twitter:site" content="@JupiterDesign" />
-	 {/* Canonical URL */}
+    <meta name="twitter:site" content="@JupiterDesign" />*/}
+	 {/* Canonical URL 
     <link rel="canonical" href="http://www.cafelaesmeralda.com.ar" />
 	 {/* Schema */}
    <script
@@ -98,11 +98,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <meta charSet="UTF-8" />
-    <meta
+    {/* <meta
       name="keywords"
       content="café, café premium, tienda de café, café en línea, granos de café, La Esmeralda, café gourmet, café orgánico, comprar café"
     />
-    <meta name="author" content="La Esmeralda Café" />
+    <meta name="author" content="La Esmeralda Café" />*/}
       </head>
       <body className={`${inter.className} h-min-screen`}>
       <CartProvider>
