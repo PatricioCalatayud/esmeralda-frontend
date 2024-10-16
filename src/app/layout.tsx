@@ -26,8 +26,36 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "La Esmeralda Cafe",
+    "url": "http://www.cafelaesmeralda.com.ar",
+    "logo": "/LogoCafe.png",
+    "sameAs": [
+      "https://www.instagram.com/cafelaesmeralda/",
+      "https://www.facebook.com/cafelaesmeralda10/"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+54 - 1158803709",
+      "contactType": "Customer Service",
+      "areaServed": "Worldwide",
+      "availableLanguage": ["Spanish"]
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Dr Juan Felipe Aranguren 1528",
+      "addressLocality": "Caballito",
+      "addressRegion": "Buenos Aires",
+      "postalCode": "1406",
+      "addressCountry": "AR"
+    },
+    "description": "Descubre los mejores granos de café en La Esmeralda. Tu tienda en línea de café premium, con una selección exclusiva de los mejores cafés del mundo."
+  };
+
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <link rel="icon" href="/cafe.ico" />
        {/* Open Graph Meta Tags */}
@@ -64,36 +92,11 @@ export default function RootLayout({
     <meta name="twitter:site" content="@JupiterDesign" />
 	 {/* Canonical URL */}
     <link rel="canonical" href="http://www.cafelaesmeralda.com.ar" />
-	{/* Schema */}
-  <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "La Esmeralda Cafe",
-            "url": "http://www.cafelaesmeralda.com.ar",
-            "logo": "/LogoCafe.png",
-            "sameAs": [
-              "https://www.instagram.com/cafelaesmeralda/",
-              "https://www.facebook.com/cafelaesmeralda10/"
-            ],
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+54 - 1158803709",
-              "contactType": "Customer Service",
-              "areaServed": "Worldwide",
-              "availableLanguage": ["Spanish"]
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "Dr Juan Felipe Aranguren 1528",
-              "addressLocality": "Caballito",
-              "addressRegion": "Buenos Aires",
-              "postalCode": "1406",
-              "addressCountry": "AR"
-            },
-            "description": "Descubre los mejores granos de café en La Esmeralda. Tu tienda en línea de café premium, con una selección exclusiva de los mejores cafés del mundo."
-          }`}
-        </script> 
+	 {/* Schema */}
+   <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <meta charSet="UTF-8" />
     <meta
       name="keywords"

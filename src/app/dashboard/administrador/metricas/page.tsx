@@ -249,6 +249,18 @@ const VisuallyHiddenInput = styled('input')({
             </div>
         ))): <p className="flex justify-center my-20">No hay productos vendidos este mes</p>}
       </Tabs.Item>
+      <Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
+      
+        
+      </Tabs.Item>
+      <Tabs.Item title="Importe de productos por mes bonificados " icon={HiCash}>
+      
+        
+      </Tabs.Item>
+      <Tabs.Item title="Productos reparto por mes" icon={HiCash}>
+      
+        
+      </Tabs.Item>
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
       {bestProducts && bestProducts.length > 0 ? bestProducts?.map ((product: any, index: number) => (
           <>
@@ -352,7 +364,7 @@ const VisuallyHiddenInput = styled('input')({
         )): <p className="flex justify-center my-20">No hay deudas</p>}
         
       </Tabs.Item>
-
+      
     </Tabs>
     <hr className="mt-4"/>
     <div className="mt-4 mb-4 mx-4 flex gap-4">
