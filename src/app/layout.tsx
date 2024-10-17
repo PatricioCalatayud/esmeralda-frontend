@@ -92,12 +92,12 @@ export default function RootLayout({
     <meta name="twitter:site" content="@JupiterDesign" />*/}
 	 {/* Canonical URL 
     <link rel="canonical" href="http://www.cafelaesmeralda.com.ar" />
-	 {/* Schema */}
+	 {/* Schema 
    <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <meta charSet="UTF-8" />
+        <meta charSet="UTF-8" />*/}
     {/* <meta
       name="keywords"
       content="café, café premium, tienda de café, café en línea, granos de café, La Esmeralda, café gourmet, café orgánico, comprar café"
