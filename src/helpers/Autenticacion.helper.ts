@@ -140,3 +140,18 @@ export async function deleteUser(userId: string, token: string | undefined) {
     console.log(error);
   }
 }
+
+export const putAddress = async (addressId: string, addressData: { address: string }, token: string) => {
+  try {
+    const response = await axios.put(`http://localhost:3001/address/${addressId}`, addressData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Error actualizando la dirección", error);
+    return error.response;
+  }
+};

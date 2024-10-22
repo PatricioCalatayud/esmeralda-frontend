@@ -7,7 +7,7 @@ import React, {
   useContext,
 } from "react";
 
-import { jwtDecode } from "jwt-decode"; // Asegúrate de importar correctamente
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import { getSessionGoogle, signOutWithGoogle } from "@/utils/singGoogle";
 import { ISession } from "@/interfaces/ISession";
@@ -67,6 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             image: undefined,
             role: decodedToken.roles[0],
             phone: decodedToken.phone,
+            address: decodedToken.address,
           });
         }
       } catch (error) {
@@ -101,6 +102,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           image: sessionGoogle.user?.image ?? "",
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
+          address: decodedToken.address,
         }),
         setUserGoogle(true);
       } else {
@@ -128,7 +130,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             email: decodedToken.email,
             image: sessionGoogle.user?.image ?? "",
             role: decodedToken.roles[0],
-            phone: decodedToken.phon,
+            phone: decodedToken.phone,
+            address: decodedToken.address
           }),
           setUserGoogle(true);
         }
