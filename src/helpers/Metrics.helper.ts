@@ -155,3 +155,61 @@ export async function getProductMostSold( token: string | undefined ) {
       console.log(error);
     }
   }
+
+  export async function getProductsByMonthBonus(token:string,userId:string,date:string) { 
+    const body = {
+      userId: userId,
+      date: date
+    }
+    try {
+      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados`, body,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        });
+        console.log(response.data);
+      const products = response.data;
+      return products;
+    } catch (error: any) {
+      console.log(error);
+    }
+    
+  }
+  export async function getProductsByMonthBonusAmount(token:string,userId:string,date:string) { 
+    const body = {
+      userId: userId,
+      date: date
+    }
+    try {
+      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados-importe`, body,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        });
+        console.log(response.data);
+      const products = response.data;
+      return products;
+    } catch (error: any) {
+      console.log(error);
+    }
+    
+  }
+  export async function getProductsDistribution(token:string,deliveryId:string,date:string) { 
+    const body = {
+      deliveryId: deliveryId,
+      date: date
+    }
+    try {
+      const response = await axios.post(`${apiURL}/metrics/productos-por-reparto-por-mes`, body,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        });
+        console.log(response.data);
+      const products = response.data;
+      return products;
+    } catch (error: any) {
+      console.log(error);
+    }
+    
+  }
