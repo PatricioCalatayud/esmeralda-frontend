@@ -39,41 +39,80 @@ function HeadlineCards() {
       <div className='rounded-xl relative'>
         <div className='absolute w-full h-full bg-black/50 rounded-xl text-white flex flex-col justify-center items-center p-4'>
           <p className='font-bold text-xl sm:text-2xl px-2'>Tienda Online</p>
-          <p className='px-2 text-center'>¡Comienza tu pedido ahora!</p>
+          <p className='px-2 text-center'>¡Comenzá tu pedido ahora!</p>
           <Link href='/categories'>
-            <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-teal-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Pedir Ahora</button>
+            <button
+              type="button"
+              className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-teal-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4"
+            >
+              Pedí ahora
+            </button>
           </Link>
         </div>
-        < Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de comida' />
+        <Image
+          priority={true}
+          width={500}
+          height={500}
+          className='w-full object-cover rounded-xl'
+          style={{ height: '200px' }}
+          src='https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          alt='Imagen de comida'
+        />
       </div>
-
+  
       <div className='rounded-xl relative'>
         <div className='absolute w-full h-full bg-black/50 rounded-xl text-white flex flex-col justify-center items-center p-4'>
-          <p className='font-bold text-xl sm:text-2xl px-2'>Donde estamos ubicados</p>
-          <p className='px-2 text-center'>Nos estamos expandiendo!</p>
+          <p className='font-bold text-xl sm:text-2xl px-2'>¿Dónde estamos ubicados?</p>
+          <p className='px-2 text-center'>Encontrá la dirección de nuestro local</p>
           <Link href='/mapa'>
-            <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Descubrenos</button>
+            <button
+              type="button"
+              className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4"
+            >
+              Descubrinos
+            </button>
           </Link>
         </div>
-        <Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/122370/pexels-photo-122370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de restaurante' />
+        <Image
+          priority={true}
+          width={500}
+          height={500}
+          className='w-full object-cover rounded-xl'
+          style={{ height: '200px' }}
+          src='https://images.pexels.com/photos/122370/pexels-photo-122370.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          alt='Imagen de restaurante'
+        />
       </div>
-
+  
       <div className='rounded-xl relative'>
         <div className='absolute w-full h-full bg-black/50 rounded-xl text-white flex flex-col justify-center items-center p-4'>
-          <p className='font-bold text-xl sm:text-2xl px-2'>No solo vendemos Cafe</p>
-          <p className='px-2 text-center'>Veni y enterate</p>
+          <p className='font-bold text-xl sm:text-2xl px-2'>No solo vendemos Café</p>
+          <p className='px-2 text-center'>Vení y enterate</p>
           {accessoriesCategoryId ? (
             <Link href={`/categories/${accessoriesCategoryId}`}>
-              <button type="button" className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-teal-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4">Echa un Vistazo</button>
+              <button
+                type="button"
+                className="focus:outline-none text-white bg-teal-800 hover:bg-emerald-950 focus:ring-4 focus:ring-teal-500 font-medium rounded-lg text-sm sm:text-base px-5 py-2.5 mt-4"
+              >
+                Echá un vistazo
+              </button>
             </Link>
           ) : (
-            <p>No se encontró la categoría accesorios</p>
+            <p>No se encontró la categoría de accesorios</p>
           )}
         </div>
-        <Image priority={true} width={500} height={500} className='w-full object-cover rounded-xl' style={{ height: '200px' }} src='https://images.pexels.com/photos/324028/pexels-photo-324028.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' alt='imagen de postre' />
+        <Image
+          priority={true}
+          width={500}
+          height={500}
+          className='w-full object-cover rounded-xl'
+          style={{ height: '200px' }}
+          src='https://images.pexels.com/photos/324028/pexels-photo-324028.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          alt='Imagen de postre'
+        />
       </div>
     </div>
   );
-}
-
-export default HeadlineCards;
+  }
+  
+  export default HeadlineCards;

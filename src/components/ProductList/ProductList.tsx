@@ -30,7 +30,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
   >(productsList);
   const { categories } = useCategoryContext();
 
-  //! Función para traer los productos y filtrarlos
   useEffect(() => {
     let sortedProducts = productsList || [];
     if (searchResults !== undefined && productsList !== undefined) {
@@ -110,7 +109,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
 
-  //! Función para redirigir al usuario a la categoría seleccionada
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
@@ -121,7 +119,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
     }
   };
 
-  //! Función para renderizar los headers de cada categoría
   const renderBreadcrumb = () => {
     if (!category) {
       return (
@@ -146,7 +143,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
 
   return (
     <>
-      {/* Título y filtro */}
       <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white ">
         {renderBreadcrumb()}
 
@@ -207,8 +203,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       </div>
 
       <div className="flex flex-col lg:flex-row m-10">
-        {/* Sidebar de categorías */}
-        <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600  rounded-xl lg:mr-10 mr-0">
+        <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600 rounded-xl lg:mr-10 mr-0">
           <h2 className="text-lg font-bold mb-4 text-gray-600">Categorías</h2>
           <hr className="border-teal-600" />
           <ul className="mt-4 flex flex-col gap-2">
@@ -251,92 +246,70 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               </li>
             ))}
           </ul>
-        </div>
+        </div> 
 
-        {/* Contenido principal */}
-        <div className="w-full lg:w-3/4  my-10 lg:my-0">
+        <div className="w-full lg:w-3/4 my-10 lg:my-0">
           {filteredProducts && filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product, index) => {
                 const productCategory = categories?.find(
                   (cat) => cat.id === product.category.id
                 );
+                const lowestPrice = product.subproducts.reduce(
+                  (lowest, current) => {
+                    return parseFloat(current.price) < parseFloat(lowest.price)
+                      ? current
+                      : lowest;
+                  },
+                  product.subproducts[0]
+                );
+
                 return (
                   <div
-                    key={index}
-                    className="relative rounded-lg h-[480px] shadow-lg hover:scale-105"
-                    onClick={() => router.push(`/products/${product.id}`)}
-                  >
-                    <Image
-                      width={500}
-                      height={500}
-                      src={product.imgUrl}
-                      alt={product.description}
-                      className="relative inset-0 w-full h-4/6 object-cover rounded-t-lg animate-fade-in-up  transition-transform duration-300 cursor-pointer"
-                    />
-                    <hr className=" bg-blue-gray-600" />
-                    <div className="p-4 flex flex-col justify-between w-full h-2/6">
-                      {productCategory && (
-                        <h3 className="text-gray-500 text-sm">
-                          {productCategory.name}
-                        </h3>
-                      )}
-
-                      <h2 className="text-lg font-bold">
-                        {product.description}
-                      </h2>
-
-                      {product.subproducts &&
-                        product.subproducts
-                          .filter((subproduct) => subproduct.discount > 0)
-                          .map((subproduct) => (
-                            <div key={subproduct.id}>
-                              <div className="absolute top-4 right-4 flex items-center gap-2">
-                                <FontAwesomeIcon
-                                  icon={faBolt}
-                                  style={{ color: "white" }}
-                                />
-                                <p className="text-white font-bold">
-                                  Promoción
-                                </p>
-                              </div>
-                              <p className="text-teal-400 text-sm font-bold">
-                                {subproduct.discount} % de descuento x{" "}
-                                {subproduct.amount} {subproduct.unit}
-                              </p>
-                            </div>
-                          ))}
-
-                      {product.subproducts &&
-                      product.subproducts.length > 0 ? (
-                        <>
-                          <div className="h-7 flex items-center gap-3">
-                            {product.subproducts.map((subProduct, index) => (
-                              <p
-                                key={index}
-                                className="text-sm font-medium text-gray-500 "
-                              >
-                                {" "}
-                                {subProduct.amount} {subProduct.unit}{" "}
-                              </p>
-                            ))}
-                          </div>
-                          <div className="flex gap-4 items-center">
-                            <p className="text-lg font-medium ">Desde:</p>
-                            <p className="text-lg font-bold ">
-                              ${" "}
-                              {product.subproducts.reduce((lowest, current) => {
-                                return current.price < lowest.price
-                                  ? current
-                                  : lowest;
-                              }).price}{" "}
-                              (+IVA)
-                            </p>
-                          </div>
-                        </>
-                      ) : null}
+                  key={index}
+                  className="relative flex flex-col rounded-lg h-[650px] shadow-lg hover:scale-105 transition-transform" // Aumentamos la altura a 600px
+                  onClick={() => router.push(`/products/${product.id}`)}
+                >
+                  <Image
+                    width={500}
+                    height={500}
+                    src={product.imgUrl}
+                    alt={product.description}
+                    className="w-full h-4/6 object-cover rounded-t-lg" // Mantener el tamaño más grande de la imagen
+                  />
+                  <hr className="bg-blue-gray-600" />
+                  <div className="flex-grow p-4">
+                    {productCategory && (
+                      <h3 className="text-gray-500 text-sm">{productCategory.name}</h3>
+                    )}
+                    <h2 className="text-lg font-bold">{product.description}</h2>
+                    {product.subproducts
+                      .filter((subproduct) => subproduct.discount > 0)
+                      .map((subproduct) => (
+                        <div
+                          key={subproduct.id}
+                          className="text-teal-400 text-sm font-bold"
+                        >
+                          {subproduct.discount}% de descuento x {subproduct.amount} {subproduct.unit}
+                        </div>
+                      ))}
+                    <div className="h-7 flex flex-wrap items-center gap-2">
+                      {product.subproducts.map((subProduct, index) => (
+                        <p
+                          key={index}
+                          className="text-sm font-medium text-gray-500"
+                        >
+                          {subProduct.amount} {subProduct.unit}
+                        </p>
+                      ))}
                     </div>
                   </div>
+                  {/* Contenedor para el precio */}
+                  <div className="flex-shrink-0 p-4 flex items-center justify-between w-full">
+                    <p className="text-lg font-medium">Desde:</p>
+                    <p className="text-lg font-bold">${lowestPrice.price} (+IVA)</p>
+                  </div>
+                </div>
                 );
               })}
             </div>
@@ -349,21 +322,6 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
           )}
         </div>
       </div>
-      <style jsx>{`
-        @keyframes fade-in-up {
-          0% {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out forwards;
-        }
-      `}</style>
     </>
   );
 };
