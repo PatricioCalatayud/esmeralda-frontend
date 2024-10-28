@@ -7,9 +7,7 @@ import { ProductProvider } from "@/context/product.context";
 import { AuthProvider } from "@/context/auth.context";
 import { CartProvider } from "@/context/cart.context";
 import { CategoryProvider } from "@/context/categories.context";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
-import Link from "next/link";
+
 import ChatBotEsmeralda from "@/components/ChatBot/ChatBot";
 
 
@@ -63,6 +61,7 @@ export const metadata: Metadata = {
   icons: {
     shortcut: "/LogoCafe.png",
   },
+  
 
 };
 

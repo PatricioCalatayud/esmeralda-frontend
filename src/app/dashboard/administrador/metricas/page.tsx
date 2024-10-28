@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthContext } from "@/context/auth.context";
-import { getBestProducts, getCsv, getDebts, getOrdersByUserMonth, getProductLeastSold, getProductMostSold, getProductsByMonth, getProductsSold, getWorstProducts, uploadCsv } from "@/helpers/Metrics.helper";
+import { getBestProducts, getCsv, getDebts, getOrdersByUserMonth, getProductLeastSold, getProductMostSold, getProductsByMonth, getProductsByMonthBonus, getProductsByMonthBonusAmount, getProductsDistribution, getProductsSold, getWorstProducts, uploadCsv } from "@/helpers/Metrics.helper";
 import { Tabs } from "flowbite-react";
 import {  HiCalendar, HiCash, HiClipboardList, HiMinus, HiOutlineChartPie,  HiPlus } from "react-icons/hi";
 import { useEffect, useState } from "react";
@@ -30,6 +30,10 @@ const Metricas = () => {
     const [date, setDate] = useState<any>();
     const [users, setUsers] = useState<any>();
     const [user, setUser] = useState<any>();
+    const [deliveryId, setDeliveryId] = useState<any>();
+    const [productsByMonthBonus, setProductsByMonthBonus] = useState<any>();
+    const [productsByMonthBonusAmount, setProductsByMonthBonusAmount] = useState<any>();
+    const [productsDistribution, setProductsDistribution] = useState<any>();
     useEffect(() => {
         const fetchData = async () => {
             if (token) {  // Asegúrate de que `token` esté definido antes de hacer la llamada
@@ -109,6 +113,21 @@ const VisuallyHiddenInput = styled('input')({
     const response8 = await getProductsSold(token, productId, 10 );
     setProductsSold(response8);
     console.log(response8);
+  }
+  const handleSeachProductsByMonthBonus = async() => {
+    const response9 = await getProductsByMonthBonus(token, user, date);
+    setProductsByMonthBonus(response9);
+    console.log(response9);
+  }
+  const handleSeachProductsByMonthBonusAmount = async() => {
+    const response10 = await getProductsByMonthBonusAmount(token, user, date);
+    setProductsByMonthBonusAmount(response10);
+    console.log(response10);
+  }
+  const handleSearchProductsDistribution = async() => {
+    const response11 = await getProductsDistribution(token, deliveryId , date);
+    setProductsDistribution(response11);
+    console.log(response11);
   }
   
     return (
@@ -251,17 +270,201 @@ const VisuallyHiddenInput = styled('input')({
         ))): <p className="flex justify-center my-20">No hay productos vendidos este mes</p>}
       </Tabs.Item>
       <Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
-      
+      <div className="flex justify-center w-full gap-4 px-4">
+        <div className="w-full">
+              <label
+                htmlFor="userId"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Usuarios
+              </label>
+              <select
+                name="userId"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setUser(e.target.value)}
+              >
+                <option value="">--Seleccione--</option>
+                {users?.map((user: any) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+            <div className="w-full">
+              <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Fecha
+              </label>
+              <input
+                type="month"
+                placeholder="Fecha"
+                name="date"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setDate(e.target.value)}
+              >
+              </input>
+
+            </div>
+        </div>
+        <button
+              type="submit"
+              className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        onClick={handleSearchProductsDistribution}
+            >
+                Productos reparto por mes
+            </button>
+            
+            {productsDistribution && productsDistribution.length > 0 ? productsDistribution?.map ((product: any, index: number) => (
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
+        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
         
       </Tabs.Item>
+      <Tabs.Item title="Peores productos" icon={HiClipboardList}>
+        {worstProducts && worstProducts.length > 0 ? worstProducts?.map ((product: any , index: number) => (
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
+        )) : <p className="flex justify-center my-20">No hay productos calificados</p>}
+
+      </Tabs.Item>
       <Tabs.Item title="Importe de productos por mes bonificados " icon={HiCash}>
-      
+      <div className="flex justify-center w-full gap-4 px-4">
+        <div className="w-full">
+              <label
+                htmlFor="userId"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Usuarios
+              </label>
+              <select
+                name="userId"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setUser(e.target.value)}
+              >
+                <option value="">--Seleccione--</option>
+                {users?.map((user: any) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+            <div className="w-full">
+              <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Fecha
+              </label>
+              <input
+                type="month"
+                placeholder="Fecha"
+                name="date"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setDate(e.target.value)}
+              >
+              </input>
+
+            </div>
+        </div>
+        <button
+              type="submit"
+              className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        onClick={handleSeachProductsByMonthBonusAmount}
+            >
+                Buscar valor de productos bonificados en este mes
+            </button>
+            
+            {productsByMonthBonusAmount && productsByMonthBonusAmount.length > 0 ? productsByMonthBonusAmount?.map ((product: any, index: number) => (
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
+        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
         
       </Tabs.Item>
       <Tabs.Item title="Productos reparto por mes" icon={HiCash}>
       
+      <div className="flex justify-center w-full gap-4 px-4">
+      <div className="w-full">
+              <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Fecha de entrega
+              </label>
+              <input
+                type="month"
+                placeholder="Fecha"
+                name="date"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setDate(e.target.value)}
+              >
+              </input>
+
+            </div>
+            <div className="w-full">
+              <label
+                htmlFor="category"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Fecha
+              </label>
+              <input
+                type="month"
+                placeholder="Fecha"
+                name="date"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                onChange={(e) => setDate(e.target.value)}
+              >
+              </input>
+
+            </div>
+        </div>
+        <button
+              type="submit"
+              className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        onClick={handleSeachProductsByMonthBonusAmount}
+            >
+                Buscar valor de productos bonificados en este mes
+            </button>
+            
+            {productsByMonthBonusAmount && productsByMonthBonusAmount.length > 0 ? productsByMonthBonusAmount?.map ((product: any, index: number) => (
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
+        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
+      </Tabs.Item>
+      <Tabs.Item title="Peores productos" icon={HiClipboardList}>
+        {worstProducts && worstProducts.length > 0 ? worstProducts?.map ((product: any , index: number) => (
+          <>
+          <div className="flex justify-between w-full px-8 py-4" key={index}>
+           <p> {product.description}</p>
+           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
+            </div>
+            <hr /></>
+        )) : <p className="flex justify-center my-20">No hay productos calificados</p>}
         
       </Tabs.Item>
+     
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
       {bestProducts && bestProducts.length > 0 ? bestProducts?.map ((product: any, index: number) => (
           <>
