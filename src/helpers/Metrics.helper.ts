@@ -156,13 +156,13 @@ export async function getProductMostSold( token: string | undefined ) {
     }
   }
 
-  export async function getProductsByMonthBonus(token:string,userId:string,date:string) { 
+  export async function getProductsByMonthBonus(token:string | undefined,userId:string,date:string) { 
     const body = {
       userId: userId,
       date: date
     }
     try {
-      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados`, body,{
+      const response = await axios.post(`${apiURL}/metrics/productos-por-mes-usuario-bonificados`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -175,13 +175,13 @@ export async function getProductMostSold( token: string | undefined ) {
     }
     
   }
-  export async function getProductsByMonthBonusAmount(token:string,userId:string,date:string) { 
+  export async function getProductsByMonthBonusAmount(token:string | undefined,userId:string,date:string) { 
     const body = {
       userId: userId,
       date: date
     }
     try {
-      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados-importe`, body,{
+      const response = await axios.post(`${apiURL}/metrics/productos-por-mes-usuario-bonificados-importe`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -194,7 +194,7 @@ export async function getProductMostSold( token: string | undefined ) {
     }
     
   }
-  export async function getProductsDistribution(token:string,deliveryId:string,date:string) { 
+  export async function getProductsDistribution(token:string | undefined,deliveryId:string,date:string) { 
     const body = {
       deliveryId: deliveryId,
       date: date

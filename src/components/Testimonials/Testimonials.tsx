@@ -5,6 +5,7 @@ import 'slick-carousel/slick/slick-theme.css';
 import { FaStar } from 'react-icons/fa';
 import axios from 'axios';
 import Image from 'next/image';
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 interface Testimonial {
   id: string;
@@ -26,7 +27,7 @@ const Testimonials: React.FC = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/testimony');
+        const response = await axios.get(`${apiURL}/testimony`);
         setTestimonials(response.data);
       } catch (error) {
         console.error('Error fetching testimonials:', error);

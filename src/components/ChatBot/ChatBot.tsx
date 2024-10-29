@@ -439,9 +439,9 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
                 router.push(urlLocal + "/contact");
                 return "step3c";
                 case "irawhatsapp":
-                  link = "https://api.whatsapp.com/send?phone=541158803709";
+                  link = "https://api.whatsapp.com/send?phone=541150107956";
                   window.open(link, "_blank");
-                  await params.injectMessage("Aquí puedes talk con una persona.");
+                  await params.injectMessage("Aquí puedes hablar con una persona.");
                   return "step2";
                 case "quierohablarconunapersona":
                   await params.injectMessage(
@@ -599,9 +599,9 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
               case "masopciones":
                 return "step3c";
               case "irawhatsapp":
-                link = "https://api.whatsapp.com/send?phone=541158803709";
+                link = "https://api.whatsapp.com/send?phone=541150107956";
                 window.open(link, "_blank");
-                await params.injectMessage("Aquí puedes talk con una persona.");
+                await params.injectMessage("Aquí puedes hablar con una persona.");
                 break;
               case "quierohablarconunapersona":
                 await params.injectMessage(
