@@ -328,17 +328,7 @@ const VisuallyHiddenInput = styled('input')({
         )): <p className="flex justify-center my-20">No hay productos calificados</p>}
         
       </Tabs.Item>
-      <Tabs.Item title="Peores productos" icon={HiClipboardList}>
-        {worstProducts && worstProducts.length > 0 ? worstProducts?.map ((product: any , index: number) => (
-          <>
-          <div className="flex justify-between w-full px-8 py-4" key={index}>
-           <p> {product.description}</p>
-           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
-            </div>
-            <hr /></>
-        )) : <p className="flex justify-center my-20">No hay productos calificados</p>}
 
-      </Tabs.Item>
       <Tabs.Item title="Importe de productos por mes bonificados " icon={HiCash}>
       <div className="flex justify-center w-full gap-4 px-4">
         <div className="w-full">
@@ -395,7 +385,7 @@ const VisuallyHiddenInput = styled('input')({
            <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
             </div>
             <hr /></>
-        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
+        )): <p className="flex justify-center my-20">No hay productos bonificados en este mes</p>}
         
       </Tabs.Item>
       <Tabs.Item title="Productos reparto por mes" icon={HiCash}>
@@ -439,31 +429,21 @@ const VisuallyHiddenInput = styled('input')({
         <button
               type="submit"
               className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-        onClick={handleSeachProductsByMonthBonusAmount}
+        onClick={handleSearchProductsDistribution}
             >
-                Buscar valor de productos bonificados en este mes
+                Buscar valor de reparto por mes
             </button>
             
-            {productsByMonthBonusAmount && productsByMonthBonusAmount.length > 0 ? productsByMonthBonusAmount?.map ((product: any, index: number) => (
+            {productsDistribution && productsDistribution.length > 0 ? productsDistribution?.map ((product: any, index: number) => (
           <>
           <div className="flex justify-between w-full px-8 py-4" key={index}>
            <p> {product.description}</p>
            <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
             </div>
             <hr /></>
-        )): <p className="flex justify-center my-20">No hay productos calificados</p>}
+        )): <p className="flex justify-center my-20">No hay productos de reparto en este mes</p>}
       </Tabs.Item>
-      <Tabs.Item title="Peores productos" icon={HiClipboardList}>
-        {worstProducts && worstProducts.length > 0 ? worstProducts?.map ((product: any , index: number) => (
-          <>
-          <div className="flex justify-between w-full px-8 py-4" key={index}>
-           <p> {product.description}</p>
-           <p className={`${product.averageRating <= 2 ? 'text-red-800' : (product.averageRating < 3.5 && product.averageRating > 2) ? 'text-yellow-800' : 'text-green-800'} font-semibold`}>Puntaje: {product.averageRating.toFixed(2)} / 5</p>
-            </div>
-            <hr /></>
-        )) : <p className="flex justify-center my-20">No hay productos calificados</p>}
-        
-      </Tabs.Item>
+
      
       <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
       {bestProducts && bestProducts.length > 0 ? bestProducts?.map ((product: any, index: number) => (

@@ -162,7 +162,7 @@ export async function getProductMostSold( token: string | undefined ) {
       date: date
     }
     try {
-      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados`, body,{
+      const response = await axios.post(`${apiURL}/metrics/productos-por-mes-usuario-bonificados`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -181,7 +181,7 @@ export async function getProductMostSold( token: string | undefined ) {
       date: date
     }
     try {
-      const response = await axios.post(`${apiURL}/metrics/producto-por-mes-usuario-bonificados-importe`, body,{
+      const response = await axios.post(`${apiURL}/metrics/productos-por-mes-usuario-bonificados-importe`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
