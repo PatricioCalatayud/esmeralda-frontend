@@ -143,6 +143,7 @@ console.log(orders);
                   {session?.role === "Cliente" && order.orderDetail.transactions.status !== "Pendiente de pago" && order?.receipt?.status === "Comprobante verificado" && 
                 <div  className={`flex items-center justify-center text-teal-500`}>
                   <p>{order.orderDetail.transactions.status}</p>
+                  
                   </div> }
 
           </td>
@@ -161,7 +162,7 @@ console.log(orders);
                   Ver detalle
                 </Link>
                  }
-              {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" &&  order?.receipt?.status === "Pendiente de subir comprobante" &&
+              {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" &&  (order?.receipt?.status === "Pendiente de subir comprobante" || order?.receipt?.status === "Rechazado") &&
           <Link
                   type="button"
                   data-drawer-target="drawer-update-product"
