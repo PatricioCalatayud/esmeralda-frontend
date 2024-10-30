@@ -296,14 +296,13 @@ handleSubmit = {handleSubmit}
                   value={dataProduct.tipoGrano}
                   onChange={handleChange}
                 >
-                  <option value="">--Seleccione--</option>
                   <option value="Santos">Santos</option>
-                  <option value="Colombiano">Colombiano</option>
-                  <option value="Torrado">Torrado</option>
-                  <option value="Rio de oro">Rio de Oro</option>
-                  <option value="Descafeino">Descafeinado</option>
-                  <option value="Blend-premium">Blend</option>
-                  <option value="Mezcla baja calidad">Mezcla</option>
+<option value="Colombiano">Colombiano</option>
+<option value="Torrado">Torrado</option>
+<option value="Rio de Oro">Rio de Oro</option>
+<option value="Descafeinado">Descafeinado</option>
+<option value="Blen-Premium">Blen-Premium</option>
+<option value="Mezcla baja calidad">Mezcla baja calidad</option>
                 </select>
                 {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
