@@ -81,31 +81,33 @@ const InsertProduct = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-const formData = new FormData();
-formData.append("description", dataProduct.description);
-formData.append("averageRating", "0"); // o puedes utilizar `0` directamente si el backend lo soporta
-formData.append("presentacion", dataProduct.presentacion || "");
-formData.append("tipoGrano", dataProduct.tipoGrano || "");
-formData.append("categoryID", dataProduct.categoryID);
-
-
-// Añadir la imagen al FormData si existe
-if (imageFile) {
-  formData.append("file", imageFile);} // Asegúrate de que el campo 'file' coincide con lo que espera el backend
-
-
-// Añadir cada subproduct al FormData
-subproducts.forEach((subproduct, index) => {
-
-    formData.append(`subproducts[${index}][amount]`, subproduct.amount);
-    formData.append(`subproducts[${index}][unit]`, subproduct.unit);
-    formData.append(`subproducts[${index}][stock]`, subproduct.stock);
-    formData.append(`subproducts[${index}][price]`, subproduct.price);
-    formData.append(`subproducts[${index}][discount]`, subproduct.discount);
-    // Añadir más campos según sea necesario
-});
+    const formData = new FormData();
+    formData.append("description", dataProduct.description);
+    formData.append("averageRating", "0"); // o puedes utilizar `0` directamente si el backend lo soporta
+    formData.append("presentacion", dataProduct.presentacion || "");
+    formData.append("tipoGrano", dataProduct.tipoGrano || "");
+    formData.append("categoryID", dataProduct.categoryID);
   
-
+    // Añadir la imagen al FormData si existe
+    if (imageFile) {
+      formData.append("file", imageFile); // Asegúrate de que el campo 'file' coincide con lo que espera el backend
+    }
+  
+    // Añadir cada subproduct al FormData
+    subproducts.forEach((subproduct, index) => {
+      formData.append(`subproducts[${index}][amount]`, subproduct.amount);
+      formData.append(`subproducts[${index}][unit]`, subproduct.unit);
+      formData.append(`subproducts[${index}][stock]`, subproduct.stock);
+      formData.append(`subproducts[${index}][price]`, subproduct.price);
+      formData.append(`subproducts[${index}][discount]`, subproduct.discount);
+      // Añadir más campos según sea necesario
+    });
+  
+    // Imprimir los datos de FormData en la consola usando forEach
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`);
+    });
+  
     //! Mostrar alerta de carga mientras se procesa la solicitud
     Swal.fire({
       title: "Agregando producto...",
@@ -115,22 +117,18 @@ subproducts.forEach((subproduct, index) => {
         Swal.showLoading();
       },
     });
-
-      const response = await postProducts(formData, token);
-
-      if (response && ( response.status === 201 || response.status === 200)) {
-        Swal.fire({
-          icon: "success",
-          title: "¡Agregado!",
-          text: "El producto ha sido agregado con éxito.",
-        }).then(() => {
-          router.push("../../dashboard/administrador/product");
-        });
-      
-      // Mostrar alerta de éxito
-      
+  
+    const response = await postProducts(formData, token);
+  
+    if (response && (response.status === 201 || response.status === 200)) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Agregado!",
+        text: "El producto ha sido agregado con éxito.",
+      }).then(() => {
+        router.push("../../dashboard/administrador/product");
+      });
     } else {
-      // Mostrar alerta de error
       Swal.fire({
         icon: "error",
         title: "¡Error!",
@@ -298,12 +296,12 @@ handleSubmit = {handleSubmit}
                 >
                   <option value="">--Seleccione--</option>
                   <option value="Santos">Santos</option>
-                  <option value="Colombiano">Colombiano</option>
-                  <option value="Torrado">Torrado</option>
-                  <option value="Rio de oro">Rio de Oro</option>
-                  <option value="Descafeino">Descafeinado</option>
-                  <option value="Blend-premium">Blend</option>
-                  <option value="Mezcla baja calidad">Mezcla</option>
+<option value="Colombiano">Colombiano</option>
+<option value="Torrado">Torrado</option>
+<option value="Rio de Oro">Rio de Oro</option>
+<option value="Descafeinado">Descafeinado</option>
+<option value="Blen-Premium">Blen-Premium</option>
+<option value="Mezcla baja calidad">Mezcla baja calidad</option>
                 </select>
                 {errors.tipoGrano && (
                   <span className="text-red-500">{errors.tipoGrano}</span>
@@ -482,8 +480,10 @@ handleSubmit = {handleSubmit}
               </div>
               <hr  className="col-span-full "/>
             </div>
-            
+          
 ))}
+
+
  {/* Botón para añadir más subproductos */}
             
             <div className="h-40 col-span-full flex items-center justify-center">
