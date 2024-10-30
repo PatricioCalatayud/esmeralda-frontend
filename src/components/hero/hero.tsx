@@ -7,7 +7,7 @@ const Hero = () => {
         {/* Superposición visual para aumentar el contraste del texto */}
         <div className="absolute w-full h-full text-gray-200 max-h-[500px] bg-black/60 flex flex-col justify-center">
           <h1 className="px-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">
-            Descubre los <span className="text-teal-800">Mejores</span>
+          Descubrí los <span className="text-teal-800">Mejores</span>
           </h1>
           <h2 className="px-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
             <span className="text-teal-800">Sabores</span> que Llegan a Tu Taza
