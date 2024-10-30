@@ -214,7 +214,7 @@ const Navbar = () => {
                 pathname === "/sobrenosotros" && "text-gray-900 font-bold"
               }`}
             >
-              Sobre la Esmeralda
+              Sobre La Esmeralda
             </Dropdown.Item>
             <Dropdown.Item
               href="/mvv"
@@ -222,7 +222,7 @@ const Navbar = () => {
                 pathname === "/mvv" && "text-gray-900 font-bold"
               }`}
             >
-              Mision Vision Valores
+             Misión, Visión y Valores
             </Dropdown.Item>
             <Dropdown.Item
               href="/faq"
@@ -239,7 +239,7 @@ const Navbar = () => {
               pathname === "/politica" && "text-gray-900 font-bold"
             }`}
           >
-            Politica
+         Política
           </Link>
           {session && (
             <Link
