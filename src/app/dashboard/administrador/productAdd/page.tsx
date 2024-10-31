@@ -294,7 +294,6 @@ handleSubmit = {handleSubmit}
                   value={dataProduct.tipoGrano}
                   onChange={handleChange}
                 >
-                  <option value="">--Seleccione--</option>
                   <option value="Santos">Santos</option>
 <option value="Colombiano">Colombiano</option>
 <option value="Torrado">Torrado</option>
