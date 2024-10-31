@@ -559,7 +559,7 @@ const Cart = () => {
                           : ""
                       }
                     >
-                      Pago con trasnferencia bancaria
+                      Pago con transferencia bancaria
                     </button>{" "}
                   </div>
                 ) : (

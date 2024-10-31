@@ -132,12 +132,16 @@ console.log(orders);
                 <div  className={`flex items-center justify-center ${order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"}`}>
                   <p>{order.orderDetail.transactions.status}</p>
                 </div>} 
-                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status !== "Pendiente de revisión de comprobante" &&
+                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status !== "Pendiente de revisión de comprobante" && order?.receipt?.status !== "Rechazado" &&
                 <div  className={`flex items-center justify-center ${order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"}`}>
                   <p>{order.orderDetail.transactions.status}</p>
                 </div>} 
-                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status === "Pendiente de revisión de comprobante" && 
+                {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" && order?.receipt?.status === "Pendiente de revisión de comprobante"&& 
                 <div  className={`flex items-center justify-center text-teal-500`}>
+                  <p>{order?.receipt?.status}</p>
+                  </div> }
+                  {session?.role === "Cliente" && order.orderDetail.transactions.status === "Pendiente de pago" &&  order?.receipt?.status === "Rechazado" && 
+                <div  className={`flex items-center justify-center text-red-500`}>
                   <p>{order?.receipt?.status}</p>
                   </div> }
                   {session?.role === "Cliente" && order.orderDetail.transactions.status !== "Pendiente de pago" && order?.receipt?.status === "Comprobante verificado" && 
