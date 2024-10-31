@@ -92,7 +92,7 @@ const ProductList = () => {
   const onPageChange = (page: number) => setCurrentPage(page);
 
   //! Función para manejar la eliminación de un producto
-  const handleDeleteProduct = async (id: string) => {
+  /*const handleDeleteProduct = async (id: string) => {
     const { isConfirmed } = await Swal.fire({
       title: "¿Estás seguro?",
       text: "No podrás revertir esta acción",
@@ -149,7 +149,7 @@ const ProductList = () => {
         );
       }
     }
-  };
+  };*/
 
   //! Función para habilitar un producto
   const handleEnableProduct = async (id: string, subproduct:ISubProduct) => {
@@ -661,7 +661,7 @@ const ProductList = () => {
                 </Tooltip>}
               </div>
 
-              <Tooltip content="Eliminar">
+              {/*<Tooltip content="Eliminar">
                 <button
                   type="button"
                   onClick={() => handleDeleteProduct(product.id)}
@@ -669,7 +669,7 @@ const ProductList = () => {
                 >
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
-              </Tooltip>
+              </Tooltip>*/}
             </div>
           </td>
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
