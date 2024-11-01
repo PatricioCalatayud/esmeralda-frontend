@@ -241,11 +241,11 @@ const Cart = () => {
   //! Renderizado si hay elementos en el carrito
 
   return (
-    <div className="font-sans w-3/4 mx-auto  h-screen ">
+    <div className="font-sans w-3/4 mx-auto h-screen ">
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
         <div className="bg-white rounded-md w-full 0">
-          <h2 className="text-2xl font-bold text-gray-900 h-10 flex  justify-center items-center">
-            Tus Articulos
+          <h2 className="text-2xl font-bold text-gray-900 h-10 flex justify-center items-center">
+            Tus Artículos
           </h2>
           <hr className=" w-full " />
           <div className="space-y-4 w-full mt-4">
@@ -347,7 +347,7 @@ const Cart = () => {
         </div>
 
         <div className="rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
-          <h2 className="text-xl font-bold  h-10 flex  justify-center items-center">
+          <h2 className="text-xl font-bold h-10 flex justify-center items-center">
             Resumen de compra
           </h2>
           <hr className=" w-full " />
@@ -403,7 +403,7 @@ const Cart = () => {
               onClose={() => setOpenModal(false)}
               className="px-80 py-40 custom-modal-container"
             >
-              <Modal.Header>Detalle de envio</Modal.Header>
+              <Modal.Header>Detalle de envío</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
                 {loading === false ? (
                   <>
@@ -412,14 +412,14 @@ const Cart = () => {
                         htmlFor="addresOrder"
                         className="block text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Dirección de envio
+                        Dirección de envío
                       </label>
                       <input
                         type="text"
                         name="addresOrder"
                         id="addresOrder"
                         className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-                        placeholder="Avenida San Martin 123"
+                        placeholder="Avenida San Martín 123"
                         value={addresOrder}
                         onChange={(e) => setAddresOrder(e.target.value)}
                         disabled={isDelivery === true}
@@ -440,7 +440,7 @@ const Cart = () => {
                     {/* Agregado: Botón para preguntar si necesita factura */}
                     <div className="flex gap-4 items-center h-20">
                       <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                        ¿Necesitas Factura?
+                        ¿Necesitás Factura?
                       </h4>
                       <input
                         type="checkbox"
@@ -454,7 +454,7 @@ const Cart = () => {
                     {needsInvoice && (
                       <div className="flex flex-col gap-4">
                         <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                          ¿Qué tipo de factura necesitas?
+                          ¿Qué tipo de factura necesitás?
                         </h4>
                         <div className="flex gap-4">
                           <button
@@ -511,7 +511,7 @@ const Cart = () => {
                     <button
                       onClick={() => handleCheckout("Cliente Cuenta Corriente")}
                       type="button"
-                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
                       disabled={
                         !session ||
                         cart.length === 0 ||
