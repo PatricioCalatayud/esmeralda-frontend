@@ -22,9 +22,11 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [limitTransfer, setLimitTransfer] = useState(0);
+  const [currentUser, setCurrentUser] = useState<ISession | null>(null); // Estado para almacenar el usuario seleccionado
+
     useEffect(() => {
         const fetchUsers = async () =>{
-            console.log("llegue aca?");
+          setLoading(true);
             const limit = USER_PER_PAGE;
             const page = currentPage;
             const response = await getUsers(token);
@@ -35,7 +37,7 @@ const Users = () => {
         }
         fetchUsers()
         setLoading(false);
-    }, [roleUser,token]);
+    }, [token]);
     const onPageChange = (page: number) => setCurrentPage(page);
 
     const getCurrentPageUsers = () => {
@@ -61,83 +63,62 @@ const Users = () => {
         setSearchTerm(e.target.value); // Actualizar el estado del término de búsqueda
         setCurrentPage(1); // Reiniciar la página actual al cambiar el término de búsqueda
       };
-      const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, id: string) => {
-        if(e.target.value === "Cliente"){
-          setShowModal(true);
-        }else {
+      const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>, user: ISession) => {
         const newRole = e.target.value;
         
-        try {
-            const user = {
-                role: newRole
-            }
-          const response = await putUser(id,user, token as string);
-
-         if (response?.status === 200 || response?.status === 201) {
-          setRoleUser(newRole)
-          Swal.fire("¡Éxito!", "El estado del usuario ha sido actualizado.", "success");
-
-         } else {
-          Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
-         }
-          
-        } catch (error) {
-          console.error("Error updating order:", error);
-          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-        }}
-      };
-      const handleCheck = async (role: string, id: string) => {
-        if(role === "Cliente"){
-          setShowModal(true);
-        
-        const newRole = role;
-        
-        try {
-            const user = {
-                role: newRole,
-                accountLimit: limitTransfer
-            }
-            if (limitTransfer === 0) {
-              Swal.fire({
-                title: "¿Este cliente tendra limite de cuenta corriente de $0?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Si, Esta bien",
-              }).then(async (result) => {
-                if (result.isConfirmed) {
-                  const response = await putUser(id,user, token as string);
-                  if (response && (response?.status === 200 || response?.status === 201)) {
-                    Swal.fire("¡Correcto!", "El estado del usuario ha sido actualizado.", "success");
-                    setShowModal(false);
-                  } else {
-                    console.error("Error updating order:", response);
-                    Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
-                  }
-                } else if (result.isDenied) {
-                  Swal.fire("No se realizaron cambios", "", "info");
-                }
-              })
-            } else {
-              
-            
-          
-              const response = await putUser(id,user, token as string);
-         if (response?.status === 200 || response?.status === 201) {
-          setRoleUser(newRole)
-          Swal.fire("¡Éxito!", "El estado del usuario ha sido actualizado.", "success");
-          setShowModal(false);
-         } else {
-          Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
-         }
+        if (newRole === "Cliente") {
+            setCurrentUser(user); // Guarda el usuario seleccionado antes de abrir el modal
+            setShowModal(true);
+        } else {
+            await updateUserRole(user.id, newRole);
         }
+    };
+    
+    const updateUserRole = async (id: string, newRole: string) => {
+        try {
+            const user = { role: newRole };
+            const response = await putUser(id, user, token as string);
+    
+            if (response?.status === 200 || response?.status === 201) {
+                setUsers((prevUsers) =>
+                    prevUsers?.map((u) => (u.id === id ? { ...u, role: newRole } : u))
+                );
+                Swal.fire("¡Éxito!", "El estado del usuario ha sido actualizado.", "success");
+            } else {
+                Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
+            }
         } catch (error) {
-          console.error("Error updating order:", error);
-          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-        }}
-      };
-console.log(limitTransfer);
+            console.error("Error updating user role:", error);
+            Swal.fire("¡Error!", "No se pudo actualizar el rol del usuario.", "error");
+        }
+    };
+    
+    const handleCheck = async () => {
+        if (!currentUser) return;
+    
+        const newRole = "Cliente";
+        const user = {
+            role: newRole,
+            accountLimit: limitTransfer,
+        };
+    
+        try {
+            const response = await putUser(currentUser.id, user, token as string);
+            if (response?.status === 200 || response?.status === 201) {
+                setUsers((prevUsers) =>
+                    prevUsers?.map((u) => (u.id === currentUser.id ? { ...u, role: newRole } : u))
+                );
+                Swal.fire("¡Éxito!", "El estado del usuario ha sido actualizado.", "success");
+                setShowModal(false);
+                setCurrentUser(null);
+            } else {
+                Swal.fire("¡Error!", "No se pudo actualizar el estado del usuario.", "error");
+            }
+        } catch (error) {
+            console.error("Error updating user role:", error);
+            Swal.fire("¡Error!", "No se pudo actualizar el rol del usuario.", "error");
+        }
+    };
     return (
         loading ? <div className="flex items-center justify-center h-screen">
     <Spinner
@@ -166,7 +147,7 @@ console.log(limitTransfer);
         >
             {getCurrentPageUsers() ?.map((user: ISession, index) => (
                 <tr
-                    key={index}
+                    key={user.id}
                     className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                     <th
@@ -202,6 +183,7 @@ console.log(limitTransfer);
                         <div className="flex justify-center items-center">
                             {user.role}
                         </div>
+                        <p>{user.id}</p>
                     </td>
                     {user.role !== "Administrador" && <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                         <div className="flex justify-center items-center">
@@ -209,7 +191,7 @@ console.log(limitTransfer);
                 id="status"
                 name="status"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                onChange={(e) => handleChange(e, user.id)}
+                onChange={(e) => handleChange(e, user)}
               >
                 <option value="">--Seleccione--</option>
                 <option value={"Cliente"}>Cliente</option>
@@ -247,7 +229,7 @@ console.log(limitTransfer);
               <Modal.Footer>
 
               <button
-                  onClick={() =>handleCheck("Cliente",user.id)}
+                  onClick={handleCheck}
                   type="button"
                   className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
                   disabled={
