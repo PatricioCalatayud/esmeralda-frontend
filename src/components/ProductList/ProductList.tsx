@@ -267,7 +267,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                   key={index}
-                  className="relative flex flex-col rounded-lg h-[650px] shadow-lg hover:scale-105 transition-transform" // Aumentamos la altura a 600px
+                  className="relative flex flex-col rounded-lg h-[720px] shadow-lg hover:scale-105 transition-transform" // Aumentamos la altura a 600px
                   onClick={() => router.push(`/products/${product.id}`)}
                 >
                   <Image
@@ -275,7 +275,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                     height={500}
                     src={product.imgUrl}
                     alt={product.description}
-                    className="w-full h-4/6 object-cover rounded-t-lg" // Mantener el tamaño más grande de la imagen
+                    className="w-full h-[420px] object-cover rounded-t-lg" // Mantener el tamaño más grande de la imagen
                   />
                   <hr className="bg-blue-gray-600" />
                   <div className="flex-grow p-4">
@@ -283,6 +283,10 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                       <h3 className="text-gray-500 text-sm">{productCategory.name}</h3>
                     )}
                     <h2 className="text-lg font-bold">{product.description}</h2>
+
+                    <p className=" text-sm font-medium text-gray-700">Presentación: {product.presentacion}</p>
+                    <p className=" text-sm font-medium text-gray-700">Tipo de grano: {product.tipoGrano}</p>
+
                     {product.subproducts
                       .filter((subproduct) => subproduct.discount > 0)
                       .map((subproduct) => (
