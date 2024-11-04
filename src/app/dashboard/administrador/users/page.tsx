@@ -183,7 +183,6 @@ const Users = () => {
                         <div className="flex justify-center items-center">
                             {user.role}
                         </div>
-                        <p>{user.id}</p>
                     </td>
                     {user.role !== "Administrador" && <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                         <div className="flex justify-center items-center">
