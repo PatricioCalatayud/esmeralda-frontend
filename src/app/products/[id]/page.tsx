@@ -335,16 +335,21 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </p>
           </div>
           <button
-            className="py-2 px-4 rounded-lg bg-teal-600 text-white  hover:bg-teal-800 transition-colors duration-300 animate-fade-in-up"
-            onClick={handleAddToCart}
-          >
-            <FontAwesomeIcon
-              icon={faCartShopping}
-              size="lg"
-              style={{ marginRight: "10px" }}
-            />
-            Añadir al carrito
-          </button>
+  className={`py-2 px-4 rounded-lg ${
+    selectedStock === 0
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+      : "bg-teal-600 text-white hover:bg-teal-800"
+  } transition-colors duration-300 animate-fade-in-up`}
+  onClick={handleAddToCart}
+  disabled={selectedStock === 0}
+>
+  <FontAwesomeIcon
+    icon={faCartShopping}
+    size="lg"
+    style={{ marginRight: "10px" }}
+  />
+  Añadir al carrito
+</button>
         </div>
       </div>
 

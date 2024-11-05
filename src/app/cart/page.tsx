@@ -31,6 +31,8 @@ const Cart = () => {
   const { setCartItemCount } = useCartContext();
   const [account, setAccount] = useState<IAccountProps>();
   const [loading, setLoading] = useState(false);
+  const [floor, setFloor] = useState(""); // Nuevo estado para Piso
+  const [apartment, setApartment] = useState(""); // Nuevo estado para Departamento
 
   // Variables agregadas
   const [needsInvoice, setNeedsInvoice] = useState(false);
@@ -117,94 +119,110 @@ const Cart = () => {
     });
   };
 
-  //! Función para calcular el subtotal
-  const calcularSubtotal = () => {
-    return cart.reduce((acc, item) => {
-      return acc + (item.quantity || 1) * Number(item.price);
-    }, 0);
-  };
+ //! Función para calcular el subtotal
+const calcularSubtotal = () => {
+  return cart.reduce((acc, item) => {
+    return acc + (item.quantity || 1) * Number(item.price);
+  }, 0);
+};
 
-  //! Función para calcular el descuento
-  const calcularDescuento = () => {
-    return cart.reduce((acc, item) => {
-      // Aplicar descuento como un porcentaje del precio
-      const descuentoPorProducto =
-        (item.quantity || 1) *
-        (Number(item.price) * (Number(item.discount || 0) / 100));
-      return acc + descuentoPorProducto;
-    }, 0);
-  };
+//! Función para calcular el descuento
+const calcularDescuento = () => {
+  return cart.reduce((acc, item) => {
+    const descuentoPorProducto =
+      (item.quantity || 1) *
+      (Number(item.price) * (Number(item.discount || 0) / 100));
+    return acc + descuentoPorProducto;
+  }, 0);
+};
 
-  //! Función para calcular el IVA (21%)
-  const calcularIVA = () => {
-    const subtotal = calcularSubtotal();
-    return subtotal * 0.21; // 21% de IVA
-  };
+//! Función para calcular el IVA basado en subtotal menos descuento
+const calcularIVA = () => {
+  const subtotal = calcularSubtotal();
+  const descuento = calcularDescuento();
+  const baseParaIVA = subtotal - descuento;
+  return baseParaIVA * 0.21; // 21% de IVA sobre la base ajustada
+};
 
-  //! Función para calcular el total
-  const calcularTotal = () => {
-    const subtotal = calcularSubtotal();
-    const descuento = calcularDescuento();
-    const iva = calcularIVA();
-    return subtotal - descuento + iva;
-  };
-
+//! Función para calcular el total
+const calcularTotal = () => {
   const subtotal = calcularSubtotal();
   const descuento = calcularDescuento();
   const iva = calcularIVA();
-  const total = calcularTotal();
+  return subtotal - descuento + iva;
+};
 
-  //! Función para realizar la orden
-  const handleCheckout = async (boton: string) => {
-    const products = cart.map((product) => ({
-      productId: product.idProduct,
-      subproductId: product.idSubProduct,
-      quantity: product.quantity,
-    }));
-    setLoading(true);
-    const orderCheckout = {
-      userId: session?.id,
-      products,
-      ...(addresOrder && isDelivery === false && { address: addresOrder }), // Condicionalmente agregar la dirección
-      discount: 10,
-      ...(session?.role === "Cliente" &&
-        boton === "Cliente Transferencia" && { account: "Transferencia" }),
-      ...(session?.role === "Cliente" &&
-        boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
-      ...(needsInvoice && { invoiceType }), // Agregar tipo de factura si está seleccionada
-    };
-    console.log( "Esto es orderCheckout", orderCheckout);
-    const order = await postOrder(orderCheckout, token);
-    console.log(order);
+const subtotal = calcularSubtotal();
+const descuento = calcularDescuento();
+const iva = calcularIVA();
+const total = calcularTotal();
 
-    if (order?.status === 200 || order?.status === 201) {
-      if (session?.role === "Usuario") {
-        setTimeout(() => {
-          router.push(`/checkout/${order.data.id}`);
-        }, 1500);
-      } else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
-        setTimeout(() => {
-          router.push(`/transfer/${order.data.id}`);
-        }, 1500);
-      } else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
-        setTimeout(() => {
-          setCartItemCount(0);
-          localStorage.removeItem("cart");
-          router.push(`/dashboard/cliente/order`);
-        }, 1500);
+    // Lógica para realizar el checkout
+    const handleCheckout = async (boton: string) => {
+      const products = cart.map((product) => ({
+        productId: product.idProduct,
+        subproductId: product.idSubProduct,
+        quantity: product.quantity,
+      }));
+  
+      // Concatenar dirección con piso y departamento si están presentes
+      const fullAddress = `${addresOrder}${floor ? `, Piso: ${floor}` : ""}${apartment ? `, Depto: ${apartment}` : ""}`;
+  
+      setLoading(true);
+  
+      const orderCheckout = {
+        userId: session?.id,
+        products,
+        address: isDelivery ? undefined : fullAddress, // Usar dirección completa solo si no es retiro en local
+        discount: 10,
+        ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && { account: "Transferencia" }),
+        ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
+        ...(needsInvoice && { invoiceType }),
+      };
+  
+      try {
+        const order = await postOrder(orderCheckout, token);
+        console.log(order);
+  
+        if (order?.status === 200 || order?.status === 201) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "Pedido realizado con éxito",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          
+          // Redireccionamiento después de la confirmación
+          setTimeout(() => {
+            if (session?.role === "Usuario") {
+              router.push(`/checkout/${order.data.id}`);
+            } else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
+              router.push(`/transfer/${order.data.id}`);
+            } else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
+              setCartItemCount(0);
+              localStorage.removeItem("cart");
+              router.push(`/dashboard/cliente/order`);
+            }
+          }, 1500);
+        } else {
+          throw new Error("Pedido no completado.");
+        }
+      } catch (error:any) {
+        console.error("Error en el servidor:", error);
+        const errorMessage = (error as any)?.message || "Hubo un error al realizar tu pedido";
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Error en el pedido",
+          text: errorMessage,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } finally {
+        setLoading(false);
       }
-    } else {
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Hubo un error al realizar tu pedido",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      setLoading(false);
-    }
-  };
-
+    };
   //! Renderizado si no hay elementos en el carrito
   if (cart.length === 0) {
     return (
@@ -282,32 +300,32 @@ const Cart = () => {
                       Eliminar
                     </div>
                     <div className="flex justify-between items-center w-full">
-                      <div className="flex gap-3 font-bold items-center">
-                        <button
-                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleDecrease(item.idSubProduct)}
-                          disabled={item.quantity === 1}
-                        >
-                          <FontAwesomeIcon
-                            icon={faMinus}
-                            style={{ width: "10px", height: "10px" }}
-                          />
-                        </button>
-                        {item.quantity || 1}
-                        <button
-                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-                          onClick={() => handleIncrease(item.idSubProduct)}
-                          disabled={item.quantity === Number(item.stock)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faPlus}
-                            style={{ width: "10px", height: "10px" }}
-                          />
-                        </button>
-                        <p className="text-gray-800 text-xs text-nowrap">
-                          {item.stock} disponibles
-                        </p>
-                      </div>
+                    <div className="flex gap-3 font-bold items-center">
+  <button
+    className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+    onClick={() => handleDecrease(item.idSubProduct)}
+    disabled={item.quantity === 1}
+  >
+    <FontAwesomeIcon
+      icon={faMinus}
+      style={{ width: "10px", height: "10px" }}
+    />
+  </button>
+  {item.quantity || 1}
+  <button
+    className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+    onClick={() => handleIncrease(item.idSubProduct)}
+    disabled={item.quantity === Math.max(0, Number(item.stock))}
+  >
+    <FontAwesomeIcon
+      icon={faPlus}
+      style={{ width: "10px", height: "10px" }}
+    />
+  </button>
+  <p className="text-gray-800 text-xs text-nowrap">
+  {item.stock > 0 ? `${item.stock} disponibles` : "0 disponibles"}
+</p>
+</div>
                       <div className="ml-auto">
                         {item.discount && Number(item.discount) > 0 ? (
                           <div>
@@ -399,192 +417,223 @@ const Cart = () => {
               Ir a pagar
             </button>
             <Modal
-              show={openModal}
-              onClose={() => setOpenModal(false)}
-              className="px-80 py-40 custom-modal-container"
-            >
-              <Modal.Header>Detalle de envío</Modal.Header>
-              <Modal.Body className="flex flex-col gap-4">
-                {loading === false ? (
-                  <>
-                    <div className="w-full h-20 gap-4 flex flex-col">
-                      <label
-                        htmlFor="addresOrder"
-                        className="block text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Dirección de envío
-                      </label>
-                      <input
-                        type="text"
-                        name="addresOrder"
-                        id="addresOrder"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 "
-                        placeholder="Avenida San Martín 123"
-                        value={addresOrder}
-                        onChange={(e) => setAddresOrder(e.target.value)}
-                        disabled={isDelivery === true}
-                      />
-                    </div>
-                    <div className="flex gap-4 items-center h-20">
-                      <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                        Retiro en local
-                      </h4>
-                      <input
-                        type="checkbox"
-                        name="isDelivery"
-                        id="isDelivery"
-                        onChange={(e) => setIsDelivery(e.target.checked)}
-                      />
-                    </div>
+  show={openModal}
+  onClose={() => setOpenModal(false)}
+  className="px-80 py-40 custom-modal-container"
+>
+  <Modal.Header>Detalle de envío</Modal.Header>
+  <Modal.Body className="flex flex-col gap-4">
+    {loading === false ? (
+      <>
+        <div className="w-full h-20 gap-4 flex flex-col">
+          <label
+            htmlFor="addresOrder"
+            className="block text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Dirección de envío
+          </label>
+          <input
+            type="text"
+            name="addresOrder"
+            id="addresOrder"
+            className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="Avenida San Martín 123"
+            value={addresOrder}
+            onChange={(e) => setAddresOrder(e.target.value)}
+            disabled={isDelivery === true}
+          />
+        </div>
 
-                    {/* Agregado: Botón para preguntar si necesita factura */}
-                    <div className="flex gap-4 items-center h-20">
-                      <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                        ¿Necesitás Factura?
-                      </h4>
-                      <input
-                        type="checkbox"
-                        name="needsInvoice"
-                        id="needsInvoice"
-                        onChange={(e) => setNeedsInvoice(e.target.checked)}
-                      />
-                    </div>
+        {/* Nuevo input para Piso */}
+        <div className="w-full h-20 gap-4 flex flex-col">
+          <label
+            htmlFor="floor"
+            className="block text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Piso
+          </label>
+          <input
+            type="text"
+            name="floor"
+            id="floor"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="Ejemplo: 3"
+            value={floor}
+            onChange={(e) => setFloor(e.target.value)}
+            disabled={isDelivery === true}
+          />
+        </div>
 
-                    {/* Agregado: Si necesita factura, mostrar los tipos A, B, C */}
-                    {needsInvoice && (
-                      <div className="flex flex-col gap-4">
-                        <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-                          ¿Qué tipo de factura necesitás?
-                        </h4>
-                        <div className="flex gap-4">
-                          <button
-                            type="button"
-                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                              invoiceType === "A"
-                                ? "bg-teal-600 text-white"
-                                : "bg-gray-200"
-                            }`}
-                            onClick={() => setInvoiceType("A")}
-                          >
-                            A
-                          </button>
-                          <button
-                            type="button"
-                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                              invoiceType === "B"
-                                ? "bg-teal-600 text-white"
-                                : "bg-gray-200"
-                            }`}
-                            onClick={() => setInvoiceType("B")}
-                          >
-                            B
-                          </button>
-                          <button
-                            type="button"
-                            className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                              invoiceType === "C"
-                                ? "bg-teal-600 text-white"
-                                : "bg-gray-200"
-                            }`}
-                            onClick={() => setInvoiceType("C")}
-                          >
-                            C
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center h-40">
-                    <Spinner
-                      color="teal"
-                      className="h-12 w-12"
-                      onPointerEnterCapture={() => {}}
-                      onPointerLeaveCapture={() => {}}
-                    />
-                  </div>
-                )}
-              </Modal.Body>
-              <Modal.Footer>
-                {session && session.role === "Cliente" ? (
-                  <div className="w-full">
-                    <button
-                      onClick={() => handleCheckout("Cliente Cuenta Corriente")}
-                      type="button"
-                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
-                      disabled={
-                        !session ||
-                        cart.length === 0 ||
-                        (isDelivery === false && addresOrder === "") ||
-                        account && account.balance + total > account.creditLimit
-                      }
-                      title={
-                        !session
-                          ? "Necesita estar logueado para continuar con el pago"
-                          : cart.length === 0
-                          ? "El carrito está vacío"
-                          : ""
-                      }
-                    >
-                      <p>Agregar a cuenta corriente: $ {total}</p>
-                      {account && (
-                        <p>
-                          {" "}
-                          <b
-                            className={`${
-                              account.balance + total > account.creditLimit
-                                ? "text-red-500"
-                                : "text-white"
-                            }`}
-                          >
-                            $ {account.balance + total}{" "}
-                          </b>/ $ {account?.creditLimit}
-                        </p>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => handleCheckout("Cliente Transferencia")}
-                      type="button"
-                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white  hover:bg-blue-800`}
-                      disabled={
-                        !session ||
-                        cart.length === 0 ||
-                        (isDelivery === false && addresOrder === "")
-                      }
-                      title={
-                        !session
-                          ? "Necesita estar logueado para continuar con el pago"
-                          : cart.length === 0
-                          ? "El carrito está vacío"
-                          : ""
-                      }
-                    >
-                      Pago con transferencia bancaria
-                    </button>{" "}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleCheckout("Usuario")}
-                    type="button"
-                    className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white  hover:bg-teal-800`}
-                    disabled={
-                      !session ||
-                      cart.length === 0 ||
-                      (isDelivery === false && addresOrder === "")
-                    }
-                    title={
-                      !session
-                        ? "Necesita estar logueado para continuar con el pago"
-                        : cart.length === 0
-                        ? "El carrito está vacío"
-                        : ""
-                    }
-                  >
-                    Ir a pagar
-                  </button>
-                )}
-              </Modal.Footer>
-            </Modal>
+        {/* Nuevo input para Departamento */}
+        <div className="w-full h-20 gap-4 flex flex-col">
+          <label
+            htmlFor="apartment"
+            className="block text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Departamento
+          </label>
+          <input
+            type="text"
+            name="apartment"
+            id="apartment"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="Ejemplo: A"
+            value={apartment}
+            onChange={(e) => setApartment(e.target.value)}
+            disabled={isDelivery === true}
+          />
+        </div>
+
+        <div className="flex gap-4 items-center h-20">
+          <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+            Retiro en local
+          </h4>
+          <input
+            type="checkbox"
+            name="isDelivery"
+            id="isDelivery"
+            onChange={(e) => setIsDelivery(e.target.checked)}
+          />
+        </div>
+
+        <div className="flex gap-4 items-center h-20">
+          <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+            ¿Necesitás Factura?
+          </h4>
+          <input
+            type="checkbox"
+            name="needsInvoice"
+            id="needsInvoice"
+            onChange={(e) => setNeedsInvoice(e.target.checked)}
+          />
+        </div>
+
+        {needsInvoice && (
+          <div className="flex flex-col gap-4">
+            <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+              ¿Qué tipo de factura necesitás?
+            </h4>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                  invoiceType === "A" ? "bg-teal-600 text-white" : "bg-gray-200"
+                }`}
+                onClick={() => setInvoiceType("A")}
+              >
+                A
+              </button>
+              <button
+                type="button"
+                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                  invoiceType === "B" ? "bg-teal-600 text-white" : "bg-gray-200"
+                }`}
+                onClick={() => setInvoiceType("B")}
+              >
+                B
+              </button>
+              <button
+                type="button"
+                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                  invoiceType === "C" ? "bg-teal-600 text-white" : "bg-gray-200"
+                }`}
+                onClick={() => setInvoiceType("C")}
+              >
+                C
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+    ) : (
+      <div className="flex items-center justify-center h-40">
+        <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
+      </div>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    {session && session.role === "Cliente" ? (
+      <div className="w-full">
+        <button
+          onClick={() => handleCheckout("Cliente Cuenta Corriente")}
+          type="button"
+          className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
+          disabled={
+            !session ||
+            cart.length === 0 ||
+            (isDelivery === false && addresOrder === "") ||
+            (needsInvoice && !invoiceType) ||
+            (account && account.balance + total > account.creditLimit)
+          }
+          title={
+            !session
+              ? "Necesita estar logueado para continuar con el pago"
+              : cart.length === 0
+              ? "El carrito está vacío"
+              : ""
+          }
+        >
+          <p>Agregar a cuenta corriente: $ {total}</p>
+          {account && (
+            <p>
+              <b
+                className={`${
+                  account.balance + total > account.creditLimit
+                    ? "text-red-500"
+                    : "text-white"
+                }`}
+              >
+                $ {account.balance + total}
+              </b>{" "}
+              / $ {account?.creditLimit}
+            </p>
+          )}
+        </button>
+        <button
+          onClick={() => handleCheckout("Cliente Transferencia")}
+          type="button"
+          className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white hover:bg-blue-800`}
+          disabled={
+            !session ||
+            cart.length === 0 ||
+            (isDelivery === false && addresOrder === "") ||
+            (needsInvoice && !invoiceType)
+          }
+          title={
+            !session
+              ? "Necesita estar logueado para continuar con el pago"
+              : cart.length === 0
+              ? "El carrito está vacío"
+              : ""
+          }
+        >
+          Pago con transferencia bancaria
+        </button>
+      </div>
+    ) : (
+      <button
+        onClick={() => handleCheckout("Usuario")}
+        type="button"
+        className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
+        disabled={
+          !session ||
+          cart.length === 0 ||
+          (isDelivery === false && addresOrder === "") ||
+          (needsInvoice && !invoiceType)
+        }
+        title={
+          !session
+            ? "Necesita estar logueado para continuar con el pago"
+            : cart.length === 0
+            ? "El carrito está vacío"
+            : ""
+        }
+      >
+        Ir a pagar
+      </button>
+    )}
+  </Modal.Footer>
+</Modal>
             <Link href="/categories">
               <button
                 type="button"
