@@ -18,7 +18,7 @@ const Banner = () => {
               height={500}
               src="/esmeralda1.webp"
               alt="Café en Grano"
-              className="w-3/4 sm:w-3/4 lg:w-3/4 h-auto mx-auto mb-11 drop-shadow-[-10px_10px_12px_rgba(0,0,0,1)] object-cover"
+              className="w-3/4 sm:w-3/4 lg:w-3/4 h-auto mx-auto mb-11 drop-shadow-[-10px_10px_12px_rgba(0,0,0,1)] object-cover rounded-lg" // Agregada clase rounded-lg para esquinas redondeadas
             />
           </div>
 
@@ -37,27 +37,27 @@ const Banner = () => {
             </p>
             <div className="flex flex-col gap-4">
               <div data-aos="fade-up" className="flex items-center gap-4">
-              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
-              <FontAwesomeIcon icon={faLock} size="lg"/>
-              </div  >
+                <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+                  <FontAwesomeIcon icon={faLock} size="lg" />
+                </div>
                 <p>Calidad Garantizada</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
-              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
-              <FontAwesomeIcon icon={faCircleExclamation} size="lg"/>
-              </div  >
+                <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+                  <FontAwesomeIcon icon={faCircleExclamation} size="lg" />
+                </div>
                 <p>Servicio Rápido</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
-              <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
-                <FontAwesomeIcon icon={faMugSaucer} size="lg"/>
+                <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
+                  <FontAwesomeIcon icon={faMugSaucer} size="lg" />
                 </div>
                 <p>Café en Grano Seleccionado</p>
               </div>
               <div data-aos="fade-up" className="flex items-center gap-4">
                 <div className="shadow-sm w-12 h-12 flex justify-center items-center rounded-full bg-teal-100 dark:bg-teal-400">
-              <FontAwesomeIcon icon={faTruck} size="lg"/>
-              </div  >
+                  <FontAwesomeIcon icon={faTruck} size="lg" />
+                </div>
                 <p>Entrega Rápida</p>
               </div>
             </div>

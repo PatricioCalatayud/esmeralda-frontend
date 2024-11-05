@@ -64,21 +64,47 @@ const OrderList = () => {
     }
   };
 
-  //! Función para manejar el cambio en el estado de la orden
-  const handleChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => {
-    const newStatus = { status: e.target.value };
-    const response = await putOrder(id, newStatus, token as string);
-    if (response && (response?.status === 200 || response?.status === 201)) {
-      Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
-    } else {
-      console.error("Error updating order:", response);
-      Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-    }
-  };
+ 
+ //! Función para manejar el cambio en el estado de la orden
+const handleChange = async (
+  e: React.ChangeEvent<HTMLSelectElement>,
+  id: string
+) => {
+  const newStatus = { status: e.target.value };
+  const response = await fetch(`http://localhost:3001/order/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(newStatus),
+  });
 
+  if (response.ok) {
+    Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
+
+    // Actualizar el estado local
+    setOrders(
+      orders.map((order) =>
+        order.id === id
+          ? {
+              ...order,
+              orderDetail: {
+                ...order.orderDetail,
+                transactions: {
+                  ...order.orderDetail.transactions,
+                  status: newStatus.status,
+                },
+              },
+            }
+          : order
+      )
+    );
+  } else {
+    console.error("Error updating order:", response);
+    Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+  }
+};
   //! Función para manejar el cambio en el campo de búsqueda
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -227,13 +253,16 @@ const OrderList = () => {
 
   //! Renderizar columna de "Acciones" (Cambio de estado)
   const renderActionsColumn = (order: IOrders) => {
+    const isRejected = order.receipt?.status === "Rechazado";
+  
     return (
       <select
         id="status"
         name="status"
         className="bg-gray-50 border text-sm rounded-lg block w-full p-2.5"
         onChange={(e) => handleChange(e, order.id)}
-        value={order.orderDetail.transactions.status}
+        value={isRejected ? "Pendiente de pago" : order.orderDetail.transactions.status}
+        disabled={isRejected} // Deshabilitamos el select si el estado es "Rechazado"
       >
         <option value="Pendiente de pago">Pendiente de pago</option>
         <option value="En preparación">En preparación</option>
