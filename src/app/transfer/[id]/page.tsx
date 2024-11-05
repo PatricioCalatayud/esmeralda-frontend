@@ -275,300 +275,301 @@ const Transfer = ({ params }: { params: { id: string } }) => {
       }
     };
     
-  
-
-  return (
-    <div className="p-8">
-                  <Modal
+    return (
+      <div className="p-8">
+          <Modal
               show={openModal}
               onClose={() => setOpenModal(false)}
               className="px-4 py-4 custom-modal-container"
-
-            >
-
+          >
               <Modal.Body className="flex flex-col gap-4">
-              <ThemeProvider theme={theme}>
-      <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
-        <video
-          autoPlay
-          loop
-          muted
-          className="absolute top-0 left-0 w-full h-full object-cover"
-        >
-          <source src="/roaster.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div className="relative z-10 font-sans max-w-7xl mx-auto">
-          <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <Box
-              sx={{
-                marginTop: 8,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                backgroundColor: "rgba(255, 255, 255, 0.7)",
-                padding: 4,
-                borderRadius: 2,
-                boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
-              }}
-            >
-              <Avatar sx={{ m: 1, bgcolor: "teal" }}></Avatar>
-              <Typography component="h1" variant="h5" color="teal">
-                Iniciar sesión
-              </Typography>
-              <Box
-                component="form"
-                onSubmit={handleSubmitLogin}
-                noValidate
-                sx={{ mt: 3 }}
-              >
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Correo"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={dataUser.email}
-                  onChange={handleChange}
-                  error={!!error.email}
-                  helperText={error.email}
-                  InputLabelProps={{ style: { color: "teal" } }}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  label="Contraseña"
-                  name="password"
-                  autoComplete="current-password"
-                  value={dataUser.password}
-                  onChange={handleChange}
-                  error={!!error.password}
-                  helperText={error.password}
-                  InputLabelProps={{ style: { color: "teal" } }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
-                  <div className="text-sm">
-                    <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
-                      ¿Olvidaste tu contraseña?
-                    </Link>
-                  </div>
-                </div>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{
-                    mt: 3,
-                    mb: 1,
-                    backgroundColor: "teal",
-                    "&:hover": {
-                      backgroundColor: "darkslategray",
-                    },
-                  }}
-                >
-                  Iniciar sesión
-                </Button>
-                  <Link href="/" passHref>
-                  <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 1,
-                         mb: 2,
-                         backgroundColor: "transparent",
-                         "&:hover": {
-                           backgroundColor: "gray",
-                           border: "1px solid gray",
-                           color:"white"
-                         },
-                         border: "1px solid black",
-                         boxShadow: "none",
-                         color: "black",
-                       }}
-                    >
-                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
-                      Volver al Inicio
-                    </Button>
-                  </Link>
-                
-                <p className="text-sm mt-8 text-center font-semibold text-gray-800">
-                  ¿No tienes cuenta?{" "}
-                  <a
-                    href="/register"
-                    className="text-teal-900 font-bold tracking-wide hover:underline ml-1"
-                  >
-                    Regístrate Aquí
-                  </a>
-                </p>
-                {submitError && (
-                  <p className="text-red-500 mt-4">{submitError}</p>
-                )}
-                <div>
-                  <hr className="border-gray-600 border-2 my-3" />
-                </div>
-                <div className="space-x-6 flex justify-center mt-2">
-                  <button type="button" className="border-none outline-none" onClick={() => signInWithGoogle()}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="32px"
-                      className="inline"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="#fbbd00"
-                        d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z"
-                        data-original="#fbbd00"
-                      />
-                      <path
-                        fill="#0f9d58"
-                        d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z"
-                        data-original="#0f9d58"
-                      />
-                      <path
-                        fill="#31aa52"
-                        d="m139.131 325.477-86.308 86.308a260.085 260.085 0 0 0 22.158 25.235C123.333 485.371 187.62 512 256 512V392c-49.624 0-93.117-26.72-116.869-66.523z"
-                        data-original="#31aa52"
-                      />
-                      <path
-                        fill="#3c79e6"
-                        d="M512 256a258.24 258.24 0 0 0-4.192-46.377l-2.251-12.299H256v120h121.452a135.385 135.385 0 0 1-51.884 55.638l86.216 86.216a260.085 260.085 0 0 0 25.235-22.158C485.371 388.667 512 324.38 512 256z"
-                        data-original="#3c79e6"
-                      />
-                      <path
-                        fill="#cf2d48"
-                        d="m352.167 159.833 10.606 10.606 84.853-84.852-10.606-10.606C388.668 26.629 324.381 0 256 0l-60 60 60 60c36.326 0 70.479 14.146 96.167 39.833z"
-                        data-original="#cf2d48"
-                      />
-                      <path
-                        fill="#eb4132"
-                        d="M256 120V0C187.62 0 123.333 26.629 74.98 74.98a259.849 259.849 0 0 0-22.158 25.235l86.308 86.308C162.883 146.72 206.376 120 256 120z"
-                        data-original="#eb4132"
-                      />
-                    </svg>
-                  </button>
-                  <button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="32px"
-                      fill="#007bff"
-                      viewBox="0 0 167.657 167.657"
-                    >
-                      <path
-                        d="M83.829.349C37.532.349 0 37.881 0 84.178c0 41.523 30.222 75.911 69.848 82.57v-65.081H49.626v-23.42h20.222V60.978c0-20.037 12.238-30.956 30.115-30.956 8.562 0 15.92.638 18.056.919v20.944l-12.399.006c-9.72 0-11.594 4.618-11.594 11.397v14.947h23.193l-3.025 23.42H94.026v65.653c41.476-5.048 73.631-40.312 73.631-83.154 0-46.273-37.532-83.805-83.828-83.805z"
-                        data-original="#010002"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-                
-              </Box>
-            </Box>
-          </Container>
-        </div>
-        <ToastContainer />
-      </div>
-      <div className="absolute bottom-1 left-1 hidden md:block">
-        <Image
-          src="/logoblanco.png"
-          alt="Logo"
-          width={300}
-          height={300}
-          className="w-[300px] h-[300px]"
-        />
-      </div>
-    </ThemeProvider>
+                  <ThemeProvider theme={theme}>
+                      <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
+                          <video
+                              autoPlay
+                              loop
+                              muted
+                              className="absolute top-0 left-0 w-full h-full object-cover"
+                          >
+                              <source src="/roaster.mp4" type="video/mp4" />
+                              Your browser does not support the video tag.
+                          </video>
+                          <div className="relative z-10 font-sans max-w-7xl mx-auto">
+                              <Container component="main" maxWidth="xs">
+                                  <CssBaseline />
+                                  <Box
+                                      sx={{
+                                          marginTop: 8,
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          alignItems: "center",
+                                          backgroundColor: "rgba(255, 255, 255, 0.7)",
+                                          padding: 4,
+                                          borderRadius: 2,
+                                          boxShadow: "0 2px 16px -3px rgba(6, 81, 237, 0.3)",
+                                      }}
+                                  >
+                                      <Avatar sx={{ m: 1, bgcolor: "teal" }}></Avatar>
+                                      <Typography component="h1" variant="h5" color="teal">
+                                          Iniciar sesión
+                                      </Typography>
+                                      <Box
+                                          component="form"
+                                          onSubmit={handleSubmitLogin}
+                                          noValidate
+                                          sx={{ mt: 3 }}
+                                      >
+                                          <TextField
+                                              margin="normal"
+                                              required
+                                              fullWidth
+                                              id="email"
+                                              label="Correo"
+                                              name="email"
+                                              autoComplete="email"
+                                              autoFocus
+                                              value={dataUser.email}
+                                              onChange={handleChange}
+                                              error={!!error.email}
+                                              helperText={error.email}
+                                              InputLabelProps={{ style: { color: "teal" } }}
+                                          />
+                                          <TextField
+                                              margin="normal"
+                                              required
+                                              fullWidth
+                                              type={showPassword ? 'text' : 'password'}
+                                              id="password"
+                                              label="Contraseña"
+                                              name="password"
+                                              autoComplete="current-password"
+                                              value={dataUser.password}
+                                              onChange={handleChange}
+                                              error={!!error.password}
+                                              helperText={error.password}
+                                              InputLabelProps={{ style: { color: "teal" } }}
+                                              InputProps={{
+                                                  endAdornment: (
+                                                      <InputAdornment position="end">
+                                                          <IconButton
+                                                              aria-label="toggle password visibility"
+                                                              onClick={handleClickShowPassword}
+                                                              onMouseDown={handleMouseDownPassword}
+                                                              edge="end"
+                                                          >
+                                                              {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+                                                          </IconButton>
+                                                      </InputAdornment>
+                                                  ),
+                                              }}
+                                          />
+                                          <div className="flex flex-wrap items-center gap-4 justify-between mt-4">
+                                              <div className="text-sm">
+                                                  <Link href="/forgotPassword" className="text-teal-600 font-semibold hover:underline" passHref>
+                                                      ¿Olvidaste tu contraseña?
+                                                  </Link>
+                                              </div>
+                                          </div>
+                                          <Button
+                                              type="submit"
+                                              fullWidth
+                                              variant="contained"
+                                              sx={{
+                                                  mt: 3,
+                                                  mb: 1,
+                                                  backgroundColor: "teal",
+                                                  "&:hover": {
+                                                      backgroundColor: "darkslategray",
+                                                  },
+                                              }}
+                                          >
+                                              Iniciar sesión
+                                          </Button>
+                                          <Link href="/" passHref>
+                                              <Button
+                                                  fullWidth
+                                                  variant="contained"
+                                                  sx={{
+                                                      mt: 1,
+                                                      mb: 2,
+                                                      backgroundColor: "transparent",
+                                                      "&:hover": {
+                                                          backgroundColor: "gray",
+                                                          border: "1px solid gray",
+                                                          color:"white"
+                                                      },
+                                                      border: "1px solid black",
+                                                      boxShadow: "none",
+                                                      color: "black",
+                                                  }}
+                                              >
+                                                  <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
+                                                  Volver al Inicio
+                                              </Button>
+                                          </Link>
+                                          <p className="text-sm mt-8 text-center font-semibold text-gray-800">
+                                              ¿No tienes cuenta?{" "}
+                                              <a
+                                                  href="/register"
+                                                  className="text-teal-900 font-bold tracking-wide hover:underline ml-1"
+                                              >
+                                                  Regístrate Aquí
+                                              </a>
+                                          </p>
+                                          {submitError && (
+                                              <p className="text-red-500 mt-4">{submitError}</p>
+                                          )}
+                                          <div>
+                                              <hr className="border-gray-600 border-2 my-3" />
+                                          </div>
+                                          <div className="space-x-6 flex justify-center mt-2">
+                                              <button type="button" className="border-none outline-none" onClick={() => signInWithGoogle()}>
+                                                  <svg
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      width="32px"
+                                                      className="inline"
+                                                      viewBox="0 0 512 512"
+                                                  >
+                                                      {/* Google SVG path here */}
+                                                  </svg>
+                                              </button>
+                                              <button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
+                                                  <svg
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      width="32px"
+                                                      fill="#007bff"
+                                                      viewBox="0 0 167.657 167.657"
+                                                  >
+                                                      {/* Facebook SVG path here */}
+                                                  </svg>
+                                              </button>
+                                          </div>
+                                      </Box>
+                                  </Box>
+                              </Container>
+                          </div>
+                          <ToastContainer />
+                      </div>
+                      <div className="absolute bottom-1 left-1 hidden md:block">
+                          <Image
+                              src="/logoblanco.png"
+                              alt="Logo"
+                              width={300}
+                              height={300}
+                              className="w-[300px] h-[300px]"
+                          />
+                      </div>
+                  </ThemeProvider>
               </Modal.Body>
-            </Modal>
-      <DashboardAddModifyComponent
-        disabled={errors.imgUrl === ""}
-        titleDashboard="Agregar comprobante de transferencia"
-        backLink="/dashboard/cliente/order"
-        buttonSubmitText="Enviar comprobante"
-        handleSubmit={handleSubmit}
-      >
-        <div className="grid gap-4 mb-4 sm:grid-cols-2">
-          <div className="mb-4 col-span-full">
-            <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-              Comprobante de transferencia
-            </span>
-            <span className="block mb-2 text-sm font-semibold text-red-800 dark:text-white">
-              Monto a transferir: $ {totalPrice}
-            </span>
-            <div className="flex justify-center items-center w-full ">
-              <label
-                htmlFor="dropzone-file"
-                className="flex flex-col justify-center items-center w-full h-18 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-              >
-                <div className="flex flex-col justify-center items-center pt-5 pb-6 ">
-                  <IoCloudUploadOutline />
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">
-                      Click para subir comprobante
-                    </span>
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    PDF, PNG, JPG or JPGE (MAX. 800x400px)
-                  </p>
-                </div>
-                <input
-                  id="dropzone-file"
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </label>
-            </div>
-            {!file ? (
-              <span className="text-red-500">{errors.imgUrl}</span>
-            ) : null}
-             {/* Mostrar previsualización */}
-        {previewUrl && (
-          <div className="preview mt-4 w-full flex justify-center">
-            {fileType?.includes("image") ? (
-              <Image
-                src={previewUrl}
-                alt="Preview"
-                width={300}
-                height={300}
-                className="object-contain"
-              />
-            ) : fileType?.includes("pdf") ? (
-              <iframe
-                src={previewUrl}
-                width="300"
-                height="400"
-                title="PDF Preview"
-                className="border"
-              />
-            ) : null}
-          </div>
-        )}
-          </div>
-        </div>
-      </DashboardAddModifyComponent>
-    </div>
+          </Modal>
+          <DashboardAddModifyComponent
+              disabled={errors.imgUrl === ""}
+              titleDashboard="Agregar comprobante de transferencia"
+              backLink="/dashboard/cliente/order"
+              buttonSubmitText="Enviar comprobante"
+              handleSubmit={handleSubmit}
+          >
+              <div className="grid gap-4 mb-4 sm:grid-cols-2">
+                  <div className="mb-4 col-span-full">
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          DETALLE DE PAGO POR TRANSFERENCIA
+                      </h2>
+                      <div className="border border-gray-300 rounded-lg p-4 bg-gray-100 dark:bg-gray-800">
+                          <div className="mb-2">
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">Número de cuenta:</span> 0011776-4 006-9
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">CUIT:</span> 30-69917035-2
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">Razón Social:</span> INTERCAFE SA
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">CBU:</span> 0070006120000011776499
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">Alias:</span> CAFELAESMERALDA
+                              </p>
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4">
+                              Pago con Mercado Pago
+                          </h3>
+                          <div className="mt-2">
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">Razón Social:</span> INTERCAFE SA
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">CVU:</span> 0000003100037751602197
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">Alias:</span> cafelaesmeralda.mp
+                              </p>
+                              <p className="text-gray-700 dark:text-white">
+                                  <span className="font-bold">CUIT/CUIL:</span> 30699170352
+                              </p>
+                          </div>
+                      </div>
+                      <div className="mt-6">
+                          <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                              Comprobante de transferencia
+                          </span>
+                          <span className="block mb-2 text-sm font-semibold text-red-800 dark:text-white">
+                              Monto a transferir: $ {totalPrice}
+                          </span>
+                          <div className="flex justify-center items-center w-full ">
+                              <label
+                                  htmlFor="dropzone-file"
+                                  className="flex flex-col justify-center items-center w-full h-18 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                              >
+                                  <div className="flex flex-col justify-center items-center pt-5 pb-6 ">
+                                      <IoCloudUploadOutline />
+                                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                          <span className="font-semibold">
+                                              Click para subir comprobante
+                                          </span>
+                                      </p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                                          PDF, PNG, JPG or JPGE (MAX. 800x400px)
+                                      </p>
+                                  </div>
+                                  <input
+                                      id="dropzone-file"
+                                      type="file"
+                                      className="hidden"
+                                      onChange={handleFileChange}
+                                  />
+                              </label>
+                          </div>
+                          {!file ? (
+                              <span className="text-red-500">{errors.imgUrl}</span>
+                          ) : null}
+                          {previewUrl && (
+                              <div className="preview mt-4 w-full flex justify-center">
+                                  {fileType?.includes("image") ? (
+                                      <Image
+                                          src={previewUrl}
+                                          alt="Preview"
+                                          width={300}
+                                          height={300}
+                                          className="object-contain"
+                                      />
+                                  ) : fileType?.includes("pdf") ? (
+                                      <iframe
+                                          src={previewUrl}
+                                          width="300"
+                                          height="400"
+                                          title="PDF Preview"
+                                          className="border"
+                                      />
+                                  ) : null}
+                              </div>
+                          )}
+                      </div>
+                  </div>
+              </div>
+          </DashboardAddModifyComponent>
+      </div>
   );
-};
-export default Transfer;
+}
+  export default Transfer;
