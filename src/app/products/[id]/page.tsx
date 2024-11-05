@@ -268,6 +268,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
             {filteredProduct.description}
           </h1>
+          {product?.presentacion && <p className=" text-md font-medium text-gray-700">Presentación: {product?.presentacion}</p>}
+                    {product?.tipoGrano && <p className=" text-md font-medium text-gray-700">Tipo de grano: {product?.tipoGrano}</p>}
           <hr className="animate-fade-in-up" />
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
             <div className="mb-4 flex space-x-4 animate-fade-in-up">

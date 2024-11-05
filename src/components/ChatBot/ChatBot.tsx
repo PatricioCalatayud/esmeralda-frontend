@@ -24,6 +24,28 @@ const ChatBotEsmeralda = () => {
   const [optionForm, setOptionForm] = useState<string>()
   const [address, setAddress] = useState<string>("")
   const [receiptId, setReceiptId] = useState<string>("")
+  const [stock, setStock] = useState<number>(0) || undefined
+  console.log(stock);
+  const selectedProduct = filteredProducts?.find(product =>
+    product.subproducts.some(subproduct =>
+      `${product.description} - ${subproduct.amount} ${subproduct.unit}` === optionForm
+    )
+  );
+  
+  const selectedSubproduct = selectedProduct?.subproducts.find(subproduct =>
+    `${selectedProduct.description} - ${subproduct.amount} ${subproduct.unit}` === optionForm
+  );
+  
+  const stockAvailable = selectedSubproduct?.stock;
+  useEffect(() => {
+    setStock(Number(selectedSubproduct?.stock));
+  }, [selectedProduct])
+ 
+  
+  const stockMessage = stockAvailable !== undefined
+    ? `Dime cuántas quieres. Stock disponible: ${stockAvailable}` 
+    : `Stock no disponible para "${optionForm}"`;
+  
 
   const helpLoginOptions = [
     "Registrarme",
@@ -297,9 +319,30 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
         },
        
         step10: {
-          message: "Dime cuantas quieres.",
-          function: async (params: any) => {  
+          message: stockMessage,        
+  function: async (params: any) => {  
+            if (params.userInput === "Continuar") {
+              handleCheckout();
+              return;
+            }
             const newInput = params.userInput; // El nuevo número que vas a agregar o reemplazar
+            console.log(`New Input: ${newInput}, Stock: ${stock}`);
+            if (Number(newInput) >  Number(stock) ) {
+              
+              Swal.fire({
+                icon: "error",
+                title: "¡Error!",
+                text: "No hay suficiente stock.",
+              });
+              return;
+            } else if (Number(newInput) <= 0) {
+              Swal.fire({
+                icon: "error",
+                title: "¡Error!",
+                text: "La cantidad debe ser mayor a 0.",
+              });
+              return;
+            } else{
             const index = form?.findIndex(option => option === optionForm);
             
             if (index !== -1) {
@@ -323,7 +366,7 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
             } else {
               console.error("Opción no encontrada en form");
             }
-
+          }
 
           },
           path: "preStep9",
