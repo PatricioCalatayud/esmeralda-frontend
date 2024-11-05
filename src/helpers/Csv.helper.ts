@@ -4,7 +4,7 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getCsv( token: string | undefined ) {
     try {
-      const response = await axios.get(`${apiURL}/csv/download`,{
+      const response = await axios.get(`${apiURL}/csv/download-products`,{
         responseType: 'blob',
         headers: {
           Authorization: `Bearer ${token}`,'Content-Type': 'text/csv',
@@ -19,7 +19,7 @@ export async function getCsv( token: string | undefined ) {
 
   export async function uploadCsv( token: string | undefined, file: any) {
     try {
-      const response = await axios.post(`${apiURL}/csv/upload`,file,{
+      const response = await axios.post(`${apiURL}/csv/updateproductsfromcsv`,file,{
         headers: {
 
           Authorization: `Bearer ${token}`,
@@ -33,7 +33,8 @@ export async function getCsv( token: string | undefined ) {
   }
   export async function csvProductMostSold( token: string | undefined ) {
     try {
-      const response = await axios.post(`${apiURL}/csv/productos-mas-vendidos`,{
+      const response = await axios.post(
+        `${apiURL}/csv/productos-mas-vendidos`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },

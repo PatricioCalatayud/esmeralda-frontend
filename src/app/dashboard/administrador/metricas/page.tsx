@@ -8,8 +8,8 @@ import {
   getProductLeastSold,
   getProductMostSold,
   getProductsByMonth,
-  getProductsByMonthBonus,
-  getProductsByMonthBonusAmount,
+  //getProductsByMonthBonus,
+  //getProductsByMonthBonusAmount,
   getProductsDistribution,
   getProductsSold,
   getWorstProducts,
@@ -32,7 +32,7 @@ import { getUsers } from "@/helpers/Autenticacion.helper";
 import Image from "next/image";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { csvBestProducts, csvDebts, csvOrdersByUserMonth, csvProductMostSold, csvProductsByMonth, csvProductsByMonthBonus, csvProductsByMonthBonusAmount, csvProductsDistribution, csvProductsSold, csvWorstProducts, getCsv, uploadCsv } from "@/helpers/Csv.helper";
+import { csvBestProducts, csvDebts, csvOrdersByUserMonth, csvProductLeastSold, csvProductMostSold, csvProductsByMonth, csvProductsByMonthBonus, csvProductsByMonthBonusAmount, csvProductsDistribution, csvProductsSold, csvWorstProducts, getCsv, uploadCsv } from "@/helpers/Csv.helper";
 
 const Metricas = () => {
   const { token } = useAuthContext();
@@ -50,10 +50,8 @@ const Metricas = () => {
   const [users, setUsers] = useState<any>();
   const [user, setUser] = useState<any>();
   const [deliveryId, setDeliveryId] = useState<any>();
-  const [productsByMonthBonus, setProductsByMonthBonus] = useState<any>();
-  const [productsByMonthBonusAmount, setProductsByMonthBonusAmount] = useState<
-    any
-  >();
+  //const [productsByMonthBonus, setProductsByMonthBonus] = useState<any>();
+  //const [productsByMonthBonusAmount, setProductsByMonthBonusAmount] = useState<any>();
   const [productsDistribution, setProductsDistribution] = useState<any>();
   useEffect(() => {
     const fetchData = async () => {
@@ -90,8 +88,9 @@ const Metricas = () => {
     const response8 = await getCsv(token);
     const url = window.URL.createObjectURL(new Blob([response8]));
     const link = document.createElement("a");
+    
     link.href = url;
-    link.setAttribute("download", "archivo.csv");
+    link.setAttribute("download", "productos.csv");
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
@@ -99,103 +98,184 @@ const Metricas = () => {
     console.log(response8);
   };
   const handleDownloadCsvProductsMostSold = async () => {
-    const response9 = await csvProductMostSold(token);
-    const url = window.URL.createObjectURL(new Blob([response9]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response9);
+    
+      const response = await csvProductMostSold(token);
+      if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+        const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+    
+        // Creas el blob usando el contenido de CSV que recibiste del backend
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+    
+        // Creas un enlace para descargar el archivo
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "productos-mas-vendidos.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+    
+        console.log("Archivo CSV descargado exitosamente.");
+      } else {
+        console.log("Error: No se recibió el contenido del CSV.");
+      }
   };
 
   const handleDownloadCsvBestProducts = async () => {
-    const response10 = await csvBestProducts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
+    const response = await csvBestProducts(token); // llamas a tu función para obtener el JSON
+  if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+    const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+
+    // Creas el blob usando el contenido de CSV que recibiste del backend
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Creas un enlace para descargar el archivo
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "archivo.csv");
+    link.setAttribute("download", "mejores-productos.csv");
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
 
-    console.log(response10);
+    console.log("Archivo CSV descargado exitosamente.");
+  } else {
+    console.log("Error: No se recibió el contenido del CSV.");
+  }
   }
   const handleDownloadCsvWorstProducts = async () => {
-    const response10 = await csvWorstProducts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvWorstProducts(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "peores-productos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvDebts = async () => {
-    const response10 = await csvDebts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvDebts(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "deudores.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvOrdersByUserMonth= async () => {
-    const response10 = await csvOrdersByUserMonth(token, date, user);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvOrdersByUserMonth(token, date, user);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "ordenes-de-usuarios-por-mes.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvProductsLeastSold = async () => {
-    const response10 = await csvProductMostSold(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvProductLeastSold(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-menos-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvProductsByMonth = async () => {
-    const response10 = await csvProductsByMonth(token, date, productId);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvProductsByMonth(token, date, productId);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-mas-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvProductsSold = async () => {
-    const response10 = await csvProductsSold(token, productId, 10);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvProductsSold(token, productId, 10);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
-  const handleDownloadCsvProductsByMonthBonus = async () => {
+  /*const handleDownloadCsvProductsByMonthBonus = async () => {
     const response10 = await csvProductsByMonthBonus(token, user, date);
     const url = window.URL.createObjectURL(new Blob([response10]));
     const link = document.createElement("a");
@@ -220,17 +300,27 @@ const Metricas = () => {
     console.log(response10);
   }
   const handleDownloadCsvProductsDistribution = async () => {
-    const response10 = await csvProductsDistribution(token, deliveryId, date);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
-  }
+    const response = await csvProductsDistribution(token, deliveryId, date);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
+  }*/
   const handleUploadCsv = async (file: any) => {
     const formData = new FormData();
 
@@ -265,7 +355,7 @@ const Metricas = () => {
     setProductsSold(response8);
     console.log(response8);
   };
-  const handleSeachProductsByMonthBonus = async () => {
+  /*const handleSeachProductsByMonthBonus = async () => {
     const response9 = await getProductsByMonthBonus(token, user, date);
     setProductsByMonthBonus(response9);
     console.log(response9);
@@ -274,7 +364,7 @@ const Metricas = () => {
     const response10 = await getProductsByMonthBonusAmount(token, user, date);
     setProductsByMonthBonusAmount(response10);
     console.log(response10);
-  };
+  };*/
   const handleSearchProductsDistribution = async () => {
     const response11 = await getProductsDistribution(token, deliveryId, date);
     setProductsDistribution(response11);
@@ -286,6 +376,32 @@ const Metricas = () => {
       <div className="w-full ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden ">
           <Tabs aria-label="Tabs with underline" variant="underline">
+            <Tabs.Item title="Productos" icon={HiOutlineChartPie}>
+            <div className="mt-4 mb-4 mx-4 flex gap-4">
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  onClick={handleDownloadCsv}
+                >
+                  DESCARGAR ARCHIVO CSV
+                </button>
+
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<FontAwesomeIcon icon={faUpload} />}
+                >
+                  Subir Archivo CSV
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={(e) => handleUploadCsv(e.target.files?.[0])}
+                    multiple
+                  />
+                </Button>
+              </div>
+              </Tabs.Item>
             <Tabs.Item
               active
               title="Productos vendidos"
@@ -350,25 +466,11 @@ const Metricas = () => {
                 <button
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                  onClick={handleDownloadCsv}
+                  onClick={handleDownloadCsvProductsSold}
+                  disabled={!productsSold || productsSold?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
-
-                <Button
-                  component="label"
-                  role={undefined}
-                  variant="contained"
-                  tabIndex={-1}
-                  startIcon={<FontAwesomeIcon icon={faUpload} />}
-                >
-                  Subir Archivo CSV
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={(e) => handleUploadCsv(e.target.files?.[0])}
-                    multiple
-                  />
-                </Button>
               </div>
             </Tabs.Item>
             <Tabs.Item title="Productos mas vendidos" icon={HiPlus}>
@@ -396,6 +498,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvProductsMostSold}
+                  disabled={!productMostSold || productMostSold?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
@@ -426,6 +529,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvProductsLeastSold}
+                  disabled={!productLeastSold || productLeastSold?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
@@ -500,12 +604,13 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvProductsByMonth}
+                  disabled={!productsByMonth || productsByMonth?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
             </Tabs.Item>
-            <Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
+            {/*<Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
               <div className="flex justify-center w-full gap-4 px-4">
                 <div className="w-full">
                   <label
@@ -757,11 +862,12 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvProductsDistribution}
+                  disabled={!productsDistribution || productsDistribution?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
-            </Tabs.Item>
+            </Tabs.Item>*/}
 
             <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
               {bestProducts && bestProducts.length > 0 ? (
@@ -798,6 +904,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvBestProducts}
+                  disabled={!bestProducts || bestProducts?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
@@ -838,6 +945,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvWorstProducts}
+                  disabled={!worstProducts || worstProducts?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
@@ -943,6 +1051,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvOrdersByUserMonth}
+                  disabled={!ordersByUserMonth || ordersByUserMonth?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
@@ -972,6 +1081,7 @@ const Metricas = () => {
                   type="submit"
                   className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleDownloadCsvDebts}
+                  disabled={!debts || debts?.length === 0}
                 >
                   DESCARGAR ARCHIVO CSV
                 </button>
