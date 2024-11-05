@@ -33,7 +33,8 @@ export async function getCsv( token: string | undefined ) {
   }
   export async function csvProductMostSold( token: string | undefined ) {
     try {
-      const response = await axios.post(`${apiURL}/csv/productos-mas-vendidos`,{
+      const response = await axios.post(
+        `${apiURL}/csv/productos-mas-vendidos`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },

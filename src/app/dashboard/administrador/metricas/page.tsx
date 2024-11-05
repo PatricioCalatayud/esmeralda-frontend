@@ -99,77 +99,138 @@ const Metricas = () => {
     console.log(response8);
   };
   const handleDownloadCsvProductsMostSold = async () => {
-    const response9 = await csvProductMostSold(token);
-    const url = window.URL.createObjectURL(new Blob([response9]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response9);
+    
+      const response = await csvProductMostSold(token);
+      if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+        const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+    
+        // Creas el blob usando el contenido de CSV que recibiste del backend
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+    
+        // Creas un enlace para descargar el archivo
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "mejores-productos.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+    
+        console.log("Archivo CSV descargado exitosamente.");
+      } else {
+        console.log("Error: No se recibió el contenido del CSV.");
+      }
   };
 
   const handleDownloadCsvBestProducts = async () => {
-    const response10 = await csvBestProducts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
+    const response = await csvBestProducts(token); // llamas a tu función para obtener el JSON
+  if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+    const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+
+    // Creas el blob usando el contenido de CSV que recibiste del backend
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Creas un enlace para descargar el archivo
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "archivo.csv");
+    link.setAttribute("download", "mejores-productos.csv");
     document.body.appendChild(link);
     link.click();
     link.parentNode?.removeChild(link);
 
-    console.log(response10);
+    console.log("Archivo CSV descargado exitosamente.");
+  } else {
+    console.log("Error: No se recibió el contenido del CSV.");
+  }
   }
   const handleDownloadCsvWorstProducts = async () => {
-    const response10 = await csvWorstProducts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvWorstProducts(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "peores-productos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvDebts = async () => {
-    const response10 = await csvDebts(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvDebts(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "deudores.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvOrdersByUserMonth= async () => {
-    const response10 = await csvOrdersByUserMonth(token, date, user);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvOrdersByUserMonth(token, date, user);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "ordenes-de-usuarios-por-mes.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvProductsLeastSold = async () => {
-    const response10 = await csvProductMostSold(token);
-    const url = window.URL.createObjectURL(new Blob([response10]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "archivo.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response10);
+    const response = await csvProductMostSold(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-mas-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
   }
   const handleDownloadCsvProductsByMonth = async () => {
     const response10 = await csvProductsByMonth(token, date, productId);
@@ -195,7 +256,7 @@ const Metricas = () => {
 
     console.log(response10);
   }
-  const handleDownloadCsvProductsByMonthBonus = async () => {
+  /*const handleDownloadCsvProductsByMonthBonus = async () => {
     const response10 = await csvProductsByMonthBonus(token, user, date);
     const url = window.URL.createObjectURL(new Blob([response10]));
     const link = document.createElement("a");
@@ -218,7 +279,7 @@ const Metricas = () => {
     link.parentNode?.removeChild(link);
 
     console.log(response10);
-  }
+  }*/
   const handleDownloadCsvProductsDistribution = async () => {
     const response10 = await csvProductsDistribution(token, deliveryId, date);
     const url = window.URL.createObjectURL(new Blob([response10]));
@@ -265,7 +326,7 @@ const Metricas = () => {
     setProductsSold(response8);
     console.log(response8);
   };
-  const handleSeachProductsByMonthBonus = async () => {
+  /*const handleSeachProductsByMonthBonus = async () => {
     const response9 = await getProductsByMonthBonus(token, user, date);
     setProductsByMonthBonus(response9);
     console.log(response9);
@@ -274,7 +335,7 @@ const Metricas = () => {
     const response10 = await getProductsByMonthBonusAmount(token, user, date);
     setProductsByMonthBonusAmount(response10);
     console.log(response10);
-  };
+  };*/
   const handleSearchProductsDistribution = async () => {
     const response11 = await getProductsDistribution(token, deliveryId, date);
     setProductsDistribution(response11);
@@ -505,7 +566,7 @@ const Metricas = () => {
                 </button>
               </div>
             </Tabs.Item>
-            <Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
+            {/*<Tabs.Item title="Productos por mes bonificados" icon={HiCash}>
               <div className="flex justify-center w-full gap-4 px-4">
                 <div className="w-full">
                   <label
@@ -681,7 +742,7 @@ const Metricas = () => {
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
-            </Tabs.Item>
+            </Tabs.Item>*/}
             <Tabs.Item title="Productos reparto por mes" icon={HiCash}>
               <div className="flex justify-center w-full gap-4 px-4">
                 <div className="w-full">
