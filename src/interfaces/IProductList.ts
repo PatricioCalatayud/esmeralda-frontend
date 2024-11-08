@@ -71,8 +71,8 @@ export interface IProductErrorResponse {
 export interface IProductUpdate {
   description: string;
   categoryID: string;
-  presentacion: string;
-  tipoGrano: string;
+  presentacion?: string;
+  tipoGrano?: string;
   file?: File;
   subproducts?: ISubProductUpdate[];
   imgUrl?:string
