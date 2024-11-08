@@ -85,17 +85,32 @@ const Metricas = () => {
     fetchData();
   }, [token]);
   const handleDownloadCsv = async () => {
-    const response8 = await getCsv(token);
-    const url = window.URL.createObjectURL(new Blob([response8]));
-    const link = document.createElement("a");
-    
-    link.href = url;
-    link.setAttribute("download", "productos.csv");
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
-
-    console.log(response8);
+    try {
+      const response8 = await getCsv(token);
+      
+      // Convertimos el Blob a texto para poder hacer el reemplazo
+      const csvContent = await response8.text();
+  
+      // Reemplazamos las comas por punto y coma
+      const modifiedCsvContent = csvContent.replace(/,/g, ";");
+  
+      // Creamos un nuevo Blob con el contenido modificado
+      const url = window.URL.createObjectURL(new Blob([modifiedCsvContent], { type: "text/csv" }));
+      const link = document.createElement("a");
+      
+      link.href = url;
+      link.setAttribute("download", "productos.csv");
+      document.body.appendChild(link);
+      link.click();
+      
+      // Limpiamos la URL y el link creado
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+  
+      console.log(modifiedCsvContent);
+    } catch (error) {
+      console.error("Error al descargar el CSV:", error);
+    }
   };
   const handleDownloadCsvProductsMostSold = async () => {
     
@@ -120,6 +135,28 @@ const Metricas = () => {
         console.log("Error: No se recibió el contenido del CSV.");
       }
   };
+  const handleDownloadCsvProductsLeastSold = async () => {
+    const response = await csvProductLeastSold(token);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-menos-vendidos.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }
+  }
 
   const handleDownloadCsvBestProducts = async () => {
     const response = await csvBestProducts(token); // llamas a tu función para obtener el JSON
@@ -209,28 +246,7 @@ const Metricas = () => {
       console.log("Error: No se recibió el contenido del CSV.");
     }
   }
-  const handleDownloadCsvProductsLeastSold = async () => {
-    const response = await csvProductLeastSold(token);
-    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
-      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
   
-      // Creas el blob usando el contenido de CSV que recibiste del backend
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-  
-      // Creas un enlace para descargar el archivo
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "productos-menos-vendidos.csv");
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-  
-      console.log("Archivo CSV descargado exitosamente.");
-    } else {
-      console.log("Error: No se recibió el contenido del CSV.");
-    }
-  }
   const handleDownloadCsvProductsByMonth = async () => {
     const response = await csvProductsByMonth(token, date, productId);
     if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
@@ -364,12 +380,12 @@ const Metricas = () => {
     const response10 = await getProductsByMonthBonusAmount(token, user, date);
     setProductsByMonthBonusAmount(response10);
     console.log(response10);
-  };*/
+  };
   const handleSearchProductsDistribution = async () => {
     const response11 = await getProductsDistribution(token, deliveryId, date);
     setProductsDistribution(response11);
     console.log(response11);
-  };
+  };*/
 
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
@@ -474,7 +490,7 @@ const Metricas = () => {
               </div>
             </Tabs.Item>
             <Tabs.Item title="Productos mas vendidos" icon={HiPlus}>
-              {productMostSold && productMostSold.length > 0 ? (
+              {/*productMostSold && productMostSold.length > 0 ? (
                 productMostSold?.map((product: any, index: number) => (
                   <div key={index}>
                     <div className="flex justify-between p-4">
@@ -492,7 +508,7 @@ const Metricas = () => {
                 <p className="flex justify-center my-20">
                   No hay productos mas vendidos
                 </p>
-              )}
+              )*/}
               <div className="mt-4 mb-4 mx-4 flex gap-4">
                 <button
                   type="submit"
@@ -1074,7 +1090,7 @@ const Metricas = () => {
                   </>
                 ))
               ) : (
-                <p className="flex justify-center my-20">No hay deudas</p>
+                <p className="flex justify-center my-20">No hay deudores</p>
               )}
               <div className="mt-4 mb-4 mx-4 flex gap-4">
                 <button
