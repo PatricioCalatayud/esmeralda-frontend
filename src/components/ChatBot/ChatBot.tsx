@@ -24,8 +24,7 @@ const ChatBotEsmeralda = () => {
   const [optionForm, setOptionForm] = useState<string>()
   const [address, setAddress] = useState<string>("")
   const [receiptId, setReceiptId] = useState<string>("")
-  const [stock, setStock] = useState<number>(0) || undefined
-  console.log(stock);
+
   const selectedProduct = filteredProducts?.find(product =>
     product.subproducts.some(subproduct =>
       `${product.description} - ${subproduct.amount} ${subproduct.unit}` === optionForm
@@ -37,9 +36,7 @@ const ChatBotEsmeralda = () => {
   );
   
   const stockAvailable = selectedSubproduct?.stock;
-  useEffect(() => {
-    setStock(Number(selectedSubproduct?.stock));
-  }, [selectedProduct])
+
  
   
   const stockMessage = stockAvailable !== undefined
@@ -326,8 +323,8 @@ const totalPrice = (price || []).reduce((accumulator :any, currentValue:any) => 
               return;
             }
             const newInput = params.userInput; // El nuevo número que vas a agregar o reemplazar
-            console.log(`New Input: ${newInput}, Stock: ${stock}`);
-            if (Number(newInput) >  Number(stock) ) {
+            console.log(`New Input: ${newInput}, Stock: ${stockAvailable}`);
+            if (Number(newInput) >  Number(stockAvailable) ) {
               
               Swal.fire({
                 icon: "error",
