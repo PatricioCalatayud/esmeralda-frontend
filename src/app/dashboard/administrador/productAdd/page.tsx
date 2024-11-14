@@ -17,7 +17,6 @@ import { Tooltip } from "flowbite-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-
 const InsertProduct = () => {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -75,64 +74,70 @@ const InsertProduct = () => {
   };
 
   //! Función para enviar los datos del producto al backend
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    const formData = new FormData();
-    formData.append("description", dataProduct.description);
-    formData.append("averageRating", "0"); // o puedes utilizar `0` directamente si el backend lo soporta
-    formData.append("presentacion", dataProduct.presentacion || "");
-    formData.append("tipoGrano", dataProduct.tipoGrano || "");
-    formData.append("categoryID", dataProduct.categoryID);
+ //! Función para enviar los datos del producto al backend
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
   
-    // Añadir la imagen al FormData si existe
-    if (imageFile) {
-      formData.append("file", imageFile); // Asegúrate de que el campo 'file' coincide con lo que espera el backend
-    }
+  const formData = new FormData();
+  formData.append("description", dataProduct.description);
+  formData.append("averageRating", "0"); 
+  formData.append("categoryID", dataProduct.categoryID);
   
-    // Añadir cada subproduct al FormData
-    subproducts.forEach((subproduct, index) => {
-      formData.append(`subproducts[${index}][amount]`, subproduct.amount);
-      formData.append(`subproducts[${index}][unit]`, subproduct.unit);
-      formData.append(`subproducts[${index}][stock]`, subproduct.stock);
-      formData.append(`subproducts[${index}][price]`, subproduct.price);
-      formData.append(`subproducts[${index}][discount]`, subproduct.discount);
-      // Añadir más campos según sea necesario
-    });
+  // Agregar `presentacion` y `tipoGrano` solo si tienen valores
+  if (dataProduct.presentacion) {
+    formData.append("presentacion", dataProduct.presentacion);
+  }
+  if (dataProduct.tipoGrano) {
+    formData.append("tipoGrano", dataProduct.tipoGrano);
+  }
+
+  // Añadir la imagen al FormData si existe
+  if (imageFile) {
+    formData.append("file", imageFile); 
+  }
   
-    // Imprimir los datos de FormData en la consola usando forEach
-    Array.from(formData.entries()).forEach(([key, value]) => {
-      console.log(`${key}: ${value}`);
-    });
+  // Añadir cada subproduct al FormData
+  subproducts.forEach((subproduct, index) => {
+    formData.append(`subproducts[${index}][amount]`, subproduct.amount);
+    formData.append(`subproducts[${index}][unit]`, subproduct.unit);
+    formData.append(`subproducts[${index}][stock]`, subproduct.stock);
+    formData.append(`subproducts[${index}][price]`, subproduct.price);
+    formData.append(`subproducts[${index}][discount]`, subproduct.discount);
+  });
   
-    //! Mostrar alerta de carga mientras se procesa la solicitud
+  // Imprimir los datos de FormData en la consola usando forEach
+  Array.from(formData.entries()).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+  });
+  
+  //! Mostrar alerta de carga mientras se procesa la solicitud
+  Swal.fire({
+    title: "Agregando producto...",
+    text: "Por favor espera.",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+  
+  const response = await postProducts(formData, token);
+  
+  if (response && (response.status === 201 || response.status === 200)) {
     Swal.fire({
-      title: "Agregando producto...",
-      text: "Por favor espera.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      icon: "success",
+      title: "¡Agregado!",
+      text: "El producto ha sido agregado con éxito.",
+    }).then(() => {
+      router.push("../../dashboard/administrador/product");
     });
-  
-    const response = await postProducts(formData, token);
-  
-    if (response && (response.status === 201 || response.status === 200)) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Agregado!",
-        text: "El producto ha sido agregado con éxito.",
-      }).then(() => {
-        router.push("../../dashboard/administrador/product");
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "¡Error!",
-        text: "Ha ocurrido un error al agregar el producto.",
-      });
-    }
-  };
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "¡Error!",
+      text: "Ha ocurrido un error al agregar el producto.",
+    });
+  }
+};
   const handleAddSubproduct = () => {
     setSubproducts([...subproducts, {  amount: "", unit: "", price:"", stock:"", discount:"" }]);
   };
@@ -183,13 +188,11 @@ useEffect(() => {
 
 console.log("Errores de producto:", errors);
 
-
 const areAllFieldsEmpty = (errorsSubproducts: Array<{ [key: string]: string }>): boolean => {
   return errorsSubproducts.every(subproduct => {
     return Object.values(subproduct).every(value => value === "");
   });
 };
-
 
 const allFieldsEmpty = areAllFieldsEmpty(errorsSubproducts);
 
@@ -491,4 +494,4 @@ return (
 );
 }
 
-export default InsertProduct;
+export default InsertProduct

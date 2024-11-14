@@ -33,6 +33,8 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const [floor, setFloor] = useState(""); // Nuevo estado para Piso
   const [apartment, setApartment] = useState(""); // Nuevo estado para Departamento
+  const [dni, setDni] = useState(""); // Estado para DNI
+const [cuit, setCuit] = useState(""); // Estado para CUIT
 
   // Variables agregadas
   const [needsInvoice, setNeedsInvoice] = useState(false);
@@ -164,26 +166,32 @@ const total = calcularTotal();
         subproductId: product.idSubProduct,
         quantity: product.quantity,
       }));
-  
-      // Concatenar dirección con piso y departamento si están presentes
+    
       const fullAddress = `${addresOrder}${floor ? `, Piso: ${floor}` : ""}${apartment ? `, Depto: ${apartment}` : ""}`;
-  
+    
       setLoading(true);
-  
-      const orderCheckout = {
+    
+      const orderCheckout: any = {
         userId: session?.id,
         products,
-        address: isDelivery ? undefined : fullAddress, // Usar dirección completa solo si no es retiro en local
+        address: isDelivery ? undefined : fullAddress,
         discount: 10,
         ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && { account: "Transferencia" }),
         ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
         ...(needsInvoice && { invoiceType }),
       };
-  
+    
+      // Agregar identificación en función del tipo de factura seleccionado
+      if (invoiceType === "A") {
+        orderCheckout.identification = cuit; // Enviar CUIT para Factura A
+      } else if (invoiceType === "B" || invoiceType === "C") {
+        orderCheckout.identification = dni; // Enviar DNI para Factura B o C
+      }
+    
       try {
         const order = await postOrder(orderCheckout, token);
         console.log(order);
-  
+    
         if (order?.status === 200 || order?.status === 201) {
           Swal.fire({
             position: "top-end",
@@ -192,8 +200,7 @@ const total = calcularTotal();
             showConfirmButton: false,
             timer: 1500,
           });
-          
-          // Redireccionamiento después de la confirmación
+    
           setTimeout(() => {
             if (session?.role === "Usuario") {
               router.push(`/checkout/${order.data.id}`);
@@ -208,9 +215,9 @@ const total = calcularTotal();
         } else {
           throw new Error("Pedido no completado.");
         }
-      } catch (error:any) {
+      } catch (error: any) {
         console.error("Error en el servidor:", error);
-        const errorMessage = (error as any)?.message || "Hubo un error al realizar tu pedido";
+        const errorMessage = error.message || "Hubo un error al realizar tu pedido";
         Swal.fire({
           position: "top-end",
           icon: "error",
@@ -425,11 +432,9 @@ const total = calcularTotal();
   <Modal.Body className="flex flex-col gap-4">
     {loading === false ? (
       <>
+        {/* Input de Dirección */}
         <div className="w-full h-20 gap-4 flex flex-col">
-          <label
-            htmlFor="addresOrder"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
-          >
+          <label htmlFor="addresOrder" className="block text-sm font-medium text-gray-900 dark:text-white">
             Dirección de envío
           </label>
           <input
@@ -444,12 +449,9 @@ const total = calcularTotal();
           />
         </div>
 
-        {/* Nuevo input para Piso */}
+        {/* Input para Piso */}
         <div className="w-full h-20 gap-4 flex flex-col">
-          <label
-            htmlFor="floor"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
-          >
+          <label htmlFor="floor" className="block text-sm font-medium text-gray-900 dark:text-white">
             Piso
           </label>
           <input
@@ -464,12 +466,9 @@ const total = calcularTotal();
           />
         </div>
 
-        {/* Nuevo input para Departamento */}
+        {/* Input para Departamento */}
         <div className="w-full h-20 gap-4 flex flex-col">
-          <label
-            htmlFor="apartment"
-            className="block text-sm font-medium text-gray-900 dark:text-white"
-          >
+          <label htmlFor="apartment" className="block text-sm font-medium text-gray-900 dark:text-white">
             Departamento
           </label>
           <input
@@ -484,6 +483,7 @@ const total = calcularTotal();
           />
         </div>
 
+        {/* Checkbox para Retiro en Local */}
         <div className="flex gap-4 items-center h-20">
           <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
             Retiro en local
@@ -496,6 +496,7 @@ const total = calcularTotal();
           />
         </div>
 
+        {/* Checkbox para Necesitar Factura */}
         <div className="flex gap-4 items-center h-20">
           <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
             ¿Necesitás Factura?
@@ -508,8 +509,9 @@ const total = calcularTotal();
           />
         </div>
 
+        {/* Selección de Tipo de Factura y Inputs Condicionales */}
         {needsInvoice && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mb-4">
             <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
               ¿Qué tipo de factura necesitás?
             </h4>
@@ -542,6 +544,44 @@ const total = calcularTotal();
                 C
               </button>
             </div>
+
+            {/* Input de CUIT habilitado solo para Factura A */}
+            {invoiceType === "A" && (
+              <div className="w-full h-20 gap-4 flex flex-col">
+                <label htmlFor="cuit" className="block text-sm font-medium text-gray-900 dark:text-white">
+                  CUIT
+                </label>
+                <input
+                  type="text"
+                  name="cuit"
+                  id="cuit"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Ejemplo: 20-12345678-5"
+                  value={cuit}
+                  onChange={(e) => setCuit(e.target.value)}
+                  disabled={invoiceType !== "A"}
+                />
+              </div>
+            )}
+
+            {/* Input de DNI habilitado solo para Factura B o C */}
+            {(invoiceType === "B" || invoiceType === "C") && (
+              <div className="w-full h-20 gap-4 flex flex-col">
+                <label htmlFor="dni" className="block text-sm font-medium text-gray-900 dark:text-white">
+                  DNI
+                </label>
+                <input
+                  type="text"
+                  name="dni"
+                  id="dni"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="Ejemplo: 12345678"
+                  value={dni}
+                  onChange={(e) => setDni(e.target.value)}
+                  disabled={invoiceType === "A"}
+                />
+              </div>
+            )}
           </div>
         )}
       </>
