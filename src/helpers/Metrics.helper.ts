@@ -8,6 +8,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
+        console.log(response.data);
       const products = response.data;
       return products;
     } catch (error: any) {
@@ -22,6 +23,7 @@ export async function getProductMostSold( token: string | undefined ) {
           Authorization: `Bearer ${token}`,
         },
         });
+        console.log(response.data);
       const products = response.data;
       return products;
     } catch (error: any) {
@@ -167,7 +169,7 @@ export async function getProductMostSold( token: string | undefined ) {
   }
   export async function getProductsDistribution(token:string | undefined,deliveryId:string,date:string) { 
     const body = {
-      deliveryId: deliveryId,
+      deliveryId: deliveryId, // revisar este dato
       date: date
     }
     try {
