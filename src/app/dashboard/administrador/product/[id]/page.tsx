@@ -121,8 +121,12 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
 
       formData.append("description", dataProduct.description);
       formData.append("category", dataProduct.categoryID);
-      formData.append("presentacion", dataProduct.presentacion);
-      formData.append("tipoGrano", dataProduct.tipoGrano);
+      if (dataProduct.presentacion) {
+        formData.append("presentacion", dataProduct.presentacion);
+      }
+      if (dataProduct.tipoGrano) {
+        formData.append("tipoGrano", dataProduct.tipoGrano);
+      }
 
       if (imageFile) {
         formData.append("file", imageFile);
