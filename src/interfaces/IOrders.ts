@@ -77,4 +77,5 @@ export interface Bill {
     id: string;  
     type: string;
     imgUrl: string | null;
+    identification: string;
   }

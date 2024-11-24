@@ -8,8 +8,9 @@ export async function getProducts(page?: number, limit?: number) {
     const res = await axios.get(`${apiURL}/products`,{
       params: {
         page,  // Pasar el número de página
-        limit, // Pasar el límite de resultados por página
+        limit, // Pasar el límite de resultados por página 
       },
+
     });
     console.log(res.data.data)
     const products: IProductList[] = res.data.data;
