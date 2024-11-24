@@ -8,13 +8,9 @@ export async function getProducts(page?: number, limit?: number) {
     const res = await axios.get(`${apiURL}/products`,{
       params: {
         page,  // Pasar el número de página
-        limit, // Pasar el límite de resultados por página
-        _timestamp: Date.now(),
+        limit, // Pasar el límite de resultados por página 
       },
-      headers: {
-        'Cache-Control': 'no-store', // Instrucción explícita para no almacenar en caché
-        Pragma: 'no-cache',
-      },
+
     });
     console.log(res.data.data)
     const products: IProductList[] = res.data.data;
