@@ -316,6 +316,10 @@ const handleChange = async (
       return "--";
     }
   };
+  //! Renderizar columna de "CUIT/DNI"
+const renderIdentificationColumn = (order: IOrders) => {
+  return order.bill && order.bill.identification ? order.bill.identification : "--";
+};
 
   //! Funciones para subir/eliminar archivos de factura
   const handleUploadFile = async (
@@ -422,10 +426,12 @@ const handleChange = async (
         "Fecha de pedido - entrega",
         "Lugar de envio",
         "Productos",
-        "Estado", // Comprobante (aceptar o rechazar)
-        "Acciones", // Menú desplegable para cambiar el estado
-        "Necesita Factura?", // "Sí" o "No" dependiendo de la factura
-        "Archivo Factura", // Subir/eliminar archivo de factura
+        "Estado",
+        "Acciones",
+        "Necesita Factura?",
+       "Archivo Factura",
+       "CUIT/DNI",
+        
       ]}
       noContent="No hay Ordenes disponibles"
     >
@@ -475,10 +481,14 @@ const handleChange = async (
           <td className="px-4 py-3 text-center">
             {renderInvoiceColumn(order)}
           </td>
+          
           {/* Columna de "Archivo Factura" */}
           <td className="px-4 py-3 text-center">
             {renderFileActionsColumn(order)}
           </td>
+          <td className="px-4 py-3 text-center">
+  {renderIdentificationColumn(order)}
+</td>
         </tr>
       ))}
     </DashboardComponent>
