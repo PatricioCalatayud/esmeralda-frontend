@@ -9,6 +9,11 @@ export async function getProducts(page?: number, limit?: number) {
       params: {
         page,  // Pasar el número de página
         limit, // Pasar el límite de resultados por página
+        _timestamp: Date.now(),
+      },
+      headers: {
+        'Cache-Control': 'no-store', // Instrucción explícita para no almacenar en caché
+        Pragma: 'no-cache',
       },
     });
     console.log(res.data.data)
