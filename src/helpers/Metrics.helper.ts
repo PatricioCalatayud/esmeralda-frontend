@@ -186,3 +186,23 @@ export async function getProductMostSold( token: string | undefined ) {
     }
     
   }
+
+  export async function getProductsCargoySinCargo(token:string | undefined,deliveryId:string,date:string) { 
+    const body = {
+      deliveryId: deliveryId, // revisar este dato
+      date: date
+    }
+    try {
+      const response = await axios.post(`${apiURL}/metrics/productos-cargo-y-sin-cargo-por-mes-detallado`, body,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        });
+        console.log(response.data);
+      const products = response.data;
+      return products;
+    } catch (error: any) {
+      console.log(error);
+    }
+    
+  }

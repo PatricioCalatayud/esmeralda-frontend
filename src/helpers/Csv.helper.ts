@@ -215,3 +215,22 @@ export async function getCsv( token: string | undefined ) {
     }
     
   }
+  export async function csvProductsCargoySinCargo(token:string | undefined,deliveryId:string,date:string) { 
+    const body = {
+      deliveryId: deliveryId,
+      date: date
+    }
+    try {
+      const response = await axios.post(`${apiURL}/csv/productos-cargo-y-sin-cargo-por-mes-detallado`, body,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        });
+        console.log(response.data);
+      const products = response.data;
+      return products;
+    } catch (error: any) {
+      console.log(error);
+    }
+    
+  }

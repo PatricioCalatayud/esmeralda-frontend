@@ -8,6 +8,7 @@ import {
   getProductLeastSold,
   getProductMostSold,
   getProductsByMonth,
+  getProductsCargoySinCargo,
   //getProductsByMonthBonus,
   //getProductsByMonthBonusAmount,
   getProductsDistribution,
@@ -32,7 +33,7 @@ import { getUsers } from "@/helpers/Autenticacion.helper";
 import Image from "next/image";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { csvBestProducts, csvDebts, csvOrdersByUserMonth, csvProductLeastSold, csvProductMostSold, csvProductsByMonth, csvProductsByMonthBonus, csvProductsByMonthBonusAmount, csvProductsDistribution, csvProductsSold, csvWorstProducts, getCsv, uploadCsv } from "@/helpers/Csv.helper";
+import { csvBestProducts, csvDebts, csvOrdersByUserMonth, csvProductLeastSold, csvProductMostSold, csvProductsByMonth, csvProductsByMonthBonus, csvProductsByMonthBonusAmount, csvProductsCargoySinCargo, csvProductsDistribution, csvProductsSold, csvWorstProducts, getCsv, uploadCsv } from "@/helpers/Csv.helper";
 
 const Metricas = () => {
   const { token } = useAuthContext();
@@ -50,6 +51,7 @@ const Metricas = () => {
   const [users, setUsers] = useState<any>();
   const [user, setUser] = useState<any>();
   const [deliveryId, setDeliveryId] = useState<any>();
+  const [productsCargoySinCargo, setProductsCargoySinCargo] = useState<any>();
   //const [productsByMonthBonus, setProductsByMonthBonus] = useState<any>();
   //const [productsByMonthBonusAmount, setProductsByMonthBonusAmount] = useState<any>();
   const [productsDistribution, setProductsDistribution] = useState<any>();
@@ -291,6 +293,27 @@ const Metricas = () => {
       console.log("Error: No se recibió el contenido del CSV.");
     }
   }
+  const handleDownloadCsvProductConySinCargo = async () => {
+    const response = await csvProductsCargoySinCargo(token, deliveryId,date);
+    if (response && response.csvContent) { // Verificas que tienes contenido en csvContent
+      const csvContent = response.csvContent.replace(/,/g, ";") // Extraes el contenido del CSV
+  
+      // Creas el blob usando el contenido de CSV que recibiste del backend
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+  
+      // Creas un enlace para descargar el archivo
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "productos-cony-sin-cargo.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+  
+      console.log("Archivo CSV descargado exitosamente.");
+    } else {
+      console.log("Error: No se recibió el contenido del CSV.");
+    }}
   /*const handleDownloadCsvProductsByMonthBonus = async () => {
     const response10 = await csvProductsByMonthBonus(token, user, date);
     const url = window.URL.createObjectURL(new Blob([response10]));
@@ -371,6 +394,11 @@ const Metricas = () => {
     setProductsSold(response8);
     console.log(response8);
   };
+  const handleSeachProductsConCargo = async () => {
+    const response9 = await getProductsCargoySinCargo(token, deliveryId, date);
+    setProductsCargoySinCargo(response9);
+    console.log(response9);
+  }
   /*const handleSeachProductsByMonthBonus = async () => {
     const response9 = await getProductsByMonthBonus(token, user, date);
     setProductsByMonthBonus(response9);
@@ -392,7 +420,7 @@ const Metricas = () => {
       <div className="w-full ">
         <div className="bg-white dark:bg-gray-800 relative shadow-2xl sm:rounded-lg overflow-hidden ">
           <Tabs aria-label="Tabs with underline" variant="underline">
-            <Tabs.Item title="Productos" icon={HiOutlineChartPie}>
+            {/*<Tabs.Item title="Productos" icon={HiOutlineChartPie}>
             <div className="mt-4 mb-4 mx-4 flex gap-4">
                 <button
                   type="submit"
@@ -417,7 +445,7 @@ const Metricas = () => {
                   />
                 </Button>
               </div>
-              </Tabs.Item>
+              </Tabs.Item>/*/}
             <Tabs.Item
               active
               title="Productos vendidos"
@@ -459,6 +487,14 @@ const Metricas = () => {
                           <div className="flex gap-2">
                             <p>{product.subproduct?.amount}</p>
                             <p>{product.subproduct?.unit}</p>
+                          </div>
+                          <div>
+                            <p>
+                            {format(
+                          new Date(product?.order?.date),
+                          "dd'-'MM'-'yyyy",
+                          { locale: es }
+                        )}</p>
                           </div>
                           <p>
                             Total vendidos:{" "}
@@ -803,7 +839,7 @@ const Metricas = () => {
                 </button>
               </div>
             </Tabs.Item>
-            <Tabs.Item title="Productos reparto por mes" icon={HiCash}>
+            */}{/*<Tabs.Item title="Productos reparto por mes" icon={HiCash}>
               <div className="flex justify-center w-full gap-4 px-4">
                 <div className="w-full">
                   <label
@@ -883,7 +919,7 @@ const Metricas = () => {
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
-            </Tabs.Item>*/}
+            </Tabs.Item>}
 
             <Tabs.Item title="Mejores productos" icon={HiClipboardList}>
               {bestProducts && bestProducts.length > 0 ? (
@@ -967,7 +1003,7 @@ const Metricas = () => {
                 </button>
               </div>
             </Tabs.Item>
-            <Tabs.Item title="Pedidos de usuarios por mes" icon={HiCalendar}>
+            {/*<Tabs.Item title="Pedidos de usuarios por mes" icon={HiCalendar}>
               <div className="flex justify-center w-full gap-4 px-4">
                 <div className="w-full">
                   <label
@@ -1072,7 +1108,7 @@ const Metricas = () => {
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
-            </Tabs.Item>
+            </Tabs.Item>*/}
             <Tabs.Item title="Deudores" icon={HiCash}>
               {debts && debts.length > 0 ? (
                 debts?.map((debt: any, index: number) => (
@@ -1102,6 +1138,71 @@ const Metricas = () => {
                   DESCARGAR ARCHIVO CSV
                 </button>
               </div>
+            </Tabs.Item>
+            <Tabs.Item title="Productos con cargo y sin cargo por mes" icon={HiCash}>
+            <div className="flex justify-center w-full gap-4 px-4">
+                <div className="w-full">
+                  <label
+                    htmlFor="category"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Fecha
+                  </label>
+                  <input
+                    type="month"
+                    placeholder="Fecha"
+                    name="date"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    onChange={(e) => setDate(e.target.value)}
+                  ></input>
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                onClick={handleSeachProductsConCargo}
+              >
+                Buscar productos
+              </button>
+              <hr />
+              {productsCargoySinCargo  ? (
+                  <div
+                    className="flex justify-between w-full px-8 py-4 items-center"
+                  >
+                    <div className="flex flex-col gap-2">
+                      <p>{productsCargoySinCargo.importeGenerado}</p>
+                    </div>
+                    <p>
+                     
+                     
+                    </p>
+                    <p>
+                     
+                    </p>
+                   
+                  </div>
+                
+              ) : (
+                <p className="flex justify-center my-20">
+                  No hay pedidos de este mes
+                </p>
+              )}
+              <div className="mt-4 mb-4 mx-4 flex gap-4">
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  onClick={handleDownloadCsvProductConySinCargo}
+                  disabled={!productsCargoySinCargo }
+                >
+                  DESCARGAR ARCHIVO CSV
+                </button>
+              </div>
+            
+
+
+           
+
+
             </Tabs.Item>
           </Tabs>
           <hr className="mt-4" />
