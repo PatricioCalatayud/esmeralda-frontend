@@ -70,7 +70,7 @@ export interface IProductErrorResponse {
 
 export interface IProductUpdate {
   description: string;
-  categoryID: string;
+  categoryID: number;
   presentacion?: string;
   tipoGrano?: string;
   file?: File;

@@ -1,67 +1,11 @@
 import axios from "axios";
+import { pages } from "next/dist/build/templates/app-page";
+import { start } from "repl";
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
-
-export async function getProductMostSold( token: string | undefined ) {
-    try {
-      const response = await axios.post(`${apiURL}/metrics/productos-mas-vendidos`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-        console.log(response.data);
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
-
-  export async function getProductLeastSold( token: string | undefined ) {
-    try {
-      const response = await axios.post(`${apiURL}/metrics/productos-menos-vendidos`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-        console.log(response.data);
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
-
-  export async function getBestProducts( token: string | undefined ) {
-    try {
-      const response = await axios.post(`${apiURL}/metrics/mejores-productos`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
-
-  export async function getWorstProducts( token: string | undefined ) {
-    try {
-      const response = await axios.post(`${apiURL}/metrics/peores-productos`,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
 
   export async function getDebts( token: string | undefined ) {
     try {
-      const response = await axios.post(`${apiURL}/metrics/deudores`,{
+      const response = await axios.post(`${apiURL}/metrics/clients`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,49 +17,18 @@ export async function getProductMostSold( token: string | undefined ) {
     }
   }
 
-  export async function getOrdersByUserMonth( token: string | undefined, date: Date ,userId: string ) {
-    const body = {
-      userId : userId,
-      date: date
-    }
-    try {
-      const response = await axios.post(`${apiURL}/metrics/pedidos-usuario-mes`, body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
 
-  export async function getProductsByMonth( token: string | undefined, date: Date ,productId: string) {
-    const body = {
-      productId: productId,
-      date: date
-    }
-    try {
-      const response = await axios.post(`${apiURL}/metrics/productos-por-mes`,body,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-  }
 
-  export async function getProductsSold( token: string | undefined, productId: string, limit: number) {
+  export async function getProductsSold( token: string | undefined, startDate: string, endDate: string, limit: number, page: number, filter: string) {
     const body = {
-      productId: productId,
-      limit: limit
+      page: page,
+      startDate: startDate,
+      endDate: endDate,
+      limit: limit,
+      filter: filter
     }
     try {
-      const response = await axios.post(`${apiURL}/metrics/productos-vendidos`, body,{
+      const response = await axios.post(`${apiURL}/metrics/products`, body,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -167,26 +80,6 @@ export async function getProductMostSold( token: string | undefined ) {
     }
     
   }
-  export async function getProductsDistribution(token:string | undefined,deliveryId:string,date:string) { 
-    const body = {
-      deliveryId: deliveryId, // revisar este dato
-      date: date
-    }
-    try {
-      const response = await axios.post(`${apiURL}/metrics/productos-por-reparto-por-mes`, body,{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        });
-        console.log(response.data);
-      const products = response.data;
-      return products;
-    } catch (error: any) {
-      console.log(error);
-    }
-    
-  }
-
   export async function getProductsCargoySinCargo(token:string | undefined,deliveryId:string,date:string) { 
     const body = {
       deliveryId: deliveryId, // revisar este dato
