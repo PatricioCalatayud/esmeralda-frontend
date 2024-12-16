@@ -20,7 +20,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
     description: "",
-    presentacion: "",
+    presentacion: "" ,
     tipoGrano: "",
     categoryID: 0,
     imgUrl:"",
