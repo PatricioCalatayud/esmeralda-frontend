@@ -102,15 +102,15 @@ const Testimonials: React.FC = () => {
                 <div className="flex flex-col gap-4 shadow-lg py-8 px-6 mx-4 rounded-xl bg-white relative border border-gray-100">
                   <div className="mb-4 flex justify-center">
                     <img
-                      src={getAvatarUrl(data.user.id)}
-                      alt={`Avatar of ${data.user.name}`}
+                      src={getAvatarUrl(data.id)}
+                      alt={`Avatar of ${data?.user?.name}`}
                       className="rounded-full w-20 h-20 shadow-lg bg-gray-200"
 
                   />
                   </div>
                   <div className="flex flex-col items-center gap-4">
                     <div className="space-y-3 text-center">
-                      <p className="text-xl font-bold text-black/80 dark:text-white">{data.user.name}</p>
+                      <p className="text-xl font-bold text-black/80 dark:text-white">{data?.user?.name}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400 font-bold">{data.description}</p>
                       <div className="flex justify-center">
                         {[...Array(5)].map((star, index) => (

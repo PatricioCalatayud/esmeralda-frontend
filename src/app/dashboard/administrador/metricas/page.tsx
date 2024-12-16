@@ -3,7 +3,7 @@
 import { useAuthContext } from "@/context/auth.context";
 import {
   getDebts,
-  getProductsCargoySinCargo,
+  getSales,
   getProductsSold,
 } from "@/helpers/Metrics.helper";
 import { Tabs } from "flowbite-react";
@@ -30,7 +30,7 @@ const Metricas = () => {
   const [productId, setProductId] = useState<any>();
   const [date, setDate] = useState<any>();
   const [deliveryId, setDeliveryId] = useState<any>();
-  const [productsCargoySinCargo, setProductsCargoySinCargo] = useState<any>();
+  const [sales, setSales] = useState<any>();
   //const [productsByMonthBonus, setProductsByMonthBonus] = useState<any>();
   //const [productsByMonthBonusAmount, setProductsByMonthBonusAmount] = useState<any>();
   const [productsDistribution, setProductsDistribution] = useState<any>();
@@ -64,9 +64,9 @@ const Metricas = () => {
     setProductsSold(response8);
     console.log(response8);
   };
-  const handleSeachProductsConCargo = async () => {
-    const response9 = await getProductsCargoySinCargo(token, deliveryId, date);
-    setProductsCargoySinCargo(response9);
+  const handleSales= async () => {
+    const response9 = await getSales(token,startDate,endDate);
+    setSales(response9);
     console.log(response9);
   };
 
@@ -116,7 +116,7 @@ const Metricas = () => {
                   className="w-1/2 sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                   onClick={handleSeachProducts}
                 >
-                  Buscar producto
+                  Buscar productos
                 </button>
                 <hr />
                 {productsSold && productsSold.products.length > 0 ? (
@@ -220,35 +220,54 @@ const Metricas = () => {
               )}
             </Tabs.Item>
             <Tabs.Item title="Ventas" icon={HiCash}>
-              <div className="flex justify-center w-full gap-4 px-4">
-                <div className="w-full">
-                  <label
-                    htmlFor="category"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Fecha
-                  </label>
-                  <input
-                    type="month"
-                    placeholder="Fecha"
-                    name="date"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    onChange={(e) => setDate(e.target.value)}
-                  ></input>
+            <div className="flex justify-center flex-col p-4 gap-4">
+            <div className="flex w-full gap-4">
+                  <div className="w-full">
+                    <label
+                      htmlFor="category"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Desde el dia
+                    </label>
+                    <input
+                      type="date"
+                      placeholder="Fecha"
+                      name="date"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      onChange={(e) => setStartDate(e.target.value)}
+                    ></input>
+                  </div>
+                  <div className="w-full">
+                    <label
+                      htmlFor="category"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Hasta el dia
+                    </label>
+                    <input
+                      type="date"
+                      placeholder="Fecha"
+                      name="date"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      onChange={(e) => setEndDate(e.target.value)}
+                      max={new Date().toISOString().split("T")[0]}
+                    ></input>
+                  </div>
                 </div>
-              </div>
               <button
                 type="submit"
-                className="m-4 w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                onClick={handleSeachProductsConCargo}
+                className=" w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                onClick={handleSales}
               >
-                Buscar productos
+                Buscar ventas
               </button>
+              </div>
+            
               <hr />
-              {productsCargoySinCargo ? (
+              {sales ? (
                 <div className="flex justify-between w-full px-8 py-4 items-center">
                   <div className="flex flex-col gap-2">
-                    <p>{productsCargoySinCargo.importeGenerado}</p>
+                    <p>{sales.importeGenerado}</p>
                   </div>
                   <p></p>
                   <p></p>
