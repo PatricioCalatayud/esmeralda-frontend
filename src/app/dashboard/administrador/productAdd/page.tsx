@@ -22,6 +22,7 @@ const InsertProduct = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {token} = useAuthContext();
   const {categories, categoriesLoading} = useCategoryContext();
+  console.log(categories);
   const [subproducts, setSubproducts] = useState<ISubProductUpdate[]>([
     {  amount: "", 
       unit: "", 
@@ -33,7 +34,7 @@ const InsertProduct = () => {
   //! Estado para almacenar los datos del producto
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
     description: "",
-    categoryID: "",
+    categoryID: 0,
     // presentacion y tipoGrano se pueden eliminar del estado inicial si ya no son necesarios
   });
   //! Estado para almacenar los errores
@@ -50,7 +51,8 @@ const InsertProduct = () => {
   ]);
   //! Función para manejar los cambios en los inputs
   const handleChange = (e: any) => {
-    e.preventDefault();
+    e.preventDefault()
+
     setDataProduct({
       ...dataProduct,
       [e.target.name]: e.target.value,
@@ -81,7 +83,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   const formData = new FormData();
   formData.append("description", dataProduct.description);
   formData.append("averageRating", "0"); 
-  formData.append("categoryID", dataProduct.categoryID);
+  formData.append("categoryID", dataProduct.categoryID.toString());
   
   // Agregar `presentacion` y `tipoGrano` solo si tienen valores
   if (dataProduct.presentacion) {
@@ -255,7 +257,7 @@ return (
               id="category"
               name="categoryID"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              value={dataProduct.categoryID}
+              value={Number(dataProduct.categoryID)}
               onChange={handleChange}
             >
               <option value="">--Seleccione--</option>

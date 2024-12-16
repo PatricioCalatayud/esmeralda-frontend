@@ -22,7 +22,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     description: "",
     presentacion: "",
     tipoGrano: "",
-    categoryID: "",
+    categoryID: 0,
     imgUrl:"",
     
   });
@@ -120,7 +120,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const formData = new FormData();
 
       formData.append("description", dataProduct.description);
-      formData.append("category", dataProduct.categoryID);
+      formData.append("category", dataProduct.categoryID.toString());
       if (dataProduct.presentacion) {
         formData.append("presentacion", dataProduct.presentacion);
       }
@@ -214,7 +214,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                 value={dataProduct.categoryID}
                 onChange={handleChange}
               >
-                {categories?.find(category => category.id === dataProduct.categoryID)?.name || "--Seleccione--"}
+                {categories?.find(category =>Number(category.id) === Number(dataProduct.categoryID))?.name || "--Seleccione--"}
                 {categories?.map((category: Category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}

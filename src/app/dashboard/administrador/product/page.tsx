@@ -1,7 +1,9 @@
 "use client";
 import { RiDeleteBin6Fill, RiAddLargeFill } from "react-icons/ri";
 import { Tooltip } from "flowbite-react";
+import axios from "axios";
 
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
@@ -32,7 +34,7 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const PRODUCTS_PER_PAGE = 7; // Cantidad de productos por página
   const { allProducts } = useProductContext();
-  const [products, setProducts] = useState<IProductList[] | undefined>([]);
+  const [products, setProducts] = useState<IProductList[]>([]);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(0);
   const [addSubproduct, setAddSubproduct] = useState<{ id: string }>();
@@ -50,6 +52,10 @@ const ProductList = () => {
     unit: "",
     stock: 0,
   });
+  
+
+  
+
   //! Obtener los productos
   useEffect(() => {
     const fetchProducts = async () => {
@@ -370,7 +376,49 @@ const ProductList = () => {
     }}
   };
     
+  const [imageUrls, setImageUrls] = useState<Record<number, string | null>>({});
 
+
+  const fetchImageBlob = async (productId: number, url: string) => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob(); // Convertimos la respuesta a Blob
+        return URL.createObjectURL(blob); // Creamos una URL temporal
+      } else {
+        throw new Error(`Error al cargar la imagen para el producto ${productId}`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener la imagen para el producto ${productId}:`, error);
+      return null;
+    }
+  };
+
+  // useEffect para cargar las imágenes
+  useEffect(() => {
+    const fetchAllImages = async () => {
+      
+      const urls = await Promise.all(
+        products.map(async (product) => {
+          const blobUrl = await fetchImageBlob(Number(product.id), `${apiURL}/product/${product.imgUrl}`);
+          return { id: product.id, url: blobUrl };
+        })
+      );
+
+      // Convertimos el array en un objeto de mapeo
+      const urlMap = urls.reduce((acc, item) => {
+        acc[Number(item.id)] = item.url;
+        return acc;
+      }, {} as Record<number, string | null>);
+
+      setImageUrls(urlMap);
+    };
+
+    fetchAllImages();
+  }, [products, apiURL]);
+
+
+  
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner
@@ -419,7 +467,9 @@ const ProductList = () => {
                 width={500}
                 height={500}
                 priority={true}
-                src={product.imgUrl}
+                
+                src={String(imageUrls[Number(product.id)])  !== "undefined" && String(imageUrls[Number(product.id)]) !== "null" ? String(imageUrls[Number(product.id)]) : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`}
+                
                 alt={product.description}
                 className="h-12 w-12 mr-3 rounded-lg"
               />

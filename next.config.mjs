@@ -33,7 +33,12 @@ const nextConfig = {
           {
             protocol: "https",
             hostname:"storage.googleapis.com"
-          }
+          },
+          {
+            protocol: "https",
+            hostname:"img.freepik.com"
+          },
+
         ],
         domains: ['www.cafelaesmeralda.com.ar'],
       },
