@@ -1,7 +1,7 @@
 "use client";
 import { RiDeleteBin6Fill, RiAddLargeFill } from "react-icons/ri";
 import { Tooltip } from "flowbite-react";
-import axios from "axios";
+
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 import { useEffect, useState } from "react";

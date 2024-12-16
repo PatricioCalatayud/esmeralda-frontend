@@ -1,5 +1,5 @@
 "use client";
-
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@material-tailwind/react";
@@ -180,6 +180,33 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         : price
     );
   };
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined); // Estado para almacenar la URL de la imagen
+
+  const fetchUrl = async (url: string): Promise<string | undefined> => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob(); // Convertimos la respuesta a Blob
+        return URL.createObjectURL(blob);
+      } else {
+        console.error("Error al cargar la imagen:", response.status);
+        return undefined;
+      }
+    } catch (error) {
+      console.error("Error al obtener la imagen:", error);
+      return undefined;
+    }
+  };
+
+  useEffect(() => {
+    const loadImage = async () => {
+      const image = await fetchUrl(`${apiURL}/product/${filteredProduct?.imgUrl}`);
+      setImageUrl(image || "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"); // URL por defecto si la carga falla
+    };
+
+    loadImage();
+  }, [filteredProduct, apiURL]);
+
 
   const renderBreadcrumb = () => {
     if (!category) {
@@ -251,7 +278,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             width={1000}
             height={1000}
             priority={true}
-            src={filteredProduct.imgUrl}
+            src={imageUrl || "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"}
             alt={filteredProduct.description}
             className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
           />

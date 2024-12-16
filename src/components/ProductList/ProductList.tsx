@@ -1,4 +1,5 @@
 "use client";
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Category, IProductList } from "@/interfaces/IProductList";
@@ -108,7 +109,51 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       }, [])
     );
   }, [filterOption, productsList, searchResults, selectedCategory]);
+  
+  const [imageUrls, setImageUrls] = useState<Record<number, string | null>>({});
 
+
+  const fetchImageBlob = async (productId: number, url: string) => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob(); // Convertimos la respuesta a Blob
+        return URL.createObjectURL(blob); // Creamos una URL temporal
+      } else {
+        throw new Error(`Error al cargar la imagen para el producto ${productId}`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener la imagen para el producto ${productId}:`, error);
+      return null;
+    }
+  };
+
+  // useEffect para cargar las imágenes
+  useEffect(() => {
+    
+    const fetchAllImages = async () => {
+      if (!filteredProducts) {
+        console.error('No products found');
+        return; // O cualquier manejo de errores que quieras
+      }
+    
+      const urls = await Promise.all(
+        filteredProducts.map(async (product) => {
+          const blobUrl = await fetchImageBlob(Number(product.id), `${apiURL}/product/${product.imgUrl}`);
+          return { id: product.id, url: blobUrl };
+        })
+      );
+    
+      const urlMap = urls.reduce((acc, item) => {
+        acc[Number(item.id)] = item.url;
+        return acc;
+      }, {} as Record<number, string | null>);
+    
+      setImageUrls(urlMap);
+    };
+
+    fetchAllImages();
+  }, [filteredProducts, apiURL]);
   const handleCategoryChange = (id: string | null) => {
     if (id === null) {
       router.push(`/categories`);
@@ -140,7 +185,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       </h1>
     );
   };
-
+ 
   return (
     <>
       <div className="flex flex-col md:flex-row justify-around items-center bg-teal-800 py-6 text-white ">
@@ -273,7 +318,8 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                   <Image
                     width={500}
                     height={500}
-                    src={product.imgUrl}
+                    src={String(imageUrls[Number(product.id)])  !== "undefined" && String(imageUrls[Number(product.id)]) !== "null" ? String(imageUrls[Number(product.id)]) : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`}
+                  
                     alt={product.description}
                     className="w-full h-[420px] object-cover rounded-t-lg" // Mantener el tamaño más grande de la imagen
                   />
