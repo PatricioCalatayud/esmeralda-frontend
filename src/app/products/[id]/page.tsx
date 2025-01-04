@@ -38,6 +38,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     idSubProduct: "",
   });
   const [quantity, setQuantity] = useState<number>(1);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined); // Estado para almacenar la URL de la imagen
 
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
@@ -116,7 +117,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       ...selectedCart,
       quantity,
       description: filteredProduct?.description,
-      imgUrl: filteredProduct?.imgUrl,
+      imgUrl: imageUrl,
       size: selectedSize,
       idProduct: filteredProduct?.id,
     };
@@ -180,8 +181,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         : price
     );
   };
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined); // Estado para almacenar la URL de la imagen
-
+  
   const fetchUrl = async (url: string): Promise<string | undefined> => {
     try {
       const response = await fetch(url);

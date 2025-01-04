@@ -29,7 +29,7 @@ export async function LoginUser(user: ILoginProps) {
 }
 //! Funcion para registrar usuario
 
-export async function NewUser(user: IUserProps): Promise<any> {
+export async function NewUser(user: any): Promise<any> {
   try {
     const response = await axios.post(`${apiURL}/auth/signup`, user, {
       headers: {
@@ -113,7 +113,7 @@ export async function getUser(userId: string, token: string | undefined) {
   }
 }
 
-export async function putUser(userId: string, user: IUserUpdateProps, token: string | undefined) {
+export async function putUser(userId: string, user: any, token: string | undefined) {
   try {
     const response = await axios.put(`${apiURL}/users/${userId}`, user, {
       headers: {

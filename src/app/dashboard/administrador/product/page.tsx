@@ -254,7 +254,7 @@ const ProductList = () => {
 
   //! Funciónes para editar un subproducto
   const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, subproductId: string) => {
-
+console.log(subproductId);
     const { name, value } = e.target;
     setEditProductId((prev) => ({
       ...prev,

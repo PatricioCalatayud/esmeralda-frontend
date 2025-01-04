@@ -312,7 +312,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                   key={index}
-                  className="relative flex flex-col rounded-lg h-[720px] shadow-lg hover:scale-105 transition-transform" // Aumentamos la altura a 600px
+                  className="relative flex flex-col rounded-lg h-[720px] shadow-lg hover:scale-105 transition-transform cursor-pointer" // Aumentamos la altura a 600px
                   onClick={() => router.push(`/products/${product.id}`)}
                 >
                   <Image

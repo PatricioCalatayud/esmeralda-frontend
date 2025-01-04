@@ -447,7 +447,7 @@ const renderIdentificationColumn = (order: IOrders) => {
             $ {order.orderDetail.totalPrice}
           </td>
           <td className="px-4 py-3 text-center">
-            {order.date && format(new Date(order.date), "dd'-'MM'-'yyyy", { locale: es })}
+            {order.create && format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
             <br />
             {order.orderDetail.deliveryDate &&
               format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}

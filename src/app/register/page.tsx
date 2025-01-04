@@ -49,6 +49,15 @@ const provinceMapping: Record<number, string> = {
   23: "Tucumán",
   24: "Ciudad Autónoma de Buenos Aires",
 };
+const arcaIdentificationsMapping = {
+  "Inscripto responsable": "Inscripto responsable",
+  "Inscripto no responsable": "Inscripto no responsable",
+  "Consumidor final": "Consumidor final",
+  "Monotributista": "Monotributista",
+  "Exento": "Exento",
+  "Sujeto no alcanzado": "Sujeto no alcanzado",
+
+}
 
 const RegisterUser = () => {
   const Router = useRouter();
@@ -57,26 +66,28 @@ const RegisterUser = () => {
     name: "",
     email: "",
     password: "",
+    street: "",
+    number: 0,
+    zipCode: "",
+    locality: "",
+    province: "",
+    arca_identification: "",
+    cuit: 0,
     phone: "",
-    address: {
-      province: 0,
-      localidad: "",
-      deliveryNumber: 0,
-      address: "",
-    },
   };
 
   const initialErrorState: IUserErrorProps = {
     name: "",
     email: "",
     password: "",
+    street: "",
+    number: "",
+    zipCode: "",
+    locality: "",
+    province: "",
+    arca_identification: "",
+    cuit: "",
     phone: "",
-    address: {
-      province: "",
-      localidad: "",
-      deliveryNumber: "",
-      address: "",
-    },
   };
 
   const [dataUser, setDataUser] = useState<IUserProps>(initialUserData);
@@ -86,6 +97,12 @@ const RegisterUser = () => {
     Object.keys(provinceMapping).map((key) => ({
       value: Number(key),
       label: provinceMapping[Number(key)],
+    }))
+  );
+  const [arcaIdentifications] = useState(
+    Object.keys(arcaIdentificationsMapping).map((key) => ({
+      value:key,
+      label: key,
     }))
   );
   const [localities, setLocalities] = useState<{ value: string; label: string }[]>([]);
@@ -152,20 +169,28 @@ const RegisterUser = () => {
     setSelectedProvince(null);
     setLocalities([]);
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === "province") {
       const provinceValue = Number(value);
+  
       setSelectedProvince(provinceValue);
       setDataUser((prevDataUser) => ({
         ...prevDataUser,
-        address: {
-          ...prevDataUser.address,
-          province: provinceValue,
-          locality: "",
-        },
+        province: provinceMapping[provinceValue],
+      }));
+    } else if (name === "cuit") {
+      // Si el campo es CUIT, convierte el valor a número
+      setDataUser((prevDataUser) => ({
+        ...prevDataUser,
+        cuit: Number(value), // Conversión explícita a número
+      }));
+    }else if (name === "number") {
+      // Si el campo es CUIT, convierte el valor a número
+      setDataUser((prevDataUser) => ({
+        ...prevDataUser,
+        number: Number(value), // Conversión explícita a número
       }));
     } else {
       setDataUser((prevDataUser) => ({
@@ -175,33 +200,21 @@ const RegisterUser = () => {
     }
   };
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setDataUser((prevDataUser) => ({
-      ...prevDataUser,
-      address: {
-        ...prevDataUser.address,
-        [name]: value,
-      },
-    }));
-
-    // Verificar que el campo locality se actualiza correctamente
-    console.log("Localidad seleccionada:", value);
-  };
+console.log(dataUser);
 
   const validateRegisterUserForm = (data: IUserProps): IUserErrorProps => {
     const errors: IUserErrorProps = {
       name: "",
       email: "",
       password: "",
+      street: "",
+      number: "",
+      zipCode: "",
+      locality: "",
+      province: "",
+      arca_identification: "",
+      cuit: "",
       phone: "",
-      address: {
-        province: "",
-        localidad: "", // No validaremos este campo
-        deliveryNumber: "",
-        address: "",
-      },
     };
   
     // Validación del nombre
@@ -239,16 +252,41 @@ const RegisterUser = () => {
       errors.phone = "El teléfono debe tener entre 7 y 14 dígitos";
       console.log("Error en teléfono (formato):", errors.phone);
     }
-  
-    // Validación de la dirección
-    if (!data.address.address) {
-      errors.address.address = "La dirección es obligatoria";
-      console.log("Error en dirección:", errors.address.address);
+
+    if (!data.number) {
+      errors.number = "El número es obligatorio";
+      console.log("Error en número:", errors.number);
+    }
+
+    if (!data.arca_identification) {
+      errors.arca_identification = "La identificación ARCA es obligatoria";
+      console.log("Error en identificación ARCA:", errors.arca_identification);
     }
   
-    if (!data.address.province) {
-      errors.address.province = "La provincia es obligatoria";
-      console.log("Error en provincia:", errors.address.province);
+    if (!data.cuit) {
+      errors.cuit = "El CUIT es obligatorio";
+      console.log("Error en CUIT:", errors.cuit);
+    }
+  
+    // Validación de la dirección
+    if (!data.street) {
+      errors.street = "La dirección es obligatoria";
+      console.log("Error en dirección:", errors.street);
+    }
+  
+    if (!data.province) {
+      errors.province = "La provincia es obligatoria";
+      console.log("Error en provincia:", errors.province);
+    }
+  
+    if (!data.locality) {
+      errors.locality = "La localidad es obligatoria";
+      console.log("Error en localidad:", errors.locality);
+    }
+  
+    if (!data.zipCode) {
+      errors.zipCode = "El código postal es obligatorio";
+      console.log("Error en código postal:", errors.zipCode);
     }
   
     // Imprimir el objeto completo de errores para revisar
@@ -312,8 +350,8 @@ const RegisterUser = () => {
           title: "¡Registro exitoso!",
           text: "Tu cuenta se ha creado correctamente.",
         });
-  
-        Router.push("/login");
+        localStorage.setItem("idUser", response.data.id);
+        Router.push("/emailVerify");
       } else {
         Swal.fire({
           icon: "error",
@@ -333,8 +371,8 @@ const RegisterUser = () => {
       setLoading(false);
     }
   };
-  const isDisabled = !!error.name || !!error.email || !!error.password || !!error.phone || !!error.address.address || !!error.address.province || !!error.address.localidad || !dataUser.name.trim() || !dataUser.email.trim() || !dataUser.password.trim() || !dataUser.phone.trim() || !dataUser.address.address.trim() || !dataUser.address.province || !dataUser.address.localidad.trim();
-
+  const isDisabled = error.name!=="" || error.email!=="" || error.password!=="" || error.phone!=="" || error.street!=="" || error.number!=="" || error.zipCode!=="" || error.locality!=="" || error.province!=="" || error.arca_identification!=="" || error.cuit!==""  
+console.log(isDisabled);
   return (
     <>
       <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">
@@ -374,6 +412,7 @@ const RegisterUser = () => {
                   helperText={error.name}
                   InputLabelProps={{ style: { color: "teal" } }}
                 />
+                <div className="grid grid-cols-2 gap-4">
                 <TextField
                   margin="normal"
                   required
@@ -387,6 +426,20 @@ const RegisterUser = () => {
                   helperText={error.email}
                   InputLabelProps={{ style: { color: "teal" } }}
                 />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="phone"
+                  label="Teléfono"
+                  name="phone"
+                  value={dataUser.phone}
+                  onChange={handleChange}
+                  error={!!error.phone}
+                  helperText={error.phone}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                />
+                </div>
                 <TextField
                   margin="normal"
                   required
@@ -416,32 +469,35 @@ const RegisterUser = () => {
                   }}
                   autoComplete="current-password"
                 />
+                
+                <div className="grid grid-cols-2 gap-4">
                 <TextField
                   margin="normal"
                   required
                   fullWidth
-                  id="phone"
-                  label="Teléfono"
-                  name="phone"
-                  value={dataUser.phone}
-                  onChange={handleChange}
-                  error={!!error.phone}
-                  helperText={error.phone}
-                  InputLabelProps={{ style: { color: "teal" } }}
-                />
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="address"
+                  id="street"
                   label="Dirección"
-                  name="address"
-                  value={dataUser.address.address}
-                  onChange={handleAddressChange}
-                  error={!!error.address.address}
-                  helperText={error.address.address}
+                  name="street"
+                  value={dataUser.street}
+                  onChange={handleChange}
+                  error={!!error.street}
+                  helperText={error.street}
                   InputLabelProps={{ style: { color: "teal" } }}
                 />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="number"
+                  label="Número"
+                  name="number"
+                  value={dataUser.number===0 ? "" : dataUser.number}
+                  onChange={handleChange}
+                  error={!!error.number}
+                  helperText={error.number}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                />
+                </div>
                 <TextField
                   select
                   margin="normal"
@@ -450,10 +506,10 @@ const RegisterUser = () => {
                   id="province"
                   label="Provincia"
                   name="province"
-                  value={dataUser.address.province.toString()}
+                  value={selectedProvince}
                   onChange={handleChange}
-                  error={!!error.address.province}
-                  helperText={error.address.province}
+                  error={!!error.province}
+                  helperText={error.province}
                   InputLabelProps={{ style: { color: "teal" } }}
                 >
                   {provinces.map((option) => (
@@ -470,18 +526,19 @@ const RegisterUser = () => {
                   </Typography>
                 ) : (
                   selectedProvince && (
+                    <div className="grid grid-cols-2 gap-4">
                     <TextField
                       select
                       margin="normal"
                       required
                       fullWidth
-                      id="localidad"
+                      id="locality"
                       label="Localidad"
-                      name="localidad"
-                      value={dataUser.address.localidad}
-                      onChange={handleAddressChange}
-                      error={!!error.address.localidad}
-                      helperText={error.address.localidad}
+                      name="locality"
+                      value={dataUser.locality}
+                      onChange={handleChange}
+                      error={!!error.locality}
+                      helperText={error.locality}
                       InputLabelProps={{ style: { color: "teal" } }}
                     >
                       {localities.map((option, index) => (
@@ -490,9 +547,58 @@ const RegisterUser = () => {
                         </MenuItem>
                       ))}
                     </TextField>
+                    <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="zipCode"
+                  label="Codigo Postal"
+                  name="zipCode"
+                  value={dataUser.zipCode}
+                  onChange={handleChange}
+                  error={!!error.zipCode}
+                  helperText={error.zipCode}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                />
+                    </div>
                   )
                 )}
-
+                <div className="grid grid-cols-2 gap-4">
+                <TextField
+                
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="cuit"
+                  label="CUIL/CUIT"
+                  name="cuit"
+                  value={dataUser.cuit===0 ? "" :dataUser.cuit}
+                  onChange={handleChange}
+                  error={!!error.cuit}
+                  helperText={error.cuit}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                />
+<TextField
+                  select
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="arca_identification"
+                  label="condición frente al iva"
+                  name="arca_identification"
+                  value={dataUser.arca_identification}
+                  onChange={handleChange}
+                  error={!!error.arca_identification}
+                  helperText={error.arca_identification}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                >
+                  {arcaIdentifications.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+</div>
                 <Button
                   type="submit"
                   fullWidth

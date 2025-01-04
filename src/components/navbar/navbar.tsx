@@ -39,7 +39,8 @@ const Navbar = () => {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgotPassword" ||
-    pathname === "/resetPassword";
+    pathname === "/resetPassword" ||
+    pathname === "/emailVerify";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;

@@ -1,5 +1,5 @@
 "use client";
-
+import axios from "axios";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { ICart } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Typography from "@mui/material/Typography";
 import {
   faBagShopping,
   faMinus,
@@ -20,13 +21,15 @@ import { useCartContext } from "@/context/cart.context";
 import { getUser } from "@/helpers/Autenticacion.helper";
 import { IAccountProps } from "@/interfaces/IUser";
 import { Spinner } from "@material-tailwind/react";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<ICart[]>([]);
   const { session, token } = useAuthContext();
   const [openModal, setOpenModal] = useState(false);
-  const [addresOrder, setAddresOrder] = useState("");
+  const [street, setStreet] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [account, setAccount] = useState<IAccountProps>();
@@ -35,10 +38,113 @@ const Cart = () => {
   const [apartment, setApartment] = useState(""); // Nuevo estado para Departamento
   const [dni, setDni] = useState(""); // Estado para DNI
 const [cuit, setCuit] = useState(""); // Estado para CUIT
-
+const [localities, setLocalities] = useState<{ value: string; label: string }[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
+  const [loadingLocalities, setLoadingLocalities] = useState(false); // Estado de carga para localidades
   // Variables agregadas
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [invoiceType, setInvoiceType] = useState<string>("");
+  
+
+  const provinceMapping: Record<number, string> = {
+    1: "Buenos Aires",
+    2: "Córdoba",
+    3: "Catamarca",
+    4: "Chaco",
+    5: "Chubut",
+    6: "Corrientes",
+    7: "Entre Ríos",
+    8: "Formosa",
+    9: "Jujuy",
+    10: "La Pampa",
+    11: "La Rioja",
+    12: "Mendoza",
+    13: "Misiones",
+    14: "Neuquén",
+    15: "Río Negro",
+    16: "Salta",
+    17: "San Juan",
+    18: "San Luis",
+    19: "Santa Cruz",
+    20: "Santa Fe",
+    21: "Santiago del Estero",
+    22: "Tierra del Fuego",
+    23: "Tucumán",
+    24: "Ciudad Autónoma de Buenos Aires",
+  };
+  const [provinces] = useState(
+    Object.keys(provinceMapping).map((key) => ({
+      value: Number(key),
+      label: provinceMapping[Number(key)],
+    }))
+  );
+  const initialAddressData = {
+      street: "",
+      number: "",
+      province: "",
+      locality: "",
+      zipCode: "",
+
+  };
+     const [address, setAddress] = useState(initialAddressData);
+console.log(address);
+    // Cargar localidades cuando se selecciona una provincia
+    useEffect(() => {
+      if (selectedProvince) {
+        const fetchLocalities = async (provinceId: number) => {
+          try {
+            setLoadingLocalities(true); // Inicia el estado de carga
+            const provinceName = provinceMapping[provinceId];
+  
+            const response = await axios.get(
+              `https://apis.datos.gob.ar/georef/api/localidades?provincia=${provinceName}&max=5000`
+            );
+  
+            if (response.data && response.data.localidades.length > 0) {
+              const localitiesList = response.data.localidades.map((locality: any) => ({
+                value: locality.nombre,
+                label: locality.nombre,
+              }));
+              setLocalities(localitiesList);
+              console.log("Localidades cargadas:", localitiesList); // Verifica que las localidades se cargan correctamente
+            } else {
+              Swal.fire({
+                icon: "info",
+                title: "Sin localidades",
+                text: "No se encontraron localidades para la provincia seleccionada.",
+              });
+            }
+          } catch (error: any) {
+            Swal.fire({
+              icon: "error",
+              title: "Error en la solicitud",
+              text: `Error: ${error.response?.data.message || error.message}`,
+            });
+          } finally {
+            setLoadingLocalities(false); // Finaliza el estado de carga
+          }
+        };
+  
+        fetchLocalities(selectedProvince);
+      }
+    }, [selectedProvince]);
+
+    
+      const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+    
+        setAddress((prevDataUser) => ({
+          ...prevDataUser,
+            street:`${street}${floor ? `, Piso: ${floor}` : ""}${apartment ? `, Depto: ${apartment}` : ""}`,
+            [name]: value,
+            
+          
+        }));
+    
+        // Verificar que el campo locality se actualiza correctamente
+        console.log("Localidad seleccionada:", value);
+      };
+    
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -162,19 +268,18 @@ const total = calcularTotal();
     // Lógica para realizar el checkout
     const handleCheckout = async (boton: string) => {
       const products = cart.map((product) => ({
-        productId: product.idProduct,
-        subproductId: product.idSubProduct,
+        productId: Number(product.idProduct),
+        subproductId: Number(product.idSubProduct),
         quantity: product.quantity,
       }));
-    
-      const fullAddress = `${addresOrder}${floor ? `, Piso: ${floor}` : ""}${apartment ? `, Depto: ${apartment}` : ""}`;
+
     
       setLoading(true);
     
       const orderCheckout: any = {
         userId: session?.id,
         products,
-        address: isDelivery ? undefined : fullAddress,
+        address: isDelivery ? undefined : { ...address },
         discount: 10,
         ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && { account: "Transferencia" }),
         ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
@@ -432,57 +537,137 @@ const total = calcularTotal();
   <Modal.Body className="flex flex-col gap-4">
     {loading === false ? (
       <>
+      <div className="w-full h-20 gap-4 flex">
         {/* Input de Dirección */}
         <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="addresOrder" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Dirección de envío
-          </label>
-          <input
+          <TextField
+          label="Calle"
+          margin="normal"
+          required
+          fullWidth
             type="text"
-            name="addresOrder"
-            id="addresOrder"
-            className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Avenida San Martín 123"
-            value={addresOrder}
-            onChange={(e) => setAddresOrder(e.target.value)}
+            name="street"
+            id="street"
+            InputLabelProps={{ style: { color: "teal" } }}
+            placeholder="Avenida San Martín"
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
             disabled={isDelivery === true}
           />
         </div>
-
+          <TextField
+          label="Numero"
+          margin="normal"
+          required
+          fullWidth
+            type="text"
+            name="number"
+            id="number"
+            InputLabelProps={{ style: { color: "teal" } }}
+            placeholder="123"
+            value={address.number.toString()}
+            onChange={handleAddressChange}
+            disabled={isDelivery === true}
+          />
+        </div>
         {/* Input para Piso */}
-        <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="floor" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Piso
-          </label>
-          <input
+        <div className="w-full h-20 gap-4 flex">
+          <TextField
+          label="Piso"
+          margin="normal"
+          required
+          fullWidth
             type="text"
             name="floor"
             id="floor"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            InputLabelProps={{ style: { color: "teal" } }}
             placeholder="Ejemplo: 3"
             value={floor}
             onChange={(e) => setFloor(e.target.value)}
             disabled={isDelivery === true}
           />
-        </div>
+        
 
         {/* Input para Departamento */}
-        <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="apartment" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Departamento
-          </label>
-          <input
+       
+          <TextField
+          label="Departamento"
+          margin="normal"
+          required
+          fullWidth
             type="text"
             name="apartment"
             id="apartment"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            InputLabelProps={{ style: { color: "teal" } }}
             placeholder="Ejemplo: A"
             value={apartment}
             onChange={(e) => setApartment(e.target.value)}
             disabled={isDelivery === true}
           />
+        
         </div>
-
+        <TextField
+                  select
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="province"
+                  label="Provincia"
+                  name="province"
+                  value={address.province}
+                  onChange={(e) => {setSelectedProvince(Number(e.target.value)),
+                    handleAddressChange}}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                  disabled={isDelivery === true}
+                >
+                  {provinces.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                {/* Mostrar el spinner o las localidades */}
+                {loadingLocalities ? (
+                  <Typography align="center" sx={{ color: "teal" }}>
+                    Cargando localidades...
+                  </Typography>
+                ) : (
+                  selectedProvince && (
+                    <TextField
+                      select
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="localidad"
+                      label="Localidad"
+                      name="locality"
+                      value={address.locality}
+                      onChange={handleAddressChange}
+                      InputLabelProps={{ style: { color: "teal" } }}
+                      disabled={isDelivery === true}
+                    >
+                      {localities.map((option, index) => (
+                        <MenuItem key={`${option.value}-${index}`} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )
+                )}
+<TextField
+          label="Codigo Postal"
+          margin="normal"
+          required
+          fullWidth
+            type="text"
+            name="zipCode"
+            id="zipCode"
+            InputLabelProps={{ style: { color: "teal" } }}
+            placeholder="55200"
+            value={address.zipCode}
+            onChange={handleAddressChange}
+            disabled={isDelivery === true}
+          />
         {/* Checkbox para Retiro en Local */}
         <div className="flex gap-4 items-center h-20">
           <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
@@ -601,7 +786,7 @@ const total = calcularTotal();
           disabled={
             !session ||
             cart.length === 0 ||
-            (isDelivery === false && addresOrder === "") ||
+            (isDelivery === false && street === "") ||
             (needsInvoice && !invoiceType) ||
             (account && account.balance + total > account.creditLimit)
           }
@@ -636,7 +821,7 @@ const total = calcularTotal();
           disabled={
             !session ||
             cart.length === 0 ||
-            (isDelivery === false && addresOrder === "") ||
+            (isDelivery === false && street === "") ||
             (needsInvoice && !invoiceType)
           }
           title={
@@ -658,7 +843,7 @@ const total = calcularTotal();
         disabled={
           !session ||
           cart.length === 0 ||
-          (isDelivery === false && addresOrder === "") ||
+          (isDelivery === false && street === "") ||
           (needsInvoice && !invoiceType)
         }
         title={

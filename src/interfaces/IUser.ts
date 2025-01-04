@@ -1,9 +1,15 @@
 export interface IUserProps {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  address: IAddressProps;
+  name: string,
+    email: string,
+    password: string,
+    street: string,
+    number: number | undefined,
+    zipCode: string,
+    locality: string,
+    province: string,
+    arca_identification: string,
+    cuit:  number | undefined,
+    phone: string,
   account?: string;
 }
 
@@ -15,16 +21,17 @@ export interface IAddressProps {
 }
 
 export interface IUserErrorProps {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  address: {
-    province: string; // Los errores son strings
-    localidad: string;
-    deliveryNumber: string;
-    address: string;
-  };
+  name: string,
+    email: string,
+    password: string,
+    street: string,
+    number: string,
+    zipCode: string,
+    locality: string,
+    province: string,
+    arca_identification: string,
+    cuit: string,
+    phone: string,
 }
 
 export interface IAccountProps {

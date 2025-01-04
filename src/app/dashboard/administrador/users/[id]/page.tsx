@@ -6,7 +6,7 @@ import { getUser, putUser } from "@/helpers/Autenticacion.helper";
 import { getOrders, putAccountPayment, putOrder } from "@/helpers/Order.helper";
 import { IOrders } from "@/interfaces/IOrders";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -148,8 +148,11 @@ console.log(user);
   ) => {
     e.preventDefault();
 
-    const user = {
-      accountLimit: Number(dataProduct.limit),
+    const usuario = {
+      account: {
+        ...user.account,
+        creditLimit: Number(dataProduct.limit)
+      },
     };
 
     //! Mostrar alerta de carga mientras se procesa la solicitud
@@ -162,7 +165,7 @@ console.log(user);
       },
     });
 
-    const response = await putUser(id, user, token);
+    const response = await putUser(id, usuario, token);
 
     if (response && (response.status === 201 || response.status === 200)) {
       Swal.fire({
@@ -444,7 +447,7 @@ console.log(user);
         ]}
         noContent="No hay Ordenes disponibles"
       >
-        {getCurrentPageOrders().map((order: IOrders) => (
+        {getCurrentPageOrders().map((order: any) => (
           <tr
             key={order.id}
             className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -472,7 +475,7 @@ console.log(user);
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               {order.productsOrder &&
-                order.productsOrder.map((product, productIndex) => (
+                order.productsOrder.map((product : any, productIndex : number) => (
                   <div
                     key={productIndex}
                     className="mb-2 text-start flex items-center"

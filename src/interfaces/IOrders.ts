@@ -1,6 +1,6 @@
 export interface IOrders {
     id:            string;
-    date:          string;
+    create:          string;
     user:          User;
     productsOrder: ProductsOrder[];
     orderDetail:   OrderDetail;
@@ -8,6 +8,7 @@ export interface IOrders {
     status:        string;
     invoiceType?:  string;
     bill?:         Bill; // Estructura del módulo Bill 
+    date?: number;
 }
 
 export interface IOrderCheckout {

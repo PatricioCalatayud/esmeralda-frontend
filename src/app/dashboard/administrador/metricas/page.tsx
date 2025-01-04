@@ -1,11 +1,7 @@
 "use client";
 
 import { useAuthContext } from "@/context/auth.context";
-import {
-  getDebts,
-  getSales,
-  getProductsSold,
-} from "@/helpers/Metrics.helper";
+import { getDebts, getSales, getProductsSold } from "@/helpers/Metrics.helper";
 import { Tabs } from "flowbite-react";
 import {
   HiCalendar,
@@ -64,8 +60,8 @@ const Metricas = () => {
     setProductsSold(response8);
     console.log(response8);
   };
-  const handleSales= async () => {
-    const response9 = await getSales(token,startDate,endDate);
+  const handleSales = async () => {
+    const response9 = await getSales(token, startDate, endDate);
     setSales(response9);
     console.log(response9);
   };
@@ -121,20 +117,22 @@ const Metricas = () => {
                 <hr />
                 {productsSold && productsSold.products.length > 0 ? (
                   <>
-                  <div className="flex justify-end">
-                    <select
-                      name="filter"
-                      id="filter"
-                      onChange={(e) => {setFilter(e.target.value); handleSeachProducts()}}
-                      className="bg-gray-50 border text-sm rounded-lg block w-1/2 p-2.5 shadow-sm"
-
-                    >
-                      <option value={""}>Filtros</option>
-                      <option value={MOST_SOLD}>Más vendido</option>
-                      <option value={LEAST_SOLD}>Menos vendido</option>
-                      <option value={BEST_RATED}>Mejor puntaje</option>
-                      <option value={WORST_RATED}>Peor puntaje</option>
-                    </select>
+                    <div className="flex justify-end">
+                      <select
+                        name="filter"
+                        id="filter"
+                        onChange={(e) => {
+                          setFilter(e.target.value);
+                          handleSeachProducts();
+                        }}
+                        className="bg-gray-50 border text-sm rounded-lg block w-1/2 p-2.5 shadow-sm"
+                      >
+                        <option value={""}>Filtros</option>
+                        <option value={MOST_SOLD}>Más vendido</option>
+                        <option value={LEAST_SOLD}>Menos vendido</option>
+                        <option value={BEST_RATED}>Mejor puntaje</option>
+                        <option value={WORST_RATED}>Peor puntaje</option>
+                      </select>
                     </div>
                     <table className="w-full text-sm text-center dark:text-gray-400">
                       <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 border-2 dark:text-gray-400 ">
@@ -163,7 +161,7 @@ const Metricas = () => {
                                   {product?.totalRevenue}
                                 </th>
                                 <th className="text-teal-800 py-4">
-                                  {product?.totalRevenue}
+                                  {(product?.rating).toFixed(2)}
                                 </th>
                               </tr>
                             )
@@ -180,48 +178,60 @@ const Metricas = () => {
               </div>
             </Tabs.Item>
             <Tabs.Item title="Deudores" icon={HiCash}>
-              {debts && debts.clients.length > 0 ? 
-              <table className="w-full text-sm text-center dark:text-gray-400">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 border-2 dark:text-gray-400 ">
-                      <th className="py-4 px-4">ID</th>
-                        <th className="py-4">Nombre del cliente</th>
-                        <th className="py-4">Email</th>
-                        <th className="py-4">Contacto</th>
-                        <th className="py-4">Balance</th>
-                      </thead>
+              {debts && debts.clients.length > 0 ? (
+                <table className="w-full text-sm text-center dark:text-gray-400">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 border-2 dark:text-gray-400 ">
+                    <th className="py-4 px-4">ID</th>
+                    <th className="py-4">Nombre del cliente</th>
+                    <th className="py-4">Email</th>
+                    <th className="py-4">Contacto</th>
+                    <th className="py-4">Balance</th>
+                  </thead>
 
-                      <tbody>
-                        {debts?.clients.map((debt: any, index: number) => (
-                            console.log(debt),
-                            (
-                              <tr
-                                key={index}
-                                className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                              >
-                                <th className="py-4 px-4">{debt?.id}</th>
-                                <th className="py-4">{debt?.name}</th>
-                                <th className=" py-4">
-                                  {debt?.email}
-                                </th>
-                                <th className="text-teal-800 py-4">
-                                <FontAwesomeIcon icon={faWhatsapp} style={{width: "26px", height: "26px"}} onClick={() => window.open(`https://wa.me/${debt?.phone}`)} className="cursor-pointer"/>
-                                </th>
-                                <th className={`${debt?.balance < 0 ? "text-red-800" : "text-teal-800"} py-4`}>
-                                  {debt?.balance}
-                                </th>
-                              </tr>
-                            )
-                          )
-                        )}
-                      </tbody>
-                    </table>
-              : (
+                  <tbody>
+                    {debts?.clients.map(
+                      (debt: any, index: number) => (
+                        console.log(debt),
+                        (
+                          <tr
+                            key={index}
+                            className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          >
+                            <th className="py-4 px-4">{debt?.id}</th>
+                            <th className="py-4">{debt?.name}</th>
+                            <th className=" py-4">{debt?.email}</th>
+                            <th className="text-teal-800 py-4">
+                              <FontAwesomeIcon
+                                icon={faWhatsapp}
+                                style={{ width: "26px", height: "26px" }}
+                                onClick={() =>
+                                  window.open(`https://wa.me/${debt?.phone}`)
+                                }
+                                className="cursor-pointer"
+                              />
+                            </th>
+                            <th
+                              className={`${
+                                debt?.balance < 0
+                                  ? "text-red-800"
+                                  : "text-teal-800"
+                              } py-4`}
+                            >
+                              {debt?.balance}
+                            </th>
+                          </tr>
+                        )
+                      )
+                    )}
+                  </tbody>
+                </table>
+              ) : (
                 <p className="flex justify-center my-20">No hay deudores</p>
               )}
             </Tabs.Item>
             <Tabs.Item title="Ventas" icon={HiCash}>
-            <div className="flex justify-center flex-col p-4 gap-4">
-            <div className="flex w-full gap-4">
+              <div className="flex justify-center flex-col p-4 gap-4">
+                <div className="flex w-full gap-4">
                   <div className="w-full">
                     <label
                       htmlFor="category"
@@ -254,29 +264,41 @@ const Metricas = () => {
                     ></input>
                   </div>
                 </div>
-              <button
-                type="submit"
-                className=" w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-                onClick={handleSales}
-              >
-                Buscar ventas
-              </button>
+                <button
+                  type="submit"
+                  className=" w-full sm:w-auto disabled:bg-gray-500 disabled:hover:none disabled:cursor-default justify-center text-white inline-flex bg-teal-800 hover:bg-teal-900 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-md text-sm py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  onClick={handleSales}
+                >
+                  Buscar ventas
+                </button>
               </div>
-            
+
               <hr />
-              {sales ? (
-                <div className="flex justify-between w-full px-8 py-4 items-center">
-                  <div className="flex flex-col gap-2">
-                    <p>{sales.importeGenerado}</p>
-                  </div>
-                  <p></p>
-                  <p></p>
-                </div>
-              ) : (
-                <p className="flex justify-center my-20">
-                  No hay pedidos de este mes
-                </p>
-              )}
+              {sales && sales.totalSales > 0 ? (
+              <table className="w-full text-sm text-center dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 border-2 dark:text-gray-400 ">
+                  <th className="py-4">Total vendidos</th>
+                  <th className="py-4">Total ganancias</th>
+                </thead>
+                
+                  <tbody>
+                    <tr className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                      <th className="text-teal-800 py-4">
+                        {sales?.totalSales}
+                      </th>
+                      <th className="text-teal-800 py-4">
+                        {sales?.totalRevenue}
+                      </th>
+                    </tr>
+                  </tbody>
+                  </table>
+                ) : (
+                  
+                  <p className="flejustify-center my-20 w-full text-center">
+                    No hay ventas en este periodo
+                  </p>
+                )}
+              
             </Tabs.Item>
           </Tabs>
           <hr className="mt-4" />

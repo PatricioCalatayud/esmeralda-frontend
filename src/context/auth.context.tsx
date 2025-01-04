@@ -111,12 +111,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           name: sessionGoogle.user.name as string,
           password: "", // Puedes agregar el password aquí o usar uno por defecto
           phone: "", // Agregar un valor para el número de teléfono
-          address: {
-            province: 0, // Aquí deberías asignar el número de la provincia
-            localidad: "", // Agregar la localidad
-            deliveryNumber: 0, // Asignar un número de delivery o mantenerlo como 0 por defecto
-            address: "", // Agregar una dirección
-          }
+
+            province: "", // Aquí deberías asignar el número de la provincia
+            locality: "", // Agregar la localidad
+            street : "",
+            zipCode: "",
+            number: 0
+
+          
         };
         const response = await NewUser(newUser);
         if (response && (response.status === 200 || response.status === 201)) {
