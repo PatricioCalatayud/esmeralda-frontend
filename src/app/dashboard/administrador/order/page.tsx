@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { IOrders } from "@/interfaces/IOrders";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { es } from "date-fns/locale";
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
@@ -210,6 +210,58 @@ const handleChange = async (
       }
     });
   };
+  const [imageUrls, setImageUrls] = useState<Record<number, string | null>>({});
+  const fetchImageBlob = async (productId: number, url: string) => {
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob(); // Convertimos la respuesta a Blob
+        return URL.createObjectURL(blob); // Creamos una URL temporal
+      } else {
+        throw new Error(`Error al cargar la imagen para el producto ${productId}`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener la imagen para el producto ${productId}:`, error);
+      return null;
+    }
+  };
+   // useEffect para cargar las imágenes
+   useEffect(() => {
+    const fetchAllImages = async () => {
+      try {
+        // Creamos un array de promesas para todas las imágenes
+        const urls = await Promise.all(
+          orders.flatMap((order) =>
+            order.productsOrder.map(async (product) => {
+              const blobUrl = await fetchImageBlob(
+                Number(product.id),
+                `${apiURL}/product/${product?.subproduct?.product?.imgUrl}`
+              );
+              return {
+                id: product?.subproduct?.product?.id,
+                url: blobUrl,
+              };
+            })
+          )
+        );
+  
+        // Convertimos el array en un objeto de mapeo { id: url }
+        const urlMap = urls.reduce((acc : any, item) => {
+          if (item?.id && item?.url) {
+            acc[item.id]  = item.url;
+          }
+          return acc;
+        }, {});
+  
+        setImageUrls(urlMap); // Verificamos el resultado
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+  
+    fetchAllImages();
+  }, [orders, apiURL]);
+    console.log(imageUrls);
 
   //! Renderizar columna de "Estado" (Comprobante)
   const renderStatusColumn = (order: IOrders) => {
@@ -408,7 +460,7 @@ const renderIdentificationColumn = (order: IOrders) => {
       Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
     }
   };
-
+  console.log(orders);
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
@@ -457,14 +509,16 @@ const renderIdentificationColumn = (order: IOrders) => {
           </td>
           <td className="px-4 py-3">
             {order.productsOrder.map((product, index) => (
+              console.log(product),
+              console.log(String(imageUrls[Number(product?.subproduct?.product?.id)])),
               <div key={index} className="flex items-center">
-                <Image
+                {imageUrls  &&<Image
                   width={50}
                   height={50}
-                  src={product.subproduct.product?.imgUrl || ""}
+                  src={String(imageUrls[Number(product?.subproduct?.product?.id)])  !== "undefined" && String(imageUrls[Number(product?.subproduct?.product?.id)]) !== "null" ? String(imageUrls[Number(product?.subproduct?.product?.id)]) : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`}
                   alt={product.subproduct.product?.description || ""}
                   className="w-10 h-10 inline-block mr-2 rounded-full"
-                />
+                />}
                 {product.subproduct.product?.description} x {product.quantity} un de {product.subproduct.amount} {product.subproduct.unit}
               </div>
             ))}

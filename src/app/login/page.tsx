@@ -342,7 +342,7 @@ const Login = () => {
                       />
                     </svg>
                   </button>
-                  <button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
+                  {/*<button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="32px"
@@ -354,7 +354,7 @@ const Login = () => {
                         data-original="#010002"
                       ></path>
                     </svg>
-                  </button>
+                  </button>*/}
                 </div>
                 
               </Box>

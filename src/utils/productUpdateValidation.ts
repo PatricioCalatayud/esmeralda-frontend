@@ -9,7 +9,7 @@ import {
     const errors: IProductErrorUpdate = {
       description: "",
       imgUrl : "",
-      presentacion: "",
+      presentation: "",
       tipoGrano: "",
       categoryID: "",
 
@@ -28,8 +28,8 @@ import {
       errors.categoryID = "La categoría es obligatoria";
     }
   
-    if (!product.presentacion) {
-      errors.presentacion = "La presentación es obligatoria";
+    if (!product.presentation) {
+      errors.presentation = "La presentación es obligatoria";
     }
   
     if (!product.tipoGrano) {

@@ -380,7 +380,7 @@ console.log(isDisabled);
           <source src="/back.mp4" type="video/mp4" />
         </video>
         <div className="relative z-10 font-sans max-w-7xl mx-auto">
-          <Container component="main" maxWidth="xs">
+          <Container component="main" maxWidth="lg">
             <CssBaseline />
             <Box
               sx={{

@@ -253,7 +253,7 @@ const ProductList = () => {
   };
 
   //! Funciónes para editar un subproducto
-  const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, subproductId: string) => {
+  const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, subproductId: number) => {
 console.log(subproductId);
     const { name, value } = e.target;
     setEditProductId((prev) => ({
@@ -418,7 +418,7 @@ console.log(subproductId);
   }, [products, apiURL]);
 
 
-  
+  console.log(imageUrls);
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner
@@ -506,7 +506,7 @@ console.log(subproductId);
                   name="stock"
                   defaultValue={String(subproduct.stock)}
                   placeholder={String(subproduct.stock)}
-                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                  onChange={(e) => handleEditProduct(e, Number(subproduct.id))}
                 />
               )
             )}
@@ -544,7 +544,7 @@ console.log(subproductId);
                     placeholder="0"
                     defaultValue={subproduct.amount}
                     onChange={(e) =>
-                      handleEditProduct(e, String(subproduct.id))
+                      handleEditProduct(e, Number(subproduct.id))
                     }
                   />
                   <select
@@ -552,7 +552,7 @@ console.log(subproductId);
                     name="unit"
                     className="bg-gray-50 h-10 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-2/3 "
                     onChange={(e) =>
-                      handleEditProduct(e, String(subproduct.id))
+                      handleEditProduct(e, Number(subproduct.id))
                     }
                   >
                     <option value={subproduct.unit}>{subproduct.unit}</option>
@@ -610,7 +610,7 @@ console.log(subproductId);
                   type="text"
                   placeholder={`${subproduct.price}`}
                   defaultValue={subproduct.price}
-                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                  onChange={(e) => handleEditProduct(e, Number(subproduct.id))}
                 /> </div>
               )
             )}
@@ -643,7 +643,7 @@ console.log(subproductId);
                   name="discount"
                   defaultValue={subproduct.discount}
                   placeholder={`${subproduct.discount}`}
-                  onChange={(e) => handleEditProduct(e, String(subproduct.id))}
+                  onChange={(e) => handleEditProduct(e, Number(subproduct.id))}
                 /> %</div>
               )
             )}
