@@ -1,9 +1,11 @@
 export interface IAddress {
   id: string;
   address: string;
-  localidad: string;
+  locality: string;
   province: number;
-  deliveryNumber?: number;
+  zipCode: string;
+  street:string
+  number: number
 }
 
 export interface ISession {
@@ -14,4 +16,6 @@ export interface ISession {
   role: string;
   phone?: string | undefined;
   address?: IAddress; // Nuevo campo para la dirección
+  email_verified?: boolean;
+  cuit?: number;
 }

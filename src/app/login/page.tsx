@@ -108,6 +108,7 @@ const Login = () => {
       const responseData = response?.data;
       if (response) {
         const decodedToken: any = jwtDecode(responseData.accessToken as string);
+        console.log(decodedToken);
         setSession({
           id: decodedToken.sub,
           name: decodedToken.name,
@@ -115,32 +116,40 @@ const Login = () => {
           image: undefined,
           role: decodedToken.roles[0],
           phone: decodedToken.phone,
+          email_verified: decodedToken.email_verified,
+          address: decodedToken.address,
+          cuit: decodedToken.exp
         })
         setUserId(decodedToken.sub);
         responseData.accessToken && setToken(responseData.accessToken);
-        
+        if(decodedToken.email_verified === false  && decodedToken.roles[0] !== "Administrador"){
+          setTimeout(() => {
+            Router.push("/emailVerify");
+          }, 1500);
+        }
+        if (decodedToken.email_verified === true || decodedToken.roles[0] === "Administrador") {
+          localStorage.setItem("userSession", JSON.stringify(responseData));
+  
+          Swal.fire({
+            icon: "success",
+            title: "¡Bienvenido a La Esmeralda !",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+  
+          setDataUser(initialUserData);
+          setTouched({
+            email: false,
+            password: false,
+          });
+  
+          setTimeout(() => {
+            Router.push("/");
+          }, 1500);
+        }
       }
 
-      if (responseData) {
-        localStorage.setItem("userSession", JSON.stringify(responseData));
-
-        Swal.fire({
-          icon: "success",
-          title: "¡Bienvenido a La Esmeralda !",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
-        setDataUser(initialUserData);
-        setTouched({
-          email: false,
-          password: false,
-        });
-
-        setTimeout(() => {
-          Router.push("/");
-        }, 1500);
-      } else {
+       else {
         Swal.fire({
           icon: "error",
           title: "Usuario o contraseña incorrecta",

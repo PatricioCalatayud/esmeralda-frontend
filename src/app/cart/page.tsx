@@ -264,7 +264,7 @@ const subtotal = calcularSubtotal();
 const descuento = calcularDescuento();
 const iva = calcularIVA();
 const total = calcularTotal();
-
+console.log(session);
     // Lógica para realizar el checkout
     const handleCheckout = async (boton: string) => {
       const products = cart.map((product) => ({
@@ -285,13 +285,8 @@ const total = calcularTotal();
         ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
         ...(needsInvoice && { invoiceType }),
       };
-    
-      // Agregar identificación en función del tipo de factura seleccionado
-      if (invoiceType === "A") {
-        orderCheckout.identification = cuit; // Enviar CUIT para Factura A
-      } else if (invoiceType === "B" || invoiceType === "C") {
-        orderCheckout.identification = dni; // Enviar DNI para Factura B o C
-      }
+      orderCheckout.identification = String(session?.cuit)
+      
     
       try {
         const order = await postOrder(orderCheckout, token);
@@ -550,7 +545,8 @@ const total = calcularTotal();
             id="street"
             InputLabelProps={{ style: { color: "teal" } }}
             placeholder="Avenida San Martín"
-            value={street}
+            value={street || session?.address?.street}
+        
             onChange={(e) => setStreet(e.target.value)}
             disabled={isDelivery === true}
           />
@@ -565,12 +561,12 @@ const total = calcularTotal();
             id="number"
             InputLabelProps={{ style: { color: "teal" } }}
             placeholder="123"
-            value={address.number.toString()}
+            value={address.number.toString() || session?.address?.number}
             onChange={handleAddressChange}
             disabled={isDelivery === true}
           />
         </div>
-        {/* Input para Piso */}
+        {/* Input para Piso 
         <div className="w-full h-20 gap-4 flex">
           <TextField
           label="Piso"
@@ -586,9 +582,9 @@ const total = calcularTotal();
             onChange={(e) => setFloor(e.target.value)}
             disabled={isDelivery === true}
           />
-        
+*/}
 
-        {/* Input para Departamento */}
+        {/* Input para Departamento 
        
           <TextField
           label="Departamento"
@@ -605,7 +601,7 @@ const total = calcularTotal();
             disabled={isDelivery === true}
           />
         
-        </div>
+        </div>*/}
         <TextField
                   select
                   margin="normal"
@@ -614,7 +610,7 @@ const total = calcularTotal();
                   id="province"
                   label="Provincia"
                   name="province"
-                  value={address.province}
+                  value={selectedProvince }
                   onChange={(e) => {setSelectedProvince(Number(e.target.value)),
                     handleAddressChange}}
                   InputLabelProps={{ style: { color: "teal" } }}
@@ -664,7 +660,7 @@ const total = calcularTotal();
             id="zipCode"
             InputLabelProps={{ style: { color: "teal" } }}
             placeholder="55200"
-            value={address.zipCode}
+            value={address.zipCode || session?.address?.zipCode}
             onChange={handleAddressChange}
             disabled={isDelivery === true}
           />
@@ -730,43 +726,8 @@ const total = calcularTotal();
               </button>
             </div>
 
-            {/* Input de CUIT habilitado solo para Factura A */}
-            {invoiceType === "A" && (
-              <div className="w-full h-20 gap-4 flex flex-col">
-                <label htmlFor="cuit" className="block text-sm font-medium text-gray-900 dark:text-white">
-                  CUIT
-                </label>
-                <input
-                  type="text"
-                  name="cuit"
-                  id="cuit"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Ejemplo: 20-12345678-5"
-                  value={cuit}
-                  onChange={(e) => setCuit(e.target.value)}
-                  disabled={invoiceType !== "A"}
-                />
-              </div>
-            )}
+       
 
-         {/* Input de DNI habilitado solo para Factura B o C */}
-{(invoiceType === "B" || invoiceType === "C") && (
-  <div className="w-full h-20 gap-4 flex flex-col">
-    <label htmlFor="dni" className="block text-sm font-medium text-gray-900 dark:text-white">
-      DNI
-    </label>
-    <input
-      type="text"
-      name="dni"
-      id="dni"
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-      placeholder="Ejemplo: 12345678"
-      value={dni}
-      onChange={(e) => setDni(e.target.value)}
-      disabled={invoiceType !== "B" && invoiceType !== "C"} // Cambiado aquí
-    />
-  </div>
-)}
           </div>
         )}
       </>
@@ -843,7 +804,7 @@ const total = calcularTotal();
         disabled={
           !session ||
           cart.length === 0 ||
-          (isDelivery === false && street === "") ||
+          
           (needsInvoice && !invoiceType)
         }
         title={
