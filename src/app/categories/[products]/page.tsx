@@ -20,10 +20,9 @@ export default async function ProductsPage({
   const selectedCategory = params.products;
   const categories = await getCategories();
   const category =
-    categories?.find((cat) => cat.id === selectedCategory) || null;
-    
-    
-  const productsList = await getProductsByCategory(category?.name || "Coffee");
+    categories?.find((cat) => Number(cat.id) === Number(selectedCategory)) || null;
+
+  const productsList = await getProductsByCategory(category?.name || "");
 
 
   return (

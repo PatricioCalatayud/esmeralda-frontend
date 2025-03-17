@@ -38,6 +38,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
     idSubProduct: "",
   });
   const [quantity, setQuantity] = useState<number>(1);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined); // Estado para almacenar la URL de la imagen
 
   const { setCartItemCount } = useCartContext();
   const { token } = useAuthContext();
@@ -116,7 +117,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       ...selectedCart,
       quantity,
       description: filteredProduct?.description,
-      imgUrl: filteredProduct?.imgUrl,
+      imgUrl: imageUrl,
       size: selectedSize,
       idProduct: filteredProduct?.id,
     };
@@ -126,11 +127,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       localStorage.setItem("cart", JSON.stringify(cart));
       Swal.fire({
         title: "Producto actualizado",
-        text: "La cantidad del producto ha sido actualizada.",
         icon: "success",
-        showCancelButton: true,
+        toast: true,
+        timer: 3000,
+        position: "bottom-left",
+        width: 600,
+        animation: false,
         confirmButtonText: "Ir al carrito",
-        cancelButtonText: "Aceptar",
+        confirmButtonColor: "#00897b",
       }).then((result: any) => {
         if (result.isConfirmed) {
           router.push("/cart");
@@ -141,12 +145,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       localStorage.setItem("cart", JSON.stringify(cart));
       setCartItemCount(cart.length);
       Swal.fire({
-        title: "Producto agregado",
-        text: "Producto agregado al carrito.",
+        title: "Producto agregado al carrito",
         icon: "success",
-        showCancelButton: true,
+        toast: true,
+        timer: 3000,
+        position: "bottom-left",
+        width: 600,
         confirmButtonText: "Ir al carrito",
-        cancelButtonText: "Aceptar",
+        confirmButtonColor: "#00897b",
       }).then((result: any) => {
         if (result.isConfirmed) {
           router.push("/cart");
@@ -180,7 +186,6 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         : price
     );
   };
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined); // Estado para almacenar la URL de la imagen
 
   const fetchUrl = async (url: string): Promise<string | undefined> => {
     try {
@@ -200,13 +205,17 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   useEffect(() => {
     const loadImage = async () => {
-      const image = await fetchUrl(`${apiURL}/product/${filteredProduct?.imgUrl}`);
-      setImageUrl(image || "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"); // URL por defecto si la carga falla
+      const image = await fetchUrl(
+        `${apiURL}/product/${filteredProduct?.imgUrl}`
+      );
+      setImageUrl(
+        image ||
+          "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"
+      ); // URL por defecto si la carga falla
     };
 
     loadImage();
   }, [filteredProduct, apiURL]);
-
 
   const renderBreadcrumb = () => {
     if (!category) {
@@ -278,7 +287,10 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             width={1000}
             height={1000}
             priority={true}
-            src={imageUrl || "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"}
+            src={
+              imageUrl ||
+              "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"
+            }
             alt={filteredProduct.description}
             className="relative w-full h-96 object-cover rounded-xl shadow-2xl"
           />
@@ -295,8 +307,16 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
           <h1 className="text-3xl font-bold mb-2 animate-fade-in-up">
             {filteredProduct.description}
           </h1>
-          {product?.presentacion && <p className=" text-md font-medium text-gray-700">Presentación: {product?.presentacion}</p>}
-                    {product?.tipoGrano && <p className=" text-md font-medium text-gray-700">Tipo de grano: {product?.tipoGrano}</p>}
+          {product?.presentacion && (
+            <p className=" text-md font-medium text-gray-700">
+              Presentación: {product?.presentacion}
+            </p>
+          )}
+          {product?.tipoGrano && (
+            <p className=" text-md font-medium text-gray-700">
+              Tipo de grano: {product?.tipoGrano}
+            </p>
+          )}
           <hr className="animate-fade-in-up" />
           <div className="mt-4 animate-fade-in-up flex flex-col justify-between">
             <div className="mb-4 flex space-x-4 animate-fade-in-up">
@@ -336,7 +356,8 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
                   </p>
                 </div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  ${Number(selectedPrice) -
+                  $
+                  {Number(selectedPrice) -
                     (Number(selectedPrice) * selectedDiscount) / 100}{" "}
                   (+IVA)
                 </p>
@@ -362,21 +383,21 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
             </p>
           </div>
           <button
-  className={`py-2 px-4 rounded-lg ${
-    selectedStock === 0
-      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-      : "bg-teal-600 text-white hover:bg-teal-800"
-  } transition-colors duration-300 animate-fade-in-up`}
-  onClick={handleAddToCart}
-  disabled={selectedStock === 0}
->
-  <FontAwesomeIcon
-    icon={faCartShopping}
-    size="lg"
-    style={{ marginRight: "10px" }}
-  />
-  Añadir al carrito
-</button>
+            className={`py-2 px-4 rounded-lg ${
+              selectedStock === 0
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-teal-600 text-white hover:bg-teal-800"
+            } transition-colors duration-300 animate-fade-in-up`}
+            onClick={handleAddToCart}
+            disabled={selectedStock === 0}
+          >
+            <FontAwesomeIcon
+              icon={faCartShopping}
+              size="lg"
+              style={{ marginRight: "10px" }}
+            />
+            Añadir al carrito
+          </button>
         </div>
       </div>
 

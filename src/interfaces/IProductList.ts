@@ -58,7 +58,7 @@ export interface IProductResponse {
 export interface IProductErrorResponse {
   description: string;
   categoryID: string;
-  presentacion: string;
+  presentation: string;
   tipoGrano: string;
   file?: string;
   amount?: string;
@@ -71,7 +71,7 @@ export interface IProductErrorResponse {
 export interface IProductUpdate {
   description: string;
   categoryID: number;
-  presentacion?: string;
+  presentation?: string;
   tipoGrano?: string;
   file?: File;
   subproducts?: ISubProductUpdate[];
@@ -89,7 +89,7 @@ export interface ISubProductUpdate{
 export interface IProductErrorUpdate {
   description: string;
   categoryID: string;
-  presentacion: string;
+  presentation: string;
   tipoGrano: string;
   file?: string;
   amount?: string;

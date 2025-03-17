@@ -134,7 +134,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
             <h4 className="text-center">
               Tu orden fue realizada el:{" "}
               <b className="font-bold">
-                {format(new Date(order.date), "d 'de' MMMM 'de' yyyy", {
+                {format(new Date(order.date ?? Date.now()), "d 'de' MMMM 'de' yyyy", {
                   locale: es,
                 })}
               </b>

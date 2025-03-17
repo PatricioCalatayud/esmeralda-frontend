@@ -1,5 +1,5 @@
 "use client";
-
+import axios from "axios";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { ICart } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Typography from "@mui/material/Typography";
 import {
   faBagShopping,
   faMinus,
@@ -20,13 +21,16 @@ import { useCartContext } from "@/context/cart.context";
 import { getUser } from "@/helpers/Autenticacion.helper";
 import { IAccountProps } from "@/interfaces/IUser";
 import { Spinner } from "@material-tailwind/react";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import { putUser } from "@/helpers/Autenticacion.helper";
 
 const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<ICart[]>([]);
-  const { session, token } = useAuthContext();
+  const { session, token, setSession } = useAuthContext();
   const [openModal, setOpenModal] = useState(false);
-  const [addresOrder, setAddresOrder] = useState("");
+  const [street, setStreet] = useState("");
   const [isDelivery, setIsDelivery] = useState(false);
   const { setCartItemCount } = useCartContext();
   const [account, setAccount] = useState<IAccountProps>();
@@ -34,11 +38,120 @@ const Cart = () => {
   const [floor, setFloor] = useState(""); // Nuevo estado para Piso
   const [apartment, setApartment] = useState(""); // Nuevo estado para Departamento
   const [dni, setDni] = useState(""); // Estado para DNI
-const [cuit, setCuit] = useState(""); // Estado para CUIT
-
+  const [cuit, setCuit] = useState(""); // Estado para CUIT
+  const [localities, setLocalities] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
+  const [loadingLocalities, setLoadingLocalities] = useState(false); // Estado de carga para localidades
   // Variables agregadas
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [invoiceType, setInvoiceType] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [address, setAddress] = useState(session?.address?.street || "");
+  const [number, setNumber] = useState(session?.address?.number || 0);
+  const [locality, setLocality] = useState(session?.address?.locality || "");
+  const [province, setProvince] = useState(session?.address?.province || "");
+
+
+  const provinceMapping: Record<number, string> = {
+    1: "Buenos Aires",
+    2: "Córdoba",
+    3: "Catamarca",
+    4: "Chaco",
+    5: "Chubut",
+    6: "Corrientes",
+    7: "Entre Ríos",
+    8: "Formosa",
+    9: "Jujuy",
+    10: "La Pampa",
+    11: "La Rioja",
+    12: "Mendoza",
+    13: "Misiones",
+    14: "Neuquén",
+    15: "Río Negro",
+    16: "Salta",
+    17: "San Juan",
+    18: "San Luis",
+    19: "Santa Cruz",
+    20: "Santa Fe",
+    21: "Santiago del Estero",
+    22: "Tierra del Fuego",
+    23: "Tucumán",
+    24: "Ciudad Autónoma de Buenos Aires",
+  };
+  const [provinces] = useState(
+    Object.keys(provinceMapping).map((key) => ({
+      value: Number(key),
+      label: provinceMapping[Number(key)],
+    }))
+  );
+  const initialAddressData = {
+    street: "",
+    number: "",
+    province: "",
+    locality: "",
+    zipcode: "",
+  };
+  console.log(address);
+  // Cargar localidades cuando se selecciona una provincia
+  useEffect(() => {
+    if (selectedProvince) {
+      const fetchLocalities = async (provinceId: number) => {
+        try {
+          setLoadingLocalities(true); // Inicia el estado de carga
+          const provinceName = provinceMapping[provinceId];
+
+          const response = await axios.get(
+            `https://apis.datos.gob.ar/georef/api/localidades?provincia=${provinceName}&max=5000`
+          );
+
+          if (response.data && response.data.localidades.length > 0) {
+            const localitiesList = response.data.localidades.map(
+              (locality: any) => ({
+                value: locality.nombre,
+                label: locality.nombre,
+              })
+            );
+            setLocalities(localitiesList);
+            console.log("Localidades cargadas:", localitiesList); // Verifica que las localidades se cargan correctamente
+          } else {
+            Swal.fire({
+              icon: "info",
+              title: "Sin localidades",
+              text:
+                "No se encontraron localidades para la provincia seleccionada.",
+            });
+          }
+        } catch (error: any) {
+          Swal.fire({
+            icon: "error",
+            title: "Error en la solicitud",
+            text: `Error: ${error.response?.data.message || error.message}`,
+          });
+        } finally {
+          setLoadingLocalities(false); // Finaliza el estado de carga
+        }
+      };
+
+      fetchLocalities(selectedProvince);
+    }
+  }, [selectedProvince]);
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setAddress((prevDataUser: any) => ({
+      ...prevDataUser,
+      street: `${street}${floor ? `, Piso: ${floor}` : ""}${
+        apartment ? `, Depto: ${apartment}` : ""
+      }`,
+      [name]: value,
+    }));
+
+    // Verificar que el campo locality se actualiza correctamente
+    console.log("Localidad seleccionada:", value);
+  };
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -46,15 +159,15 @@ const [cuit, setCuit] = useState(""); // Estado para CUIT
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
       setCart(cartItems);
     };
-  
+
     const fetchUser = async () => {
       if (token && session) {
         const response = await getUser(session.id, token);
         console.log(response);
-  
+
         if (response) {
           const accountData = response.account;
-  
+
           // Verificamos que el accountData sea del tipo esperado (un objeto de tipo IAccountProps)
           if (typeof accountData === "object" && accountData !== null) {
             setAccount(accountData as IAccountProps); // Asignamos solo si es del tipo IAccountProps
@@ -64,7 +177,7 @@ const [cuit, setCuit] = useState(""); // Estado para CUIT
         }
       }
     };
-  
+
     fetchUser();
     fetchCart();
   }, [token]);
@@ -121,115 +234,181 @@ const [cuit, setCuit] = useState(""); // Estado para CUIT
     });
   };
 
- //! Función para calcular el subtotal
-const calcularSubtotal = () => {
-  return cart.reduce((acc, item) => {
-    return acc + (item.quantity || 1) * Number(item.price);
-  }, 0);
-};
+  //! Función para calcular el subtotal
+  const calcularSubtotal = () => {
+    return cart.reduce((acc, item) => {
+      return acc + (item.quantity || 1) * Number(item.price);
+    }, 0);
+  };
 
-//! Función para calcular el descuento
-const calcularDescuento = () => {
-  return cart.reduce((acc, item) => {
-    const descuentoPorProducto =
-      (item.quantity || 1) *
-      (Number(item.price) * (Number(item.discount || 0) / 100));
-    return acc + descuentoPorProducto;
-  }, 0);
-};
+  //! Función para calcular el descuento
+  const calcularDescuento = () => {
+    return cart.reduce((acc, item) => {
+      const descuentoPorProducto =
+        (item.quantity || 1) *
+        (Number(item.price) * (Number(item.discount || 0) / 100));
+      return acc + descuentoPorProducto;
+    }, 0);
+  };
 
-//! Función para calcular el IVA basado en subtotal menos descuento
-const calcularIVA = () => {
-  const subtotal = calcularSubtotal();
-  const descuento = calcularDescuento();
-  const baseParaIVA = subtotal - descuento;
-  return baseParaIVA * 0.21; // 21% de IVA sobre la base ajustada
-};
+  //! Función para calcular el IVA basado en subtotal menos descuento
+  const calcularIVA = () => {
+    const subtotal = calcularSubtotal();
+    const descuento = calcularDescuento();
+    const baseParaIVA = subtotal - descuento;
+    return baseParaIVA * 0.21; // 21% de IVA sobre la base ajustada
+  };
 
-//! Función para calcular el total
-const calcularTotal = () => {
+  //! Función para calcular el total
+  const calcularTotal = () => {
+    const subtotal = calcularSubtotal();
+    const descuento = calcularDescuento();
+    const iva = calcularIVA();
+    return subtotal - descuento + iva;
+  };
+
   const subtotal = calcularSubtotal();
   const descuento = calcularDescuento();
   const iva = calcularIVA();
-  return subtotal - descuento + iva;
-};
+  const total = calcularTotal();
 
-const subtotal = calcularSubtotal();
-const descuento = calcularDescuento();
-const iva = calcularIVA();
-const total = calcularTotal();
+  const handleEditAddress = async () => {
+    if (!token || !session?.id) return;
 
-    // Lógica para realizar el checkout
-    const handleCheckout = async (boton: string) => {
-      const products = cart.map((product) => ({
-        productId: product.idProduct,
-        subproductId: product.idSubProduct,
-        quantity: product.quantity,
-      }));
-    
-      const fullAddress = `${addresOrder}${floor ? `, Piso: ${floor}` : ""}${apartment ? `, Depto: ${apartment}` : ""}`;
-    
-      setLoading(true);
-    
-      const orderCheckout: any = {
-        userId: session?.id,
-        products,
-        address: isDelivery ? undefined : fullAddress,
-        discount: 10,
-        ...(session?.role === "Cliente" && boton === "Cliente Transferencia" && { account: "Transferencia" }),
-        ...(session?.role === "Cliente" && boton === "Cliente Cuenta Corriente" && { account: "Cuenta corriente" }),
-        ...(needsInvoice && { invoiceType }),
-      };
-    
-      // Agregar identificación en función del tipo de factura seleccionado
-      if (invoiceType === "A") {
-        orderCheckout.identification = cuit; // Enviar CUIT para Factura A
-      } else if (invoiceType === "B" || invoiceType === "C") {
-        orderCheckout.identification = dni; // Enviar DNI para Factura B o C
-      }
-    
-      try {
-        const order = await postOrder(orderCheckout, token);
-        console.log(order);
-    
-        if (order?.status === 200 || order?.status === 201) {
-          Swal.fire({
-            position: "top-end",
-            icon: "success",
-            title: "Pedido realizado con éxito",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-    
-          setTimeout(() => {
-            if (session?.role === "Usuario") {
-              router.push(`/checkout/${order.data.id}`);
-            } else if (session?.role === "Cliente" && boton === "Cliente Transferencia") {
-              router.push(`/transfer/${order.data.id}`);
-            } else if (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente") {
-              setCartItemCount(0);
-              localStorage.removeItem("cart");
-              router.push(`/dashboard/cliente/order`);
-            }
-          }, 1500);
-        } else {
-          throw new Error("Pedido no completado.");
+    const updatedAddress = {
+      street: address,
+      locality: locality,
+      province: province,
+      number: number.toString(),
+    };
+
+    if (
+      updatedAddress.street === "" ||
+      updatedAddress.locality === "" ||
+      updatedAddress.province === "" ||
+      updatedAddress.number === ""
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Todos los campos son requeridos",
+      });
+      console.log(updatedAddress);
+      return;
+    }
+
+    const response = await putUser(
+      { id: session.id, address: updatedAddress },
+      token
+    );
+
+    if (response?.status === 200 || response?.status === 201) {
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Se ha actualizado tu dirección correctamente",
+      });
+      setSession({
+        ...session,
+        address: {
+          street: address,
+          locality,
+          province,
+          number: number || 0,
+          zipcode: session.address?.zipcode || ""
         }
-      } catch (error: any) {
-        console.error("Error en el servidor:", error);
-        const errorMessage = error.message || "Hubo un error al realizar tu pedido";
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Hubo un error al actualizar tu dirección",
+      });
+    }
+  };
+
+  // Lógica para realizar el checkout
+  const handleCheckout = async (boton: string) => {
+    const products = cart.map((product) => ({
+      productId: Number(product.idProduct),
+      subproductId: Number(product.idSubProduct),
+      quantity: product.quantity,
+    }));
+
+    setLoading(true);
+
+    const orderCheckout: any = {
+      userId: session?.id,
+      products,
+      address: isDelivery
+        ? undefined
+        : {
+            street: address,
+            number: number,
+            locality: locality,
+            province: province,
+            zipcode: session?.address?.zipcode || "",
+          },
+      discount: 10,
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Transferencia" && { account: "Transferencia" }),
+      ...(session?.role === "Cliente" &&
+        boton === "Cliente Cuenta Corriente" && {
+          account: "Cuenta corriente",
+        }),
+      ...(needsInvoice && { invoiceType }),
+    };
+    orderCheckout.identification = String(session?.cuit);
+
+    try {
+      const order = await postOrder(orderCheckout, token);
+      console.log(order);
+
+      if (order?.status === 200 || order?.status === 201) {
         Swal.fire({
           position: "top-end",
-          icon: "error",
-          title: "Error en el pedido",
-          text: errorMessage,
+          icon: "success",
+          title: "Pedido realizado con éxito",
           showConfirmButton: false,
           timer: 1500,
         });
-      } finally {
-        setLoading(false);
+
+        setTimeout(() => {
+          if (session?.role === "Usuario") {
+            router.push(`/checkout/${order.data.id}`);
+          } else if (
+            session?.role === "Cliente" &&
+            boton === "Cliente Transferencia"
+          ) {
+            router.push(`/transfer/${order.data.id}`);
+          } else if (
+            session?.role === "Cliente" &&
+            boton === "Cliente Cuenta Corriente"
+          ) {
+            setCartItemCount(0);
+            localStorage.removeItem("cart");
+            router.push(`/dashboard/cliente/order`);
+          }
+        }, 1500);
+      } else {
+        throw new Error("Pedido no completado.");
       }
-    };
+    } catch (error: any) {
+      console.error("Error en el servidor:", error);
+      const errorMessage =
+        error.message || "Hubo un error al realizar tu pedido";
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Error en el pedido",
+        text: errorMessage,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   //! Renderizado si no hay elementos en el carrito
   if (cart.length === 0) {
     return (
@@ -307,32 +486,36 @@ const total = calcularTotal();
                       Eliminar
                     </div>
                     <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-3 font-bold items-center">
-  <button
-    className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-    onClick={() => handleDecrease(item.idSubProduct)}
-    disabled={item.quantity === 1}
-  >
-    <FontAwesomeIcon
-      icon={faMinus}
-      style={{ width: "10px", height: "10px" }}
-    />
-  </button>
-  {item.quantity || 1}
-  <button
-    className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
-    onClick={() => handleIncrease(item.idSubProduct)}
-    disabled={item.quantity === Math.max(0, Number(item.stock))}
-  >
-    <FontAwesomeIcon
-      icon={faPlus}
-      style={{ width: "10px", height: "10px" }}
-    />
-  </button>
-  <p className="text-gray-800 text-xs text-nowrap">
-  {item.stock > 0 ? `${item.stock} disponibles` : "0 disponibles"}
-</p>
-</div>
+                      <div className="flex gap-3 font-bold items-center">
+                        <button
+                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+                          onClick={() => handleDecrease(item.idSubProduct)}
+                          disabled={item.quantity === 1}
+                        >
+                          <FontAwesomeIcon
+                            icon={faMinus}
+                            style={{ width: "10px", height: "10px" }}
+                          />
+                        </button>
+                        {item.quantity || 1}
+                        <button
+                          className="text-black border border-gray-900 w-6 h-6 font-bold flex justify-center items-center rounded-md disabled:bg-gray-300 disabled:border-gray-400 disabled:text-white"
+                          onClick={() => handleIncrease(item.idSubProduct)}
+                          disabled={
+                            item.quantity === Math.max(0, Number(item.stock))
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={faPlus}
+                            style={{ width: "10px", height: "10px" }}
+                          />
+                        </button>
+                        <p className="text-gray-800 text-xs text-nowrap">
+                          {item.stock > 0
+                            ? `${item.stock} disponibles`
+                            : "0 disponibles"}
+                        </p>
+                      </div>
                       <div className="ml-auto">
                         {item.discount && Number(item.discount) > 0 ? (
                           <div>
@@ -406,274 +589,325 @@ const total = calcularTotal();
           <div className="mt-8 space-y-2 flex flex-col gap-2 lg:w-80 p-4 w-full">
             <button
               type="button"
-              className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md ${
-                session && cart.length > 0
-                  ? "  bg-teal-600 text-white  hover:bg-teal-800   "
-                  : "bg-gray-300 cursor-not-allowed text-gray-500"
-              }`}
-              disabled={!session || cart.length === 0}
-              title={
-                !session
-                  ? "Necesita estar logueado para continuar con el pago"
-                  : cart.length === 0
-                  ? "El carrito está vacío"
-                  : ""
-              }
-              onClick={() => setOpenModal(true)}
+              className="text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md bg-teal-600 text-white hover:bg-teal-800"
+              onClick={() => {
+                if (!session) {
+                  Swal.fire({
+                    icon: "warning",
+                    title: "Ups!",
+                    text: "Debes iniciar sesión para continuar con el pago.",
+                    confirmButtonText: "Iniciar sesión",
+                    confirmButtonColor: "#00897b",
+                    allowOutsideClick: true,
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      router.push("/login");
+                    }
+                  });
+                } else {
+                  setOpenModal(true);
+                }
+              }}
             >
               Ir a pagar
             </button>
+
             <Modal
-  show={openModal}
-  onClose={() => setOpenModal(false)}
-  className="px-80 py-40 custom-modal-container"
->
-  <Modal.Header>Detalle de envío</Modal.Header>
-  <Modal.Body className="flex flex-col gap-4">
-    {loading === false ? (
-      <>
-        {/* Input de Dirección */}
-        <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="addresOrder" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Dirección de envío
-          </label>
-          <input
-            type="text"
-            name="addresOrder"
-            id="addresOrder"
-            className="bg-gray-50 border border-gray-300 text-gray-900 disabled:bg-gray-300 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Avenida San Martín 123"
-            value={addresOrder}
-            onChange={(e) => setAddresOrder(e.target.value)}
-            disabled={isDelivery === true}
-          />
-        </div>
+              show={openModal}
+              onClose={() => setOpenModal(false)}
+              className="px-80 py-1/2 custom-modal-container"
+            >
+              <Modal.Header>Detalle de envío</Modal.Header>
+              <Modal.Body className="flex flex-col gap-4">
+                {loading === false ? (
+                  <>
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          checked={!isDelivery}
+                          onChange={() => setIsDelivery(false)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">Enviar a domicilio</p>
+                              <p className="text-gray-600">
+                                {session?.address?.street}{" "}
+                                {session?.address?.number} -{" "}
+                                {session?.address?.locality}
+                              </p>
+                              <p className="text-gray-600">
+                                {session?.address?.province}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="text-teal-600 hover:text-teal-800 text-sm mt-2 font-semibold"
+                          >
+                            Editar
+                          </button>
+                        </div>
+                      </div>
+                      {isEditing && !isDelivery && (
+                        <div className="mt-4 space-y-3 bg-gray-50 p-4 rounded-lg">
+                          <div className="flex gap-2 w-full">
+                            <div className="w-1/2">
+                              <label
+                                htmlFor="address"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Dirección
+                              </label>
+                              <input
+                                type="text"
+                                name="address"
+                                id="address"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                placeholder="Nueva dirección"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                              />
+                            </div>
+                            <div className="w-1/2">
+                              <label
+                                htmlFor="number"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Número
+                              </label>
+                              <input
+                                type="number"
+                                name="number"
+                                id="number"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                placeholder="Número"
+                                value={number}
+                                onChange={(e) =>
+                                  setNumber(Number(e.target.value))
+                                }
+                              />
+                            </div>
+                          </div>
 
-        {/* Input para Piso */}
-        <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="floor" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Piso
-          </label>
-          <input
-            type="text"
-            name="floor"
-            id="floor"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Ejemplo: 3"
-            value={floor}
-            onChange={(e) => setFloor(e.target.value)}
-            disabled={isDelivery === true}
-          />
-        </div>
+                          <div>
+                            <label
+                              htmlFor="locality"
+                              className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                              Localidad
+                            </label>
+                            <input
+                              type="text"
+                              name="locality"
+                              id="locality"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                              placeholder="Nueva localidad"
+                              value={locality}
+                              onChange={(e) => setLocality(e.target.value)}
+                            />
+                          </div>
 
-        {/* Input para Departamento */}
-        <div className="w-full h-20 gap-4 flex flex-col">
-          <label htmlFor="apartment" className="block text-sm font-medium text-gray-900 dark:text-white">
-            Departamento
-          </label>
-          <input
-            type="text"
-            name="apartment"
-            id="apartment"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-            placeholder="Ejemplo: A"
-            value={apartment}
-            onChange={(e) => setApartment(e.target.value)}
-            disabled={isDelivery === true}
-          />
-        </div>
+                          <div>
+                            <label
+                              htmlFor="province"
+                              className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                              Provincia
+                            </label>
+                            <select
+                              name="province"
+                              id="province"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                              value={province}
+                              onChange={(e) => setProvince(e.target.value)}
+                            >
+                              {Object.entries(provinceMapping).map(
+                                ([key, value]) => (
+                                  <option key={key} value={value}>
+                                    {value}
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </div>
 
-        {/* Checkbox para Retiro en Local */}
-        <div className="flex gap-4 items-center h-20">
-          <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-            Retiro en local
-          </h4>
-          <input
-            type="checkbox"
-            name="isDelivery"
-            id="isDelivery"
-            onChange={(e) => setIsDelivery(e.target.checked)}
-          />
-        </div>
+                          <div className="flex justify-end gap-2 mt-4">
+                            <button
+                              type="button"
+                              onClick={() => setIsEditing(false)}
+                              className="py-2 px-4 text-sm font-medium text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-100"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleEditAddress();
+                                setIsEditing(false);
+                              }}
+                              className="py-2 px-4 text-sm text-white font-medium bg-teal-600 rounded-lg hover:bg-teal-700"
+                            >
+                              Guardar cambios
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-        {/* Checkbox para Necesitar Factura */}
-        <div className="flex gap-4 items-center h-20">
-          <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-            ¿Necesitás Factura?
-          </h4>
-          <input
-            type="checkbox"
-            name="needsInvoice"
-            id="needsInvoice"
-            onChange={(e) => setNeedsInvoice(e.target.checked)}
-          />
-        </div>
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          checked={isDelivery}
+                          onChange={() => {
+                            setIsDelivery(true);
+                            setIsEditing(false);
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">Retiro en local</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-gray-900">Gratis</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-        {/* Selección de Tipo de Factura y Inputs Condicionales */}
-        {needsInvoice && (
-          <div className="flex flex-col gap-4 mb-4">
-            <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
-              ¿Qué tipo de factura necesitás?
-            </h4>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                  invoiceType === "A" ? "bg-teal-600 text-white" : "bg-gray-200"
-                }`}
-                onClick={() => setInvoiceType("A")}
-              >
-                A
-              </button>
-              <button
-                type="button"
-                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                  invoiceType === "B" ? "bg-teal-600 text-white" : "bg-gray-200"
-                }`}
-                onClick={() => setInvoiceType("B")}
-              >
-                B
-              </button>
-              <button
-                type="button"
-                className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
-                  invoiceType === "C" ? "bg-teal-600 text-white" : "bg-gray-200"
-                }`}
-                onClick={() => setInvoiceType("C")}
-              >
-                C
-              </button>
-            </div>
-
-            {/* Input de CUIT habilitado solo para Factura A */}
-            {invoiceType === "A" && (
-              <div className="w-full h-20 gap-4 flex flex-col">
-                <label htmlFor="cuit" className="block text-sm font-medium text-gray-900 dark:text-white">
-                  CUIT
-                </label>
-                <input
-                  type="text"
-                  name="cuit"
-                  id="cuit"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Ejemplo: 20-12345678-5"
-                  value={cuit}
-                  onChange={(e) => setCuit(e.target.value)}
-                  disabled={invoiceType !== "A"}
-                />
-              </div>
-            )}
-
-         {/* Input de DNI habilitado solo para Factura B o C */}
-{(invoiceType === "B" || invoiceType === "C") && (
-  <div className="w-full h-20 gap-4 flex flex-col">
-    <label htmlFor="dni" className="block text-sm font-medium text-gray-900 dark:text-white">
-      DNI
-    </label>
-    <input
-      type="text"
-      name="dni"
-      id="dni"
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-      placeholder="Ejemplo: 12345678"
-      value={dni}
-      onChange={(e) => setDni(e.target.value)}
-      disabled={invoiceType !== "B" && invoiceType !== "C"} // Cambiado aquí
-    />
-  </div>
-)}
-          </div>
-        )}
-      </>
-    ) : (
-      <div className="flex items-center justify-center h-40">
-        <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
-      </div>
-    )}
-  </Modal.Body>
-  <Modal.Footer>
-    {session && session.role === "Cliente" ? (
-      <div className="w-full">
-        <button
-          onClick={() => handleCheckout("Cliente Cuenta Corriente")}
-          type="button"
-          className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
-          disabled={
-            !session ||
-            cart.length === 0 ||
-            (isDelivery === false && addresOrder === "") ||
-            (needsInvoice && !invoiceType) ||
-            (account && account.balance + total > account.creditLimit)
-          }
-          title={
-            !session
-              ? "Necesita estar logueado para continuar con el pago"
-              : cart.length === 0
-              ? "El carrito está vacío"
-              : ""
-          }
-        >
-          <p>Agregar a cuenta corriente: $ {total}</p>
-          {account && (
-            <p>
-              <b
-                className={`${
-                  account.balance + total > account.creditLimit
-                    ? "text-red-500"
-                    : "text-white"
-                }`}
-              >
-                $ {account.balance + total}
-              </b>{" "}
-              / $ {account?.creditLimit}
-            </p>
-          )}
-        </button>
-        <button
-          onClick={() => handleCheckout("Cliente Transferencia")}
-          type="button"
-          className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white hover:bg-blue-800`}
-          disabled={
-            !session ||
-            cart.length === 0 ||
-            (isDelivery === false && addresOrder === "") ||
-            (needsInvoice && !invoiceType)
-          }
-          title={
-            !session
-              ? "Necesita estar logueado para continuar con el pago"
-              : cart.length === 0
-              ? "El carrito está vacío"
-              : ""
-          }
-        >
-          Pago con transferencia bancaria
-        </button>
-      </div>
-    ) : (
-      <button
-        onClick={() => handleCheckout("Usuario")}
-        type="button"
-        className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
-        disabled={
-          !session ||
-          cart.length === 0 ||
-          (isDelivery === false && addresOrder === "") ||
-          (needsInvoice && !invoiceType)
-        }
-        title={
-          !session
-            ? "Necesita estar logueado para continuar con el pago"
-            : cart.length === 0
-            ? "El carrito está vacío"
-            : ""
-        }
-      >
-        Ir a pagar
-      </button>
-    )}
-  </Modal.Footer>
-</Modal>
+                    <div className="flex flex-col gap-4 mb-4">
+                      <h4 className="block text-sm font-medium text-gray-900 dark:text-white">
+                        ¿Qué tipo de factura necesitás?
+                      </h4>
+                      {/* // onChange={(e) => setIsDelivery(e.target.checked)} */}
+                      <div className="flex gap-4">
+                        <button
+                          type="button"
+                          className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                            invoiceType === "A"
+                              ? "bg-teal-600 text-white"
+                              : "bg-gray-200"
+                          }`}
+                          onClick={() => setInvoiceType("A")}
+                        >
+                          A
+                        </button>
+                        <button
+                          type="button"
+                          className={`text-sm px-4 py-2.5 w-full font-semibold tracking-wide rounded-md ${
+                            invoiceType === "B"
+                              ? "bg-teal-600 text-white"
+                              : "bg-gray-200"
+                          }`}
+                          onClick={() => setInvoiceType("B")}
+                        >
+                          B
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-40">
+                    <Spinner
+                      color="teal"
+                      className="h-12 w-12"
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                    />
+                  </div>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                {session && session.role === "Cliente" ? (
+                  <div className="w-full">
+                    <button
+                      onClick={() => handleCheckout("Cliente Cuenta Corriente")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && street === "") ||
+                        (needsInvoice && !invoiceType) ||
+                        (account &&
+                          account.balance + total > account.creditLimit)
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      <p>Agregar a cuenta corriente: $ {total}</p>
+                      {account && (
+                        <p>
+                          <b
+                            className={`${
+                              account.balance + total > account.creditLimit
+                                ? "text-red-500"
+                                : "text-white"
+                            }`}
+                          >
+                            $ {account.balance + total}
+                          </b>{" "}
+                          / $ {account?.creditLimit}
+                        </p>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleCheckout("Cliente Transferencia")}
+                      type="button"
+                      className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-blue-600 text-white hover:bg-blue-800`}
+                      disabled={
+                        !session ||
+                        cart.length === 0 ||
+                        (isDelivery === false && street === "") ||
+                        (needsInvoice && !invoiceType)
+                      }
+                      title={
+                        !session
+                          ? "Necesita estar logueado para continuar con el pago"
+                          : cart.length === 0
+                          ? "El carrito está vacío"
+                          : ""
+                      }
+                    >
+                      Pago con transferencia bancaria
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleCheckout("Usuario")}
+                    type="button"
+                    className={`text-sm px-4 py-2.5 my-0.5 w-full font-semibold tracking-wide rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-500 bg-teal-600 text-white hover:bg-teal-800`}
+                    disabled={
+                      !session ||
+                      cart.length === 0 ||
+                      (needsInvoice && !invoiceType)
+                    }
+                    title={
+                      !session
+                        ? "Necesita estar logueado para continuar con el pago"
+                        : cart.length === 0
+                        ? "El carrito está vacío"
+                        : ""
+                    }
+                  >
+                    Ir a pagar
+                  </button>
+                )}
+              </Modal.Footer>
+            </Modal>
             <Link href="/categories">
               <button
                 type="button"

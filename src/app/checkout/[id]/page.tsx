@@ -62,7 +62,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
         try {
           const linkPayment = {
             price: total,
-            orderId: params.id,
+            orderId: Number(params.id),
           };
 
           const response = await postMarketPay(linkPayment);

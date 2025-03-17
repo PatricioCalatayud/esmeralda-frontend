@@ -41,7 +41,7 @@ const Contacto: React.FC = () => {
 
     try {
       const res = await CreateTestimony(review, token);
-
+      console.log(res);
       if (res && ( res.status === 200 || res.status === 201)) {
 
       Swal.fire({
@@ -54,7 +54,14 @@ const Contacto: React.FC = () => {
       setPunctuation(0);
       router.push("/");
     }
-
+    else if (res.response.data.message === "El usuario ya tiene un testimonio asociado.") {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "El usuario ya tiene un testimonio asociado.",
+      });
+      return
+    }
     } catch (error: any) {
       console.error("Error creando review:", error);
       Swal.fire({

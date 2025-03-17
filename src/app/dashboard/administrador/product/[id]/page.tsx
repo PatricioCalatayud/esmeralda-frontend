@@ -11,7 +11,7 @@ import { getProductById, putProducts, putProductsFormData } from "@/helpers/Prod
 import { useAuthContext } from "@/context/auth.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useRouter } from "next/navigation";
-
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProductEdit = ({ params }: { params: { id: string } }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -20,7 +20,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const [dataProduct, setDataProduct] = useState<IProductUpdate>({
     description: "",
-    presentacion: "" ,
+    presentation: "" ,
     tipoGrano: "",
     categoryID: 0,
     imgUrl:"",
@@ -31,7 +31,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
   const [errors, setErrors] = useState<IProductErrorResponse>({
 
     description: "",
-    presentacion: "",
+    presentation: "",
     tipoGrano: "",
     file: undefined,
     categoryID: "",
@@ -51,7 +51,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         description,
         // revisar con el backend
         tipoGrano,
-        presentacion,
+        presentation,
         imgUrl,
         category = {
           id: "",
@@ -64,7 +64,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
         description,
         imgUrl,
         tipoGrano,
-        presentacion,
+        presentation,
     categoryID: category.id,
 
       }));
@@ -121,8 +121,8 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
 
       formData.append("description", dataProduct.description);
       formData.append("category", dataProduct.categoryID.toString());
-      if (dataProduct.presentacion) {
-        formData.append("presentacion", dataProduct.presentacion);
+      if (dataProduct.presentation) {
+        formData.append("presentation", dataProduct.presentation);
       }
       if (dataProduct.tipoGrano) {
         formData.append("tipoGrano", dataProduct.tipoGrano);
@@ -169,13 +169,47 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     return <div>Loading...</div>;
   }
 
+  
+  
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const fetchImageBlob = async () => {
+    try {
+      const response = await fetch(`${apiURL}/product/${dataProduct.imgUrl}`);
+      if (response.ok) {
+        const blob = await response.blob(); 
+        return URL.createObjectURL(blob); 
+      } else {
+        throw new Error(`Error al cargar la imagen para el producto`);
+      }
+    } catch (error) {
+      console.error(`Error al obtener la imagen para el producto:`, error);
+      return null;
+    }
+  };
+  
+  // Llamada para obtener la imagen
+  useEffect(() => {
+    const getImage = async () => {
+      const img = await fetchImageBlob();
+      if (img) {
+        setImageUrl(img); // Guardamos la URL en el estado
+      }
+    };
+  
+    getImage();
+  }, [dataProduct.imgUrl]); // Dependencia para que se actualice si cambia la URL del producto
+  
+  
+   
+
   return (
     <DashboardAddModifyComponent
     titleDashboard="Editar producto"
   backLink = "/dashboard/administrador/product"
   buttonSubmitText = "Actualizar"
   handleSubmit = {handleSubmit}
-  disabled = {(errors.description !== "" && errors.categoryID !== "" && errors.imgUrl !== "" && errors.presentacion !== "" && errors.tipoGrano !== "")}
+  disabled = {(errors.description !== "" && errors.categoryID !== "" && errors.imgUrl !== "" && errors.presentation !== "" && errors.tipoGrano !== "")}
   >
 <div className="grid gap-4 mb-4 sm:grid-cols-2">
             <div className="grid gap-4 sm:col-span-2">
@@ -238,16 +272,16 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   id="presentacion"
                   name="presentacion"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={dataProduct.presentacion}
+                  value={dataProduct.presentation}
                   onChange={handleChange}
                 >
-                <option value={dataProduct.presentacion}>{dataProduct.presentacion || "--Seleccione--"}</option>
+                <option value={dataProduct.presentation}>{dataProduct.presentation || "--Seleccione--"}</option>
                   <option value="Molido">Molido</option>
                   <option value="Grano">Grano</option>
                   <option value="Capsulas">Cápsulas</option>
                 </select>
-                {errors.presentacion && (
-                  <span className="text-red-500">{errors.presentacion}</span>
+                {errors.presentation && (
+                  <span className="text-red-500">{errors.presentation}</span>
                 )}
               </div>
 
@@ -269,7 +303,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
                   <option value="Santos">Santos</option>
                   <option value="Colombiano">Colombiano</option>
                   <option value="Torrado">Torrado</option>
-                  <option value="Rio de oro">Rio de Oro</option>
+                  <option value="Rio de Oro">Rio de Oro</option>
                   <option value="Descafeino">Descafeinado</option>
                   <option value="Blend-premium">Blend</option>
                   <option value="Mezcla baja calidad">Mezcla</option>
@@ -282,10 +316,10 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
           </div>
 
           <div className="sm:col-span-2">
-          {dataProduct.imgUrl && (
+          {imageUrl && (
               <div className="mt-4 flex justify-center ">
                 <Image
-                  src={dataProduct.imgUrl}
+                  src={String(imageUrl)}
                   alt="Imagen del producto"
                   width={500} // debes especificar un ancho
                   height={300} // y una altura

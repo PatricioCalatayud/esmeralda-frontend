@@ -39,7 +39,8 @@ const Navbar = () => {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/forgotPassword" ||
-    pathname === "/resetPassword";
+    pathname === "/resetPassword" ||
+    pathname === "/emailVerify";
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -120,7 +121,7 @@ const Navbar = () => {
             {!session && (
               <Link href="/login">
                 <button className="text-gray-900 font-bold">
-                  Iniciar Sesion
+                  Ingresar
                 </button>
               </Link>
             )}
@@ -190,7 +191,7 @@ const Navbar = () => {
               pathname === "/categories" && "text-gray-900 font-bold"
             }`}
           >
-            Tienda Online
+            Tienda
           </Link>
           <Dropdown
             arrowIcon={true}
@@ -291,7 +292,7 @@ const Navbar = () => {
           {!session && (
             <Link href="/login">
               <button className="text-gray-900 font-bold">
-                Iniciar Sesion
+                Ingresar
               </button>
             </Link>
           )}

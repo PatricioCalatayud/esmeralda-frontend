@@ -5,12 +5,14 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     email: "",
     password: "",
     phone: "",
-    address: {
+
       province: "",
-      localidad: "",
-      deliveryNumber: "",
-      address: ""
-    }
+      locality: "",
+      street: "",
+      number: "",
+zipCode: "",
+arca_identification: "",
+cuit: "",
   };
 
   // Validaciones del nombre
@@ -40,18 +42,16 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
   }
 
   // Validaciones de la dirección
-  if (!values.address.province) {
-    errors.address.province = "El campo provincia es requerido";
+  if (!values.province) {
+    errors.province = "El campo provincia es requerido";
   }
-  if (!values.address.localidad.trim()) {
-    errors.address.localidad = "El campo localidad es requerido";
+  if (!values.locality.trim()) {
+    errors.locality = "El campo localidad es requerido";
   }
-  if (!values.address.address.trim()) {
-    errors.address.address = "El campo dirección es requerido";
+  if (!values.street.trim()) {
+    errors.street = "El campo dirección es requerido";
   }
-  if (!values.address.deliveryNumber) {
-    errors.address.deliveryNumber = "El campo número de entrega es requerido";
-  }
+ 
 
   return errors;
 }

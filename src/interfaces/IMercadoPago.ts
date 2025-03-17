@@ -1,5 +1,5 @@
 export interface IMercadoPago {
-  orderId: string,
+  orderId: number,
   price: number,
   
 }

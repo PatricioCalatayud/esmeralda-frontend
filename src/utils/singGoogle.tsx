@@ -1,17 +1,34 @@
 import { signIn, signOut, getSession } from "next-auth/react";
 
 const signInWithGoogle = async() => {
-    await signIn("google",{  callbackUrl: "/"  })
-  };
+  try {
+    const result = await signIn("google", { 
+      redirect: false
+    });
+    return result;
+  } catch (error) {
+    console.error("Error en signInWithGoogle:", error);
+    return null;
+  }
+};
 
 const signOutWithGoogle = async() => {
-    await signOut()
-  };
+  try {
+    await signOut({ redirect: false });
+  } catch (error) {
+    console.error("Error en signOutWithGoogle:", error);
+  }
+};
 
-  const getSessionGoogle = async () => {
+const getSessionGoogle = async () => {
+  try {
     const session = await getSession();
-    console.log(session);
+    console.log("session", session)
     return session;
-  };
-  
-  export { signInWithGoogle, signOutWithGoogle, getSessionGoogle };
+  } catch (error) {
+    console.error("Error en getSessionGoogle:", error);
+    return null;
+  }
+};
+
+export { signInWithGoogle, signOutWithGoogle, getSessionGoogle };

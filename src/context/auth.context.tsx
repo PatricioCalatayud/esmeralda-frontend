@@ -77,52 +77,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
     
   }, []);
+
   useEffect(() => {
     const someFunction = async () => {
       const sessionGoogle = await getSessionGoogle();
-      ;
+      
       if (sessionGoogle && sessionGoogle.user) {
-        const user = {
-          email: sessionGoogle.user.email as string,
-        }
-        const reponseLogin = await LoginUser(user)
-        console.log(reponseLogin);
+        const user = { email: sessionGoogle.user.email as string };
+        const reponseLogin = await LoginUser(user);
+  
         if (reponseLogin && (reponseLogin.status === 200 || reponseLogin.status === 201)) {
-        console.log("Usuario:", sessionGoogle.user);
-
-      const token = reponseLogin.data.accessToken;
-      const decodedToken: any = jwtDecode(token);
-
-      setToken(token);
-
-        setSession({
-          id: decodedToken.sub,
-          name: decodedToken.name,
-          email: decodedToken.email,
-          image: sessionGoogle.user?.image ?? "",
-          role: decodedToken.roles[0],
-          phone: decodedToken.phone,
-          address: decodedToken.address,
-        }),
-        setUserGoogle(true);
-      } else {
-        const newUser = {
-          email: sessionGoogle.user.email as string,
-          name: sessionGoogle.user.name as string,
-          password: "", // Puedes agregar el password aquí o usar uno por defecto
-          phone: "", // Agregar un valor para el número de teléfono
-          address: {
-            province: 0, // Aquí deberías asignar el número de la provincia
-            localidad: "", // Agregar la localidad
-            deliveryNumber: 0, // Asignar un número de delivery o mantenerlo como 0 por defecto
-            address: "", // Agregar una dirección
-          }
-        };
-        const response = await NewUser(newUser);
-        if (response && (response.status === 200 || response.status === 201)) {
-          const token = response.data.accessToken;
+          const token = reponseLogin.data.accessToken;
           const decodedToken: any = jwtDecode(token);
-          
+  
           setToken(token);
           setSession({
             id: decodedToken.sub,
@@ -131,12 +98,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             image: sessionGoogle.user?.image ?? "",
             role: decodedToken.roles[0],
             phone: decodedToken.phone,
-            address: decodedToken.address
-          }),
+            address: decodedToken.address,
+          });
           setUserGoogle(true);
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Ups!",
+            text: "Necesitas registrarte para iniciar sesión con Google.",
+            confirmButtonText: "Registrarse",
+            confirmButtonColor: "#00897b",
+          });
+          router.push("/register");
         }
-
-      }
       } else {
         console.log("No hay sesión de Google activa");
       }
@@ -146,10 +120,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     someFunction();
   }, []);
 
+
   //! Cerrar sesión
   const handleSignOut = () => {
     if (userGoogle === true) {
       signOutWithGoogle();
+      setSession(undefined);
+      setUserId(undefined);
+      setToken(undefined);
     } else {
       localStorage.removeItem("userSession");
       localStorage.removeItem("cart");

@@ -12,7 +12,7 @@ export async function getProducts(page?: number, limit?: number) {
       },
 
     });
-    console.log(res.data.data)
+    console.log(res)
     const products: IProductList[] = res.data.data;
     return products;
   } catch (error: any) {

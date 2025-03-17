@@ -94,7 +94,7 @@ console.log(orders);
           className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-            {format(new Date(order.date), "dd'-'MM'-'yyyy", {
+            {format(new Date(order.create), "dd'-'MM'-'yyyy", {
               locale: es,
             })}
           </td>
