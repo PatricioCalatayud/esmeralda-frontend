@@ -121,7 +121,7 @@ const Navbar = () => {
             {!session && (
               <Link href="/login">
                 <button className="text-gray-900 font-bold">
-                  Iniciar Sesion
+                  Ingresar
                 </button>
               </Link>
             )}
@@ -191,7 +191,7 @@ const Navbar = () => {
               pathname === "/categories" && "text-gray-900 font-bold"
             }`}
           >
-            Tienda Online
+            Tienda
           </Link>
           <Dropdown
             arrowIcon={true}
@@ -292,7 +292,7 @@ const Navbar = () => {
           {!session && (
             <Link href="/login">
               <button className="text-gray-900 font-bold">
-                Iniciar Sesion
+                Ingresar
               </button>
             </Link>
           )}

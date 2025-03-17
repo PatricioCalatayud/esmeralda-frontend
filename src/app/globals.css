@@ -13,3 +13,53 @@
 }
 
 @import url('https://fonts.googleapis.com/css?family=Poppins:300,400,600&display=swap');
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.custom-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.custom-fade-out-down {
+  animation: fadeOutDown 0.3s ease-out;
+}
+
+.custom-popup {
+  padding: 15px;
+}
+
+.custom-title {
+  font-size: 18px;
+}
+
+.custom-content {
+  font-size: 12px;
+}
+
+.custom-icon {
+  width: 60px !important;   
+  height: 60px !important;  
+}
+
+

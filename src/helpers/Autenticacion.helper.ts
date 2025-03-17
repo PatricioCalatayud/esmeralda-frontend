@@ -1,4 +1,4 @@
-import { IUserProps, IUserUpdateProps } from "@/interfaces/IUser";
+import { IAddressProps, IUpdateProps, IUserProps, IUserUpdateProps } from "@/interfaces/IUser";
 import { ILoginProps } from "@/interfaces/ILogin";
 import axios from "axios";
 import { ISession } from "@/interfaces/ISession";
@@ -13,6 +13,7 @@ export async function LoginUser(user: ILoginProps) {
         "Content-Type": "application/json",
       },
     });
+    console.log(res)
     return res;
   } catch (error: any) {
     if (error.response) {
@@ -113,11 +114,12 @@ export async function getUser(userId: string, token: string | undefined) {
   }
 }
 
-export async function putUser(userId: string, user: any, token: string | undefined) {
+export async function putUser(user?: IUpdateProps, token?: string | undefined) {
   try {
-    const response = await axios.put(`${apiURL}/users/${userId}`, user, {
+    const response = await axios.put(`${apiURL}/users/${user?.id}`, {address: user?.address}, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
 

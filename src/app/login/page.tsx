@@ -4,7 +4,7 @@ import { ILogin, ILoginErrorProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from "sweetalert2";
 import Avatar from "@mui/material/Avatar";
@@ -20,7 +20,6 @@ import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { IconButton } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import {signInWithGoogle} from "@/utils/singGoogle";
-import { signInWithFacebook } from "@/utils/singFacebook";
 import { useAuthContext } from "@/context/auth.context";
 import { jwtDecode } from "jwt-decode";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
@@ -50,13 +49,19 @@ const Login = () => {
     password: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const{setSession,setUserId,setToken} = useAuthContext();
+  const{setSession,setUserId,setToken,session,authLoading} = useAuthContext();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
+
+  useEffect(() => {
+    if (session && !authLoading) {
+      Router.push("/");
+    }
+  }, [session, authLoading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -214,7 +219,7 @@ const Login = () => {
                   label="Correo"
                   name="email"
                   autoComplete="email"
-                  autoFocus
+                  focused={false}
                   value={dataUser.email}
                   onChange={handleChange}
                   error={!!error.email}
@@ -231,6 +236,7 @@ const Login = () => {
                   name="password"
                   autoComplete="current-password"
                   value={dataUser.password}
+                  focused={false}
                   onChange={handleChange}
                   error={!!error.password}
                   helperText={error.password}
@@ -302,15 +308,13 @@ const Login = () => {
                     href="/register"
                     className="text-teal-900 font-bold tracking-wide hover:underline ml-1"
                   >
-                    Regístrate Aquí
+                    Regístrate aquí
                   </a>
                 </p>
                 {submitError && (
                   <p className="text-red-500 mt-4">{submitError}</p>
                 )}
-                <div>
-                  <hr className="border-gray-600 border-2 my-3" />
-                </div>
+                <div className="border-gray-600 border-2 my-3 rounded-full"/>
                 <div className="space-x-6 flex justify-center mt-2">
                   <button type="button" className="border-none outline-none" onClick={() => signInWithGoogle()}>
                     <svg
@@ -351,19 +355,6 @@ const Login = () => {
                       />
                     </svg>
                   </button>
-                  {/*<button type="button" className="border-none outline-none" onClick={() => signInWithFacebook()}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="32px"
-                      fill="#007bff"
-                      viewBox="0 0 167.657 167.657"
-                    >
-                      <path
-                        d="M83.829.349C37.532.349 0 37.881 0 84.178c0 41.523 30.222 75.911 69.848 82.57v-65.081H49.626v-23.42h20.222V60.978c0-20.037 12.238-30.956 30.115-30.956 8.562 0 15.92.638 18.056.919v20.944l-12.399.006c-9.72 0-11.594 4.618-11.594 11.397v14.947h23.193l-3.025 23.42H94.026v65.653c41.476-5.048 73.631-40.312 73.631-83.154 0-46.273-37.532-83.805-83.828-83.805z"
-                        data-original="#010002"
-                      ></path>
-                    </svg>
-                  </button>*/}
                 </div>
                 
               </Box>
@@ -372,7 +363,7 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
-      <div className="absolute bottom-1 left-1 hidden md:block">
+      <div className="fixed bottom-1 left-1 hidden md:block">
         <Image
           src="/logoblanco.png"
           alt="Logo"
