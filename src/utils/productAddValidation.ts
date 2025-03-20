@@ -11,7 +11,7 @@ export function productAddValidation(
   const errors: IProductErrorUpdate = {
     description: "",
     categoryID: "",
-    presentacion: "",
+    presentation: "",
     tipoGrano: "",
     imgUrl:"",
 
@@ -24,8 +24,8 @@ export function productAddValidation(
   if (!product.imgUrl) {
     errors.imgUrl = "La imagen es obligatoria";
   }
-  if (!product.presentacion) {
-    errors.presentacion = "La presentación es obligatoria";
+  if (!product.presentation) {
+    errors.presentation = "La presentación es obligatoria";
   }
 
   if (!product.tipoGrano) {

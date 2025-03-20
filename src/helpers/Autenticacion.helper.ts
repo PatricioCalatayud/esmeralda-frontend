@@ -129,6 +129,21 @@ export async function putUser(user?: IUpdateProps, token?: string | undefined) {
   }
 }
 
+export async function putUserLimit(userId: string, user: any, token: string | undefined) {
+    try {
+      const response = await axios.put(`${apiURL}/users/${userId}`, user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      return response;
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+
 export async function deleteUser(userId: string, token: string | undefined) {
   try {
     const response = await axios.delete(`${apiURL}/users/${userId}`, {

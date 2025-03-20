@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent"
 import { Spinner } from "@material-tailwind/react";
 import Swal from "sweetalert2";
-import { getUsers, putUser } from "@/helpers/Autenticacion.helper";
+import { getUsers, putUserLimit } from "@/helpers/Autenticacion.helper";
 import { useAuthContext } from "@/context/auth.context";
 
 import { ISession } from "@/interfaces/ISession";
@@ -77,7 +77,7 @@ const Users = () => {
     const updateUserRole = async (id: string, newRole: string) => {
         try {
             const user = { role: newRole };
-            const response = await putUser(id, user, token as string);
+            const response = await putUserLimit(id, user, token as string);
     
             if (response?.status === 200 || response?.status === 201) {
                 setUsers((prevUsers) =>
@@ -103,7 +103,7 @@ const Users = () => {
         };
     
         try {
-            const response = await putUser(currentUser.id, user, token as string);
+            const response = await putUserLimit(currentUser.id, user, token as string);
             if (response?.status === 200 || response?.status === 201) {
                 setUsers((prevUsers) =>
                     prevUsers?.map((u) => (u.id === currentUser.id ? { ...u, role: newRole } : u))
