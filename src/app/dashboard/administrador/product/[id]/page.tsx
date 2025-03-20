@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { Category, IProductErrorResponse, IProductErrorUpdate, IProductUpdate } from "@/interfaces/IProductList";
+import { Category, IProductErrorResponse, IProductUpdate } from "@/interfaces/IProductList";
 import { productUpdateValidation } from "@/utils/productUpdateValidation";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
 import { useCategoryContext } from "@/context/categories.context";
-import { getProductById, putProducts, putProductsFormData } from "@/helpers/ProductsServices.helper";
+import { getProductById, putProductsFormData } from "@/helpers/ProductsServices.helper";
 import { useAuthContext } from "@/context/auth.context";
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import { useRouter } from "next/navigation";
@@ -44,37 +44,28 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
       const productData = await getProductById(params.id, token);
       console.log(productData);
       if (productData && (productData.status === 200 || productData.status === 201)) {
-
-      
-      // Desestructurar solo los campos que deseas actualizar
-      const {
-        description,
-        // revisar con el backend
-        tipoGrano,
-        presentation,
-        imgUrl,
-        category = {
-          id: "",
-          name: "",
-        },
-      } = productData.data;
-      // Establecer solo los campos especificados en dataProduct
-      setDataProduct((prevState) => ({
-        ...prevState,
-        description,
-        imgUrl,
-        tipoGrano,
-        presentation,
-    categoryID: category.id,
-
-      }));
+        const {
+          description,
+          tipoGrano,
+          presentation,
+          imgUrl,
+          category = {
+            id: "",
+            name: "",
+          },
+        } = productData.data;
+        setDataProduct((prevState) => ({
+          ...prevState,
+          description,
+          imgUrl,
+          tipoGrano,
+          presentation,
+          categoryID: category.id,
+        }));
+      }
     };
-  }
-  fetchProduct();
-
-  }, []);
-
-
+    fetchProduct();
+  }, [params.id, token]);
 
   //! Actualizar campos del producto
   const handleChange = (
@@ -198,7 +189,7 @@ const ProductEdit = ({ params }: { params: { id: string } }) => {
     };
   
     getImage();
-  }, [dataProduct.imgUrl]); // Dependencia para que se actualice si cambia la URL del producto
+  }, [dataProduct.imgUrl, fetchImageBlob]);
   
   
    
