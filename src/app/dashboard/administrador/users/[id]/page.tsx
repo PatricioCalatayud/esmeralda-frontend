@@ -2,7 +2,7 @@
 import DashboardAddModifyComponent from "@/components/DashboardComponent/DashboardAdd&ModifyComponent";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 import { useAuthContext } from "@/context/auth.context";
-import { getUser, putUser } from "@/helpers/Autenticacion.helper";
+import { getUser, putUserLimit } from "@/helpers/Autenticacion.helper";
 import { getOrders, putAccountPayment, putOrder } from "@/helpers/Order.helper";
 import { IOrders } from "@/interfaces/IOrders";
 
@@ -165,7 +165,7 @@ console.log(user);
       },
     });
 
-    const response = await putUser(id, usuario, token);
+    const response = await putUserLimit(id, usuario, token);
 
     if (response && (response.status === 201 || response.status === 200)) {
       Swal.fire({

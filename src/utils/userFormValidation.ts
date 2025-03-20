@@ -5,7 +5,7 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     email: "",
     password: "",
     phone: "",
-
+    lastname: "",
       province: "",
       locality: "",
       street: "",

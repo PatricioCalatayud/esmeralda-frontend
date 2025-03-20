@@ -41,7 +41,7 @@ const InsertProduct = () => {
   const [errors, setErrors] = useState<IProductErrorResponse>({
     description: "",
     categoryID: "",
-    presentacion: "",
+    presentation: "",
     tipoGrano: "",
     imgUrl : "",
   });
@@ -86,8 +86,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   formData.append("categoryID", dataProduct.categoryID.toString());
   
   // Agregar `presentacion` y `tipoGrano` solo si tienen valores
-  if (dataProduct.presentacion) {
-    formData.append("presentacion", dataProduct.presentacion);
+  if (dataProduct.presentation) {
+    formData.append("presentacion", dataProduct.presentation);
   }
   if (dataProduct.tipoGrano) {
     formData.append("tipoGrano", dataProduct.tipoGrano);
@@ -161,7 +161,7 @@ useEffect(() => {
   // Validar los datos del producto
   const validationErrors = productAddValidation({
     ...dataProduct,
-    presentacion: dataProduct.presentacion || "", // Solo validar si tiene valor
+    presentation: dataProduct.presentation || "", // Solo validar si tiene valor
     tipoGrano: dataProduct.tipoGrano || "", // Solo validar si tiene valor
   });
 
@@ -283,7 +283,7 @@ return (
               id="presentacion"
               name="presentacion"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              value={dataProduct.presentacion}
+              value={dataProduct.presentation}
               onChange={handleChange}
             >
               <option value="">--Seleccione--</option>
