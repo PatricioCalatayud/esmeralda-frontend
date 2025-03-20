@@ -347,13 +347,6 @@ const Navbar = () => {
                     />
                     Panel de cliente
                   </Dropdown.Item>
-                  <Dropdown.Item href="/dashboard/cliente/order">
-                    <FontAwesomeIcon
-                      icon={faTruck}
-                      style={{ marginRight: "5px" }}
-                    />
-                    Envios
-                  </Dropdown.Item>
                 </div>
               )}
 

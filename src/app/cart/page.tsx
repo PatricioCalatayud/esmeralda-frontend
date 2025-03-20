@@ -8,7 +8,6 @@ import { ICart } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Typography from "@mui/material/Typography";
 import {
   faBagShopping,
   faMinus,
@@ -21,8 +20,6 @@ import { useCartContext } from "@/context/cart.context";
 import { getUser } from "@/helpers/Autenticacion.helper";
 import { IAccountProps } from "@/interfaces/IUser";
 import { Spinner } from "@material-tailwind/react";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
 import { putUser } from "@/helpers/Autenticacion.helper";
 
 const Cart = () => {
@@ -52,7 +49,14 @@ const Cart = () => {
   const [number, setNumber] = useState(session?.address?.number || 0);
   const [locality, setLocality] = useState(session?.address?.locality || "");
   const [province, setProvince] = useState(session?.address?.province || "");
-
+  const [zipcode, setZipcode] = useState(session?.address?.zipcode || "");
+  const [tempAddress, setTempAddress] = useState({
+    street: "",
+    number: "",
+    locality: "",
+    province: "",
+    zipcode: "",
+  });
 
   const provinceMapping: Record<number, string> = {
     1: "Buenos Aires",
@@ -86,15 +90,7 @@ const Cart = () => {
       label: provinceMapping[Number(key)],
     }))
   );
-  const initialAddressData = {
-    street: "",
-    number: "",
-    province: "",
-    locality: "",
-    zipcode: "",
-  };
-  console.log(address);
-  // Cargar localidades cuando se selecciona una provincia
+
   useEffect(() => {
     if (selectedProvince) {
       const fetchLocalities = async (provinceId: number) => {
@@ -114,7 +110,7 @@ const Cart = () => {
               })
             );
             setLocalities(localitiesList);
-            console.log("Localidades cargadas:", localitiesList); // Verifica que las localidades se cargan correctamente
+            console.log("Localidades cargadas:", localitiesList);
           } else {
             Swal.fire({
               icon: "info",
@@ -272,62 +268,16 @@ const Cart = () => {
   const iva = calcularIVA();
   const total = calcularTotal();
 
-  const handleEditAddress = async () => {
-    if (!token || !session?.id) return;
-
-    const updatedAddress = {
+  const handleEditAddress = () => {
+    setTempAddress({
       street: address,
+      number: number.toString(),
       locality: locality,
       province: province,
-      number: number.toString(),
-    };
-
-    if (
-      updatedAddress.street === "" ||
-      updatedAddress.locality === "" ||
-      updatedAddress.province === "" ||
-      updatedAddress.number === ""
-    ) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Todos los campos son requeridos",
-      });
-      console.log(updatedAddress);
-      return;
-    }
-
-    const response = await putUser(
-      { id: session.id, address: updatedAddress },
-      token
-    );
-
-    if (response?.status === 200 || response?.status === 201) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        text: "Se ha actualizado tu dirección correctamente",
-      });
-      setSession({
-        ...session,
-        address: {
-          street: address,
-          locality,
-          province,
-          number: number || 0,
-          zipcode: session.address?.zipcode || ""
-        }
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Hubo un error al actualizar tu dirección",
-      });
-    }
+      zipcode: zipcode,
+    });
   };
 
-  // Lógica para realizar el checkout
   const handleCheckout = async (boton: string) => {
     const products = cart.map((product) => ({
       productId: Number(product.idProduct),
@@ -341,12 +291,14 @@ const Cart = () => {
       userId: session?.id,
       products,
       address: isDelivery
-        ? undefined
+        ? { store: true }
+        : isEditing
+        ? tempAddress
         : {
-            street: address,
-            number: number,
-            locality: locality,
-            province: province,
+            street: session?.address?.street,
+            number: session?.address?.number,
+            locality: session?.address?.locality,
+            province: session?.address?.province,
             zipcode: session?.address?.zipcode || "",
           },
       discount: 10,
@@ -361,6 +313,14 @@ const Cart = () => {
     orderCheckout.identification = String(session?.cuit);
 
     try {
+      if (!invoiceType) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Debes seleccionar un tipo de factura",
+        });
+        return;
+      }
       const order = await postOrder(orderCheckout, token);
       console.log(order);
 
@@ -635,9 +595,9 @@ const Cart = () => {
                             <div>
                               <p className="font-medium">Enviar a domicilio</p>
                               <p className="text-gray-600">
-                                {session?.address?.street}{" "}
-                                {session?.address?.number} -{" "}
-                                {session?.address?.locality}
+                                {isEditing
+                                  ? `${tempAddress.street} ${tempAddress.number} - ${tempAddress.locality}, ${tempAddress.province}`
+                                  : `${session?.address?.street} ${session?.address?.number} - ${session?.address?.locality}, ${session?.address?.province}`}
                               </p>
                               <p className="text-gray-600">
                                 {session?.address?.province}
@@ -648,7 +608,7 @@ const Cart = () => {
                             onClick={() => setIsEditing(!isEditing)}
                             className="text-teal-600 hover:text-teal-800 text-sm mt-2 font-semibold"
                           >
-                            Editar
+                            Otra dirección
                           </button>
                         </div>
                       </div>
@@ -692,25 +652,6 @@ const Cart = () => {
                               />
                             </div>
                           </div>
-
-                          <div>
-                            <label
-                              htmlFor="locality"
-                              className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                              Localidad
-                            </label>
-                            <input
-                              type="text"
-                              name="locality"
-                              id="locality"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-                              placeholder="Nueva localidad"
-                              value={locality}
-                              onChange={(e) => setLocality(e.target.value)}
-                            />
-                          </div>
-
                           <div>
                             <label
                               htmlFor="province"
@@ -733,6 +674,43 @@ const Cart = () => {
                                 )
                               )}
                             </select>
+                          </div>
+
+                          <div className="flex gap-2 w-full">
+                            <div className="w-1/2">
+                              <label
+                                htmlFor="zipcode"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Código Postal
+                              </label>
+                              <input
+                                type="text"
+                                name="zipcode"
+                                id="zipcode"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                placeholder="Código Postal"
+                                value={zipcode}
+                                onChange={(e) => setZipcode(e.target.value)}
+                              />
+                            </div>
+                            <div className="w-1/2">
+                              <label
+                                htmlFor="locality"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Localidad
+                              </label>
+                              <input
+                                type="text"
+                                name="locality"
+                                id="locality"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                placeholder="Nueva localidad"
+                                value={locality}
+                                onChange={(e) => setLocality(e.target.value)}
+                              />
+                            </div>
                           </div>
 
                           <div className="flex justify-end gap-2 mt-4">
