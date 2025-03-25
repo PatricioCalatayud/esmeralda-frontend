@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import Link from "next/link";
 import axios from "axios";
 import { IUserProps, IUserErrorProps } from "@/interfaces/IUser";
+import { IoHome } from "react-icons/io5";
 
 // Verificar si apiURL está definida correctamente
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -68,7 +69,7 @@ const RegisterUser = () => {
     password: "",
     street: "",
     number: 0,
-    zipCode: "",
+    zipcode: "",
     locality: "",
     province: "",
     arca_identification: "",
@@ -83,7 +84,7 @@ const RegisterUser = () => {
     password: "",
     street: "",
     number: "",
-    zipCode: "",
+    zipcode: "",
     locality: "",
     province: "",
     arca_identification: "",
@@ -106,57 +107,9 @@ const RegisterUser = () => {
       label: key,
     }))
   );
-  const [localities, setLocalities] = useState<
-    { value: string; label: string }[]
-  >([]);
   const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
-  const [loadingLocalities, setLoadingLocalities] = useState(false); // Estado de carga para localidades
   const [showPassword, setShowPassword] = useState(false);
 
-
-  // Cargar localidades cuando se selecciona una provincia
-  useEffect(() => {
-    if (selectedProvince) {
-      const fetchLocalities = async (provinceId: number) => {
-        try {
-          setLoadingLocalities(true); // Inicia el estado de carga
-          const provinceName = provinceMapping[provinceId];
-
-          const response = await axios.get(
-            `https://apis.datos.gob.ar/georef/api/localidades?provincia=${provinceName}&max=5000`
-          );
-
-          if (response.data && response.data.localidades.length > 0) {
-            const localitiesList = response.data.localidades.map(
-              (locality: any) => ({
-                value: locality.nombre,
-                label: locality.nombre,
-              })
-            );
-            setLocalities(localitiesList);
-            console.log("Localidades cargadas:", localitiesList); // Verifica que las localidades se cargan correctamente
-          } else {
-            Swal.fire({
-              icon: "info",
-              title: "Sin localidades",
-              text:
-                "No se encontraron localidades para la provincia seleccionada.",
-            });
-          }
-        } catch (error: any) {
-          Swal.fire({
-            icon: "error",
-            title: "Error en la solicitud",
-            text: `Error: ${error.response?.data.message || error.message}`,
-          });
-        } finally {
-          setLoadingLocalities(false); // Finaliza el estado de carga
-        }
-      };
-
-      fetchLocalities(selectedProvince);
-    }
-  }, [selectedProvince]);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (
@@ -165,12 +118,6 @@ const RegisterUser = () => {
     event.preventDefault();
   };
 
-  const handleReset = (): void => {
-    setDataUser(initialUserData);
-    setError(initialErrorState);
-    setSelectedProvince(null);
-    setLocalities([]);
-  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -212,7 +159,7 @@ const RegisterUser = () => {
       password: "",
       street: "",
       number: "",
-      zipCode: "",
+      zipcode: "",
       locality: "",
       province: "",
       arca_identification: "",
@@ -286,8 +233,8 @@ const RegisterUser = () => {
       errors.locality = "La localidad es obligatoria";
     }
 
-    if (!data.zipCode) {
-      errors.zipCode = "El código postal es obligatorio";
+    if (!data.zipcode) {
+      errors.zipcode = "El código postal es obligatorio";
     }
 
     console.log("Errores generados en la validación:", errors);
@@ -338,11 +285,15 @@ const RegisterUser = () => {
 
     try {
       console.log("Haciendo la petición POST a la API");
-      const response = await axios.post(`${apiURL}/auth/signup`, {...dataUser, name: dataUser.name + " " + dataUser.lastname}, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        `${apiURL}/auth/signup`,
+        { ...dataUser, name: dataUser.name + " " + dataUser.lastname },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       console.log(response);
 
@@ -383,7 +334,7 @@ const RegisterUser = () => {
     error.phone !== "" ||
     error.street !== "" ||
     error.number !== "" ||
-    error.zipCode !== "" ||
+    error.zipcode !== "" ||
     error.locality !== "" ||
     error.province !== "" ||
     error.arca_identification !== "" ||
@@ -509,7 +460,26 @@ const RegisterUser = () => {
                   }}
                   autoComplete="current-password"
                 />
-
+                <TextField
+                  select
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="province"
+                  label="Provincia"
+                  name="province"
+                  value={selectedProvince}
+                  onChange={handleChange}
+                  error={!!error.province}
+                  helperText={error.province}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                >
+                  {provinces.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <div className="grid grid-cols-2 gap-4">
                   <TextField
                     margin="normal"
@@ -538,72 +508,35 @@ const RegisterUser = () => {
                     InputLabelProps={{ style: { color: "teal" } }}
                   />
                 </div>
-                <TextField
-                  select
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="province"
-                  label="Provincia"
-                  name="province"
-                  value={selectedProvince}
-                  onChange={handleChange}
-                  error={!!error.province}
-                  helperText={error.province}
-                  InputLabelProps={{ style: { color: "teal" } }}
-                >
-                  {provinces.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                <div className="grid grid-cols-2 gap-4">
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="locality"
+                    label="Localidad"
+                    name="locality"
+                    value={dataUser.locality}
+                    onChange={handleChange}
+                    error={!!error.locality}
+                    helperText={error.locality}
+                    InputLabelProps={{ style: { color: "teal" } }}
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="zipcode"
+                    label="Código postal"
+                    name="zipcode"
+                    value={dataUser.zipcode}
+                    onChange={handleChange}
+                    error={!!error.zipcode}
+                    helperText={error.zipcode}
+                    InputLabelProps={{ style: { color: "teal" } }}
+                  />
+                </div>
 
-                {/* Mostrar el spinner o las localidades */}
-                {loadingLocalities ? (
-                  <Typography align="center" sx={{ color: "teal" }}>
-                    Cargando localidades...
-                  </Typography>
-                ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    <TextField
-                      select
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="locality"
-                      label="Localidad"
-                      name="locality"
-                      value={dataUser.locality}
-                      onChange={handleChange}
-                      error={!!error.locality}
-                      helperText={error.locality}
-                      InputLabelProps={{ style: { color: "teal" } }}
-                    >
-                      {localities.map((option, index) => (
-                        <MenuItem
-                          key={`${option.value}-${index}`}
-                          value={option.value}
-                        >
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                    <TextField
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="zipCode"
-                      label="Código postal"
-                      name="zipCode"
-                      value={dataUser.zipCode}
-                      onChange={handleChange}
-                      error={!!error.zipCode}
-                      helperText={error.zipCode}
-                      InputLabelProps={{ style: { color: "teal" } }}
-                    />
-                  </div>
-                )}
                 <div className="grid grid-cols-2 gap-4">
                   <TextField
                     margin="normal"
@@ -655,39 +588,17 @@ const RegisterUser = () => {
                 >
                   {loading ? "Registrando..." : "Registrarse"}
                 </Button>
-                <Link href="/" passHref>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                      mt: 1,
-                      mb: 2,
-                      backgroundColor: "transparent",
-                      "&:hover": {
-                        backgroundColor: "gray",
-                        border: "1px solid gray",
-                        color: "white",
-                      },
-                      border: "1px solid black",
-                      boxShadow: "none",
-                      color: "black",
-                    }}
-                  >
-                    Volver al Inicio
-                  </Button>
-                </Link>
-                <Button
-                  onClick={handleReset}
-                  fullWidth
-                  sx={{ mt: 1, mb: 2, borderColor: "teal", color: "teal" }}
-                >
-                  Borrar Formulario
-                </Button>
               </form>
             </Box>
           </Container>
         </div>
-        <div className="fixed bottom-1 left-1">
+        <div
+          className="fixed top-8 left-10 hidden md:block cursor-pointer"
+          onClick={() => Router.push("/")}
+        >
+          <IoHome color="white" size={30} aria-label="Volver al Inicio" />
+        </div>
+        <div className="fixed -bottom-8 left-1 hidden md:block">
           <Image src="/logoblanco.png" alt="Logo" width={300} height={300} />
         </div>
       </div>

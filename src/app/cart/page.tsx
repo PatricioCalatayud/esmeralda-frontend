@@ -33,15 +33,7 @@ const Cart = () => {
   const [account, setAccount] = useState<IAccountProps>();
   const [loading, setLoading] = useState(false);
   const [floor, setFloor] = useState(""); // Nuevo estado para Piso
-  const [apartment, setApartment] = useState(""); // Nuevo estado para Departamento
-  const [dni, setDni] = useState(""); // Estado para DNI
-  const [cuit, setCuit] = useState(""); // Estado para CUIT
-  const [localities, setLocalities] = useState<
-    { value: string; label: string }[]
-  >([]);
-  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
-  const [loadingLocalities, setLoadingLocalities] = useState(false); // Estado de carga para localidades
-  // Variables agregadas
+  const [apartment, setApartment] = useState("");
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [invoiceType, setInvoiceType] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
@@ -91,63 +83,6 @@ const Cart = () => {
     }))
   );
 
-  useEffect(() => {
-    if (selectedProvince) {
-      const fetchLocalities = async (provinceId: number) => {
-        try {
-          setLoadingLocalities(true); // Inicia el estado de carga
-          const provinceName = provinceMapping[provinceId];
-
-          const response = await axios.get(
-            `https://apis.datos.gob.ar/georef/api/localidades?provincia=${provinceName}&max=5000`
-          );
-
-          if (response.data && response.data.localidades.length > 0) {
-            const localitiesList = response.data.localidades.map(
-              (locality: any) => ({
-                value: locality.nombre,
-                label: locality.nombre,
-              })
-            );
-            setLocalities(localitiesList);
-            console.log("Localidades cargadas:", localitiesList);
-          } else {
-            Swal.fire({
-              icon: "info",
-              title: "Sin localidades",
-              text:
-                "No se encontraron localidades para la provincia seleccionada.",
-            });
-          }
-        } catch (error: any) {
-          Swal.fire({
-            icon: "error",
-            title: "Error en la solicitud",
-            text: `Error: ${error.response?.data.message || error.message}`,
-          });
-        } finally {
-          setLoadingLocalities(false); // Finaliza el estado de carga
-        }
-      };
-
-      fetchLocalities(selectedProvince);
-    }
-  }, [selectedProvince]);
-
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setAddress((prevDataUser: any) => ({
-      ...prevDataUser,
-      street: `${street}${floor ? `, Piso: ${floor}` : ""}${
-        apartment ? `, Depto: ${apartment}` : ""
-      }`,
-      [name]: value,
-    }));
-
-    // Verificar que el campo locality se actualiza correctamente
-    console.log("Localidad seleccionada:", value);
-  };
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -293,7 +228,13 @@ const Cart = () => {
       address: isDelivery
         ? { store: true }
         : isEditing
-        ? tempAddress
+        ? {
+            street: address,
+            number: number,
+            locality: locality,
+            province: province,
+            zipcode: zipcode,
+          }
         : {
             street: session?.address?.street,
             number: session?.address?.number,
@@ -409,10 +350,10 @@ const Cart = () => {
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
         <div className="bg-white rounded-md w-full 0">
           <h2 className="text-2xl font-bold text-gray-900 h-10 flex justify-center items-center">
-            Tus Artículos
+            Tus artículos
           </h2>
           <hr className=" w-full " />
-          <div className="space-y-4 w-full mt-4">
+          <div className="space-y-4 w-full mt-4 overflow-y-auto max-h-[450px]">
             {cart.map((item, index) => (
               <div
                 key={index}
@@ -514,7 +455,7 @@ const Cart = () => {
           </div>
         </div>
 
-        <div className="rounded-xl md:sticky top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400">
+        <div className="rounded-xl md:relative top-0 flex flex-col justify-between items-center shadow-2xl bg-gray-50 border border-gray-400 h-[450px]">
           <h2 className="text-xl font-bold h-10 flex justify-center items-center">
             Resumen de compra
           </h2>
@@ -586,8 +527,11 @@ const Cart = () => {
                         <input
                           type="radio"
                           name="deliveryOption"
-                          checked={!isDelivery}
-                          onChange={() => setIsDelivery(false)}
+                          checked={!isDelivery && !isEditing}
+                          onChange={() => {
+                            setIsDelivery(false);
+                            setIsEditing(false);
+                          }}
                           className="mt-1"
                         />
                         <div className="flex-1">
@@ -595,24 +539,35 @@ const Cart = () => {
                             <div>
                               <p className="font-medium">Enviar a domicilio</p>
                               <p className="text-gray-600">
-                                {isEditing
-                                  ? `${tempAddress.street} ${tempAddress.number} - ${tempAddress.locality}, ${tempAddress.province}`
-                                  : `${session?.address?.street} ${session?.address?.number} - ${session?.address?.locality}, ${session?.address?.province}`}
-                              </p>
-                              <p className="text-gray-600">
-                                {session?.address?.province}
+                                {`${session?.address?.street} ${session?.address?.number} - ${session?.address?.locality}, ${session?.address?.province}`}
                               </p>
                             </div>
                           </div>
-                          <button
-                            onClick={() => setIsEditing(!isEditing)}
-                            className="text-teal-600 hover:text-teal-800 text-sm mt-2 font-semibold"
-                          >
-                            Otra dirección
-                          </button>
                         </div>
                       </div>
-                      {isEditing && !isDelivery && (
+                    </div>
+
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="deliveryOption"
+                          checked={isEditing}
+                          onChange={() => {
+                            setIsDelivery(false);
+                            setIsEditing(true);
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">Otra dirección</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {isEditing && (
                         <div className="mt-4 space-y-3 bg-gray-50 p-4 rounded-lg">
                           <div className="flex gap-2 w-full">
                             <div className="w-1/2">
@@ -627,7 +582,7 @@ const Cart = () => {
                                 name="address"
                                 id="address"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-                                placeholder="Nueva dirección"
+                                placeholder="Ingrese su dirección"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
                               />
@@ -666,6 +621,7 @@ const Cart = () => {
                               value={province}
                               onChange={(e) => setProvince(e.target.value)}
                             >
+                              <option value="">Seleccione una provincia</option>
                               {Object.entries(provinceMapping).map(
                                 ([key, value]) => (
                                   <option key={key} value={value}>
@@ -706,31 +662,11 @@ const Cart = () => {
                                 name="locality"
                                 id="locality"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-                                placeholder="Nueva localidad"
+                                placeholder="Localidad"
                                 value={locality}
                                 onChange={(e) => setLocality(e.target.value)}
                               />
                             </div>
-                          </div>
-
-                          <div className="flex justify-end gap-2 mt-4">
-                            <button
-                              type="button"
-                              onClick={() => setIsEditing(false)}
-                              className="py-2 px-4 text-sm font-medium text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-100"
-                            >
-                              Cancelar
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                handleEditAddress();
-                                setIsEditing(false);
-                              }}
-                              className="py-2 px-4 text-sm text-white font-medium bg-teal-600 rounded-lg hover:bg-teal-700"
-                            >
-                              Guardar cambios
-                            </button>
                           </div>
                         </div>
                       )}

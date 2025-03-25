@@ -5,7 +5,7 @@ export interface IUserProps {
   password: string;
   street: string;
   number: number | undefined;
-  zipCode: string;
+  zipcode: string;
   locality: string;
   province: string;
   arca_identification: string;
@@ -45,7 +45,7 @@ export interface IUserErrorProps {
   password: string;
   street: string;
   number: string;
-  zipCode: string;
+  zipcode: string;
   locality: string;
   province: string;
   arca_identification: string;
@@ -78,7 +78,7 @@ export interface IUserUpdateProps {
   cuit?: number;
   street?: string;
   number?: number;
-  zipCode?: string;
+  zipcode?: string;
   locality?: string;
   province?: string;
 }

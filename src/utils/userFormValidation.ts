@@ -6,13 +6,13 @@ export function validateRegisterUserForm(values: IUserProps): IUserErrorProps {
     password: "",
     phone: "",
     lastname: "",
-      province: "",
-      locality: "",
-      street: "",
-      number: "",
-zipCode: "",
-arca_identification: "",
-cuit: "",
+    province: "",
+    locality: "",
+    street: "",
+    number: "",
+    zipcode: "",
+    arca_identification: "",
+    cuit: "",
   };
 
   // Validaciones del nombre
@@ -51,7 +51,6 @@ cuit: "",
   if (!values.street.trim()) {
     errors.street = "El campo dirección es requerido";
   }
- 
 
   return errors;
 }

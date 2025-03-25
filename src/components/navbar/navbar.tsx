@@ -252,14 +252,6 @@ const Navbar = () => {
               Contacto
             </Link>
           )}
-          <Link
-            href="/promociones"
-            className={` hover:text-gray-900 ${
-              pathname === "/promociones" && "text-gray-900 font-bold"
-            }`}
-          >
-            Promociones
-          </Link>
         </nav>
         <div className="hidden md:flex items-center space-x-2">
           <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
@@ -451,21 +443,7 @@ const Navbar = () => {
                 onClick={handleNavLinkClick}
               >
                 <FontAwesomeIcon icon={faBagShopping} />
-                Tienda Online
-              </Link>
-            </li>
-            <li className="text-xl py-4 flex">
-              <Link
-                href="/promociones"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/promociones"
-                    ? "text-orange-400 font-bold"
-                    : ""
-                }`}
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon icon={faTag} />
-                Promociones
+                Tienda
               </Link>
             </li>
             <li className="text-xl py-4 flex">

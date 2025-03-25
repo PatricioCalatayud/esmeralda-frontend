@@ -19,14 +19,16 @@ export async function getAllOrders( token: string | undefined , page?: number, l
   }
 }
 export async function getOrders(userId: string, token: string | undefined , page?: number, limit?: number) {
+  console.log("userId",userId);
+  console.log("token",token);
     try {
       const response = await axios.get(`${apiURL}/order/user/${userId}`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
         params: {
-          page,  // Pasar el número de página
-          limit, // Pasar el límite de resultados por página
+          page,
+          limit,
         },});
       const products: IOrders[] = response.data.data;
       return products;

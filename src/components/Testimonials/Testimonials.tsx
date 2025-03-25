@@ -90,7 +90,7 @@ const Testimonials: React.FC = () => {
             Testimonios
           </h1>
           <p data-aos="fade-up" className="text-xs text-gray-500">
-            ¡Descubre por qué a nuestros invitados les encantan nuestras hamburguesas gourmet!
+            ¡Descubre por qué a nuestros invitados les encanta nuestro Café Premium!
           </p>
         </div>
 
