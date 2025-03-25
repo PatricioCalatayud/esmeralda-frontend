@@ -7,14 +7,14 @@ import { postMarketPay } from "@/helpers/MarketPay.helper";
 import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
+import { IOrders } from "@/interfaces/IOrders";
+import { getOrders } from "@/helpers/Order.helper";
+
 const Checkout = ({ params }: { params: { id: string } }) => {
+  const [order, setOrder] = useState<IOrders | null>(null);
   const [cart, setCart] = useState<ICart[]>([]);
-  const [user, setUser] = useState<{ name: string; email: string }>({
-    name: "",
-    email: "",
-  });
   const [preferenceId, setPreferenceId] = useState<string>("");
-  const {  authLoading } = useAuthContext();
+  const { authLoading, token } = useAuthContext();
 
   useEffect(() => {
     const cartData = JSON.parse(
@@ -23,21 +23,83 @@ const Checkout = ({ params }: { params: { id: string } }) => {
     setCart(cartData);
   }, []);
 
-  const shippingCost = 0; // Costo de envío
+  useEffect(() => {
+    if (cart.length > 0) {
+      const fetchOrder = async () => {
+        try {
+          const data = await getOrders(params.id, token);
+          if (data) {
+            setOrder(data[0]); // Asumimos que getOrders devuelve un array y queremos la primera orden
+          }
+        } catch (error) {
+          console.error("Error fetching order:", error);
+        }
+      };
+
+      if (params.id && token) {
+        fetchOrder();
+      }
+    }
+  }, [params.id, token, cart]);
+
+  useEffect(() => {
+    const createPreference = async (total: number) => {
+      try {
+        const linkPayment = {
+          price: total,
+          orderId: Number(params.id),
+        };
+  
+        const response = await postMarketPay(linkPayment);
+        if (response?.status === 200 || response?.status === 201) {
+          setPreferenceId(response.data);
+        }
+      } catch (error) {
+        console.error("Error creating payment preference:", error);
+      }
+    };
+  
+    // Primero verifica el carrito
+    if (cart.length > 0) {
+      const total = cart.reduce((acc, item) => {
+        return acc + (Number(item.quantity) || 1) * Number(item.price || 0);
+      }, 0);
+      createPreference(total);
+    } 
+    // Si no hay carrito, verifica la orden
+    else if (order?.productsOrder?.length && order?.productsOrder?.length > 0) {
+      const orderTotal = order.productsOrder.reduce((acc, item) => {
+        return acc + (Number(item.quantity) || 1) * Number(item.subproduct?.price || 0);
+      }, 0);
+      createPreference(orderTotal);
+    }
+  }, [cart, order, params.id]);
+
+  console.log(cart);
+
+  const shippingCost = 0;
 
   const calcularSubtotal = () => {
-    return cart.reduce((acc, item) => {
-      return acc + (item.quantity || 1) * Number(item.price);
-    }, 0);
+    return (
+      order?.productsOrder?.reduce((acc, item) => {
+        return (
+          acc +
+          (Number(item.quantity) || 1) * Number(item.subproduct?.price || 0)
+        );
+      }, 0) || 0
+    );
   };
 
   const calcularDescuento = () => {
-    return cart.reduce((acc, item) => {
-      const descuentoPorProducto =
-        (item.quantity || 1) *
-        (Number(item.price) * (Number(item.discount || 0) / 100));
-      return acc + descuentoPorProducto;
-    }, 0);
+    return (
+      order?.productsOrder?.reduce((acc, item) => {
+        const descuentoPorProducto =
+          (Number(item.quantity) || 1) *
+          (Number(item.subproduct?.price || 0) *
+            (Number(item.subproduct?.discount || 0) / 100));
+        return acc + descuentoPorProducto;
+      }, 0) || 0
+    );
   };
 
   const calcularIVA = () => {
@@ -55,28 +117,6 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   const descuento = calcularDescuento();
   const iva = calcularIVA();
   const total = calcularTotal();
-
-  useEffect(() => {
-    const createPreference = async (total: number) => {
-      if (cart.length !== 0) {
-        try {
-          const linkPayment = {
-            price: total,
-            orderId: Number(params.id),
-          };
-
-          const response = await postMarketPay(linkPayment);
-          if (response?.status === 200 || response?.status === 201) {
-            setPreferenceId(response.data);
-          }
-        } catch (error) {
-          console.error("Error creating payment preference:", error);
-        }
-      }
-    };
-    createPreference(Number(total));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart]);
 
   return (
     <div className="font-sans bg-white h-full mb-20">
@@ -100,7 +140,11 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                   className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2"
                 >
                   Pagar con Mercado Pago{" "}
-                  <MercadoPagoIcon color="#ffffff" height={"32px"} width={"32px"} />
+                  <MercadoPagoIcon
+                    color="#ffffff"
+                    height={"32px"}
+                    width={"32px"}
+                  />
                 </a>
               ) : (
                 <div className="flex justify-center items-center w-full h-full">
@@ -117,44 +161,55 @@ const Checkout = ({ params }: { params: { id: string } }) => {
               </h2>
               <hr className="my-6" />
               <div className="space-y-6 mt-10">
-                {cart.map((item, index) => (
-                  <div key={index} className="grid sm:grid-cols-2 items-start gap-6">
+                {order?.productsOrder?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid sm:grid-cols-2 items-start gap-6"
+                  >
                     <div className="max-w-[190px] shrink-0 rounded-md">
                       <Image
                         width={500}
                         height={500}
-                        src={item.imgUrl}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/product/${item.subproduct?.product?.imgUrl}`}
                         className="w-40 h-40 object-cover rounded-xl"
-                        alt={item.description}
+                        alt={item.subproduct?.product?.description || ""}
                       />
                     </div>
                     <div className="sm:col-span-1">
-                      <h3 className="text-base text-white font-bold ">
-                        {item.description}
+                      <h3 className="text-base text-white font-bold">
+                        {item.subproduct?.product?.description}
                       </h3>
                       <ul className="text-xs text-white space-y-2 mt-2">
                         <li className="flex flex-wrap gap-4">
-                          Tamaño <span className="ml-auto">{item.size} {item.unit}</span>
-                        </li>
-                        <li className="flex flex-wrap gap-4">
                           Cantidad{" "}
-                          <span className="ml-auto">{item.quantity || 1}</span>
+                          <span className="ml-auto">{item.quantity}</span>
                         </li>
                         <li className="flex flex-wrap gap-4">
                           Producto{" "}
-                          <span className="ml-auto">${Number(item.price)}</span>
+                          <span className="ml-auto">
+                            ${Number(item.subproduct?.price || 0)}
+                          </span>
                         </li>
                         <li className="flex flex-wrap gap-4">
                           Subtotal
                           <span className="ml-auto font-bold">
-                            ${item.price * (item.quantity || 1)}
+                            $
+                            {(
+                              Number(item.subproduct?.price || 0) *
+                              Number(item.quantity)
+                            ).toFixed(2)}
                           </span>
                         </li>
                         <li className="flex flex-wrap gap-4">
                           Descuento
-                          {descuento > 0 && (
+                          {item.subproduct?.discount > 0 && (
                             <span className="ml-auto">
-                              -${(item.price * (item.quantity || 1) * (item.discount / 100)).toFixed(2)}
+                              -$
+                              {(
+                                Number(item.subproduct?.price || 0) *
+                                Number(item.quantity) *
+                                (item.subproduct?.discount / 100)
+                              ).toFixed(2)}
                             </span>
                           )}
                         </li>
@@ -167,37 +222,35 @@ const Checkout = ({ params }: { params: { id: string } }) => {
             <div className="bg-teal-800 py-4 px-8 rounded-b-xl gap-6 flex flex-col">
               <div className="flex justify-between">
                 <h4 className="text-base text-white font-semibold">Envío:</h4>
-                <h4 className="text-base text-white font-semibold">${shippingCost.toFixed(2)}</h4>
+                <h4 className="text-base text-white font-semibold">
+                  ${shippingCost.toFixed(2)}
+                </h4>
               </div>
               <hr />
               <div className="flex justify-between">
+                <h4 className="text-md text-white font-semibold">Subtotal:</h4>
                 <h4 className="text-md text-white font-semibold">
-                  Subtotal: 
-                </h4>
-                <h4 className="text-md text-white font-semibold">
-                  ${(subtotal).toFixed(2)}
+                  ${subtotal.toFixed(2)}
                 </h4>
               </div>
               <div className="flex justify-between">
+                <h4 className="text-md text-white font-semibold">Descuento:</h4>
                 <h4 className="text-md text-white font-semibold">
-                  Descuento: 
-                </h4>
-                <h4 className="text-md text-white font-semibold">
-                  -${(descuento).toFixed(2)}
+                  -${descuento.toFixed(2)}
                 </h4>
               </div>
               <hr />
               <div className="flex justify-between">
                 <h4 className="text-md text-white font-semibold">IVA (21%):</h4>
-                <h4 className="text-md text-white font-semibold">${iva.toFixed(2)}</h4>
+                <h4 className="text-md text-white font-semibold">
+                  ${iva.toFixed(2)}
+                </h4>
               </div>
               <hr />
               <div className="flex justify-between">
+                <h4 className="text-lg text-white font-bold">Total:</h4>
                 <h4 className="text-lg text-white font-bold">
-                  Total: 
-                </h4>
-                <h4 className="text-lg text-white font-bold">
-                  ${(total).toFixed(2)}
+                  ${total.toFixed(2)}
                 </h4>
               </div>
             </div>

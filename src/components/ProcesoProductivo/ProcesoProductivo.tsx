@@ -13,7 +13,7 @@ const ProcesoProductivo: React.FC = () => {
             DEL CULTIVO A LA TAZA
           </h2>
           <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
-            El Viaje de Tu Café
+            El viaje de tu Café
           </h1>
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
             Explora el fascinante recorrido del café, desde las plantaciones hasta tu taza. Cada paso en este proceso es fundamental para resaltar los sabores y aromas que convierten al café en una de las bebidas más apreciadas del mundo.

@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         //decodifico el token
         const decodedToken: any = jwtDecode(token);
-        console.log(decodedToken);
+        console.log("decodedToken",decodedToken);
         // si hay token decodificado
         if (decodedToken) {
           setUserId(decodedToken.sub);
@@ -91,6 +91,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           const decodedToken: any = jwtDecode(token);
   
           setToken(token);
+          setUserId(decodedToken.sub);
+          
           setSession({
             id: decodedToken.sub,
             name: decodedToken.name,
@@ -100,6 +102,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             phone: decodedToken.phone,
             address: decodedToken.address,
           });
+          
+          localStorage.setItem("userSession", JSON.stringify({
+            accessToken: token,
+            user: {
+              id: decodedToken.sub,
+              name: decodedToken.name,
+              email: decodedToken.email,
+              image: sessionGoogle.user?.image ?? "",
+              role: decodedToken.roles[0],
+              phone: decodedToken.phone,
+              address: decodedToken.address,
+            }
+          }));
+          
           setUserGoogle(true);
         } else {
           Swal.fire({
@@ -128,11 +144,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setSession(undefined);
       setUserId(undefined);
       setToken(undefined);
+      localStorage.removeItem("userSession");
     } else {
       localStorage.removeItem("userSession");
       localStorage.removeItem("cart");
-      setCartItemCount(0)
+      setCartItemCount(0);
       setSession(undefined);
+      setUserId(undefined);
+      setToken(undefined);
     }
     Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
     router.push("/");

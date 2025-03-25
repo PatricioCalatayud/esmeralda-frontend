@@ -40,7 +40,7 @@ const nextConfig = {
           },
 
         ],
-        domains: ['www.cafelaesmeralda.com.ar'],
+        domains: ['www.cafelaesmeralda.com.ar','localhost'],
       },
 };
 

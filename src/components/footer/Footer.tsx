@@ -136,16 +136,17 @@ const Footer: React.FC = () => {
                 Síguenos
               </h3>
               <div className="flex gap-2">
-                <Link href={"https://www.facebook.com/cafelaesmeralda10"}>
+                <Link href={"https://www.facebook.com/cafelaesmeralda10"} target="_blank">
                   <MdFacebook size={24} />
                 </Link>
-                <Link href={"https://www.instagram.com/cafelaesmeralda/"}>
+                <Link href={"https://www.instagram.com/cafelaesmeralda/"} target="_blank">
                   <AiFillInstagram size={24} />
                 </Link>
                 <Link
                   href={
                     "https://listado.mercadolibre.com.ar/_CustId_510408628?item_id=MLA1670664876&category_id=MLA409413&seller_id=510408628&client=recoview-selleritems&recos_listing=true"
                   }
+                  target="_blank"
                 >
                   <MercadoPagoIcon />
                 </Link>

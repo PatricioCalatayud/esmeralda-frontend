@@ -117,7 +117,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
       ...selectedCart,
       quantity,
       description: filteredProduct?.description,
-      imgUrl: imageUrl,
+      imgUrl: `${apiURL}/product/${filteredProduct?.imgUrl}`,
       size: selectedSize,
       idProduct: filteredProduct?.id,
     };

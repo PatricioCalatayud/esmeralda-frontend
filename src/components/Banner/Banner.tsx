@@ -23,9 +23,9 @@ const Banner = () => {
           </div>
 
           {/* sección de detalles de texto */}
-          <div className="flex flex-col justify-center gap-6 sm:px-0 mx-10 ">
+          <div className="flex flex-col justify-center gap-6 sm:px-0 mx-6 ">
             <h1 data-aos="fade-up" className="text-3xl sm:text-4xl font-bold">
-              ¡Descubre Nuestro Café en Grano Premium!
+              ¡Descubre nuestro Café Premium!
             </h1>
             <p
               data-aos="fade-up"

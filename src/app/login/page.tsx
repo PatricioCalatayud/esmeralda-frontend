@@ -24,6 +24,7 @@ import { useAuthContext } from "@/context/auth.context";
 import { jwtDecode } from "jwt-decode";
 import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IoHome } from "react-icons/io5";
 const theme = createTheme();
 
 const Login = () => {
@@ -42,12 +43,6 @@ const Login = () => {
   const [error, setError] = useState<ILoginErrorProps>(initialErrorState);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [touched, setTouched] = useState<
-    Record<keyof ILoginErrorProps, boolean>
-  >({
-    email: false,
-    password: false,
-  });
   const [showPassword, setShowPassword] = useState(false);
   const{setSession,setUserId,setToken,session,authLoading} = useAuthContext();
 
@@ -71,23 +66,6 @@ const Login = () => {
       ...prevDataUser,
       [name]: value,
     }));
-
-    if (!touched[name as keyof ILoginErrorProps]) {
-      setTouched((prevTouched) => ({
-        ...prevTouched,
-        [name]: true,
-      }));
-    }
-
-    const fieldErrors = validateLoginForm({
-      ...dataUser,
-      [name]: value,
-    });
-
-    setError((prevError) => ({
-      ...prevError,
-      [name]: fieldErrors[name as keyof ILoginErrorProps] || "",
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,10 +74,6 @@ const Login = () => {
     const errors = validateLoginForm(dataUser);
     setError(errors);
 
-    setTouched({
-      email: true,
-      password: true,
-    });
 
     if (Object.values(errors).some((x) => x !== "")) {
       return;
@@ -143,10 +117,6 @@ const Login = () => {
           });
   
           setDataUser(initialUserData);
-          setTouched({
-            email: false,
-            password: false,
-          });
   
           setTimeout(() => {
             Router.push("/");
@@ -278,29 +248,6 @@ const Login = () => {
                 >
                   Iniciar sesión
                 </Button>
-                  <Link href="/" passHref>
-                  <Button
-                       type="submit"
-                       fullWidth
-                       variant="contained"
-                       sx={{
-                         mt: 1,
-                         mb: 2,
-                         backgroundColor: "transparent",
-                         "&:hover": {
-                           backgroundColor: "gray",
-                           border: "1px solid gray",
-                           color:"white"
-                         },
-                         border: "1px solid black",
-                         boxShadow: "none",
-                         color: "black",
-                       }}
-                    >
-                      <FontAwesomeIcon icon={faHouse}  style={{ marginRight: "10px", width: "20px", height: "20px"}}/>
-                      Volver al Inicio
-                    </Button>
-                  </Link>
                 
                 <p className="text-sm mt-8 text-center font-semibold text-gray-800">
                   ¿No tienes cuenta?{" "}
@@ -363,7 +310,10 @@ const Login = () => {
         </div>
         <ToastContainer />
       </div>
-      <div className="fixed bottom-1 left-1 hidden md:block">
+      <div className="fixed top-8 left-10 hidden md:block cursor-pointer" onClick={() => Router.push("/")}>
+        <IoHome color="white" size={30} aria-label="Volver al Inicio"/>
+      </div>
+      <div className="fixed -bottom-8 left-1 hidden md:block">
         <Image
           src="/logoblanco.png"
           alt="Logo"
