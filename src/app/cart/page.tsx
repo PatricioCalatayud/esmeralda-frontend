@@ -32,8 +32,6 @@ const Cart = () => {
   const { setCartItemCount } = useCartContext();
   const [account, setAccount] = useState<IAccountProps>();
   const [loading, setLoading] = useState(false);
-  const [floor, setFloor] = useState(""); // Nuevo estado para Piso
-  const [apartment, setApartment] = useState("");
   const [needsInvoice, setNeedsInvoice] = useState(false);
   const [invoiceType, setInvoiceType] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
@@ -262,18 +260,11 @@ const Cart = () => {
         });
         return;
       }
+      console.log("orderCheckout",orderCheckout);
       const order = await postOrder(orderCheckout, token);
-      console.log(order);
+      console.log("order",order);
 
       if (order?.status === 200 || order?.status === 201) {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Pedido realizado con éxito",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
         setTimeout(() => {
           if (session?.role === "Usuario") {
             router.push(`/checkout/${order.data.id}`);
@@ -290,7 +281,7 @@ const Cart = () => {
             localStorage.removeItem("cart");
             router.push(`/dashboard/cliente/order`);
           }
-        }, 1500);
+        }, 500);
       } else {
         throw new Error("Pedido no completado.");
       }

@@ -20,7 +20,6 @@ export async function getAllOrders( token: string | undefined , page?: number, l
 }
 export async function getOrders(userId: string, token: string | undefined , page?: number, limit?: number) {
   console.log("userId",userId);
-  console.log("token",token);
     try {
       const response = await axios.get(`${apiURL}/order/user/${userId}`,{
         headers: {
@@ -30,8 +29,9 @@ export async function getOrders(userId: string, token: string | undefined , page
           page,
           limit,
         },});
-      const products: IOrders[] = response.data.data;
-      return products;
+      const data = response.data.data;
+      console.log("data",data);
+      return {data};
     } catch (error: any) {
       console.log(error);
     }
