@@ -34,8 +34,9 @@ const Dashboard = () => {
       try {
         const data = await getOrders(userId, token);
         if (data) {
-          setOrders(data);
+          setOrders(data.data);
         }
+        console.log(data)
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -46,8 +47,6 @@ const Dashboard = () => {
     }
   }, [userId, token]);
 
-  console.log("userId", userId);
-  console.log("token", token);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -82,6 +81,8 @@ const Dashboard = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("handleSearchChange", e.target.value);
   };
+
+  console.log("orders", orders);
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner
@@ -105,7 +106,7 @@ const Dashboard = () => {
         "Estado",
         "Acciones",
       ]}
-      noContent="No hay Productos disponibles"
+      noContent="No hay ordenes disponibles"
     >
       {orders?.map((order, index) => (
         <tr
@@ -169,7 +170,7 @@ const Dashboard = () => {
               </div>
             )}
             {isModalOpen && selectedOrder && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
                   <h3 className="text-xl font-bold mb-4">
                     Productos de la orden

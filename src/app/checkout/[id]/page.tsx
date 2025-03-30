@@ -8,13 +8,14 @@ import MercadoPagoIcon from "@/components/footer/MercadoPagoIcon";
 import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
 import { IOrders } from "@/interfaces/IOrders";
-import { getOrders } from "@/helpers/Order.helper";
+import { getOrder } from "@/helpers/Order.helper";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [order, setOrder] = useState<IOrders | null>(null);
   const [cart, setCart] = useState<ICart[]>([]);
   const [preferenceId, setPreferenceId] = useState<string>("");
   const { authLoading, token } = useAuthContext();
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     const cartData = JSON.parse(
@@ -24,23 +25,30 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   }, []);
 
   useEffect(() => {
-    if (cart.length > 0) {
-      const fetchOrder = async () => {
-        try {
-          const data = await getOrders(params.id, token);
-          if (data) {
-            setOrder(data[0]); // Asumimos que getOrders devuelve un array y queremos la primera orden
-          }
-        } catch (error) {
-          console.error("Error fetching order:", error);
-        }
-      };
+    const timer = setTimeout(() => {
+      setShowMessage(true);
+    }, 1000);
 
-      if (params.id && token) {
-        fetchOrder();
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const data = await getOrder(params.id, token);
+        if (data) {
+          setOrder(data);
+          console.log(data)
+        }
+      } catch (error) {
+        console.error("Error fetching order:", error);
       }
+    };
+
+    if (params.id && token) {
+      fetchOrder();
     }
-  }, [params.id, token, cart]);
+  }, [params.id, token]);
 
   useEffect(() => {
     const createPreference = async (total: number) => {
@@ -49,7 +57,7 @@ const Checkout = ({ params }: { params: { id: string } }) => {
           price: total,
           orderId: Number(params.id),
         };
-  
+
         const response = await postMarketPay(linkPayment);
         if (response?.status === 200 || response?.status === 201) {
           setPreferenceId(response.data);
@@ -58,20 +66,20 @@ const Checkout = ({ params }: { params: { id: string } }) => {
         console.error("Error creating payment preference:", error);
       }
     };
-  
-    // Primero verifica el carrito
-    if (cart.length > 0) {
-      const total = cart.reduce((acc, item) => {
-        return acc + (Number(item.quantity) || 1) * Number(item.price || 0);
-      }, 0);
-      createPreference(total);
-    } 
-    // Si no hay carrito, verifica la orden
-    else if (order?.productsOrder?.length && order?.productsOrder?.length > 0) {
+
+    if (order?.productsOrder?.length && order?.productsOrder?.length > 0) {
       const orderTotal = order.productsOrder.reduce((acc, item) => {
         return acc + (Number(item.quantity) || 1) * Number(item.subproduct?.price || 0);
       }, 0);
-      createPreference(orderTotal);
+      const totalFinal = orderTotal * 1.21;
+      createPreference(totalFinal);
+    }
+    else if (cart.length > 0) {
+      const total = cart.reduce((acc, item) => {
+        return acc + (Number(item.quantity) || 1) * Number(item.price || 0);
+      }, 0);
+      const totalFinal = total * 1.21;
+      createPreference(totalFinal);
     }
   }, [cart, order, params.id]);
 
@@ -118,6 +126,8 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   const iva = calcularIVA();
   const total = calcularTotal();
 
+  console.log(order);
+
   return (
     <div className="font-sans bg-white h-full mb-20">
       <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -147,8 +157,10 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                   />
                 </a>
               ) : (
-                <div className="flex justify-center items-center w-full h-full">
-                  <h1 className="text-3xl">No existe link de mercado pago</h1>
+                <div className="flex justify-center items-start w-full h-full">
+                  {showMessage && (
+                    <h1 className="text-3xl">No existe link de mercado pago</h1>
+                  )}
                 </div>
               )}
             </div>
@@ -160,63 +172,67 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                 Mis Pedidos
               </h2>
               <hr className="my-6" />
-              <div className="space-y-6 mt-10">
-                {order?.productsOrder?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="grid sm:grid-cols-2 items-start gap-6"
-                  >
-                    <div className="max-w-[190px] shrink-0 rounded-md">
-                      <Image
-                        width={500}
-                        height={500}
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/product/${item.subproduct?.product?.imgUrl}`}
-                        className="w-40 h-40 object-cover rounded-xl"
-                        alt={item.subproduct?.product?.description || ""}
-                      />
-                    </div>
-                    <div className="sm:col-span-1">
-                      <h3 className="text-base text-white font-bold">
-                        {item.subproduct?.product?.description}
-                      </h3>
-                      <ul className="text-xs text-white space-y-2 mt-2">
-                        <li className="flex flex-wrap gap-4">
-                          Cantidad{" "}
-                          <span className="ml-auto">{item.quantity}</span>
-                        </li>
-                        <li className="flex flex-wrap gap-4">
-                          Producto{" "}
-                          <span className="ml-auto">
-                            ${Number(item.subproduct?.price || 0)}
-                          </span>
-                        </li>
-                        <li className="flex flex-wrap gap-4">
-                          Subtotal
-                          <span className="ml-auto font-bold">
-                            $
-                            {(
-                              Number(item.subproduct?.price || 0) *
-                              Number(item.quantity)
-                            ).toFixed(2)}
-                          </span>
-                        </li>
-                        <li className="flex flex-wrap gap-4">
-                          Descuento
-                          {item.subproduct?.discount > 0 && (
+              <div className="space-y-6 mt-10 max-h-[300px] overflow-y-auto px-2 w-full">
+                {!order?.productsOrder || order.productsOrder.length === 0 ? (
+                  <p className="text-white text-center">No hay productos en la orden</p>
+                ) : (
+                  order.productsOrder.map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid sm:grid-cols-2 items-start gap-6"
+                    >
+                      <div className="max-w-[190px] shrink-0 rounded-md">
+                        <Image
+                          width={200}
+                          height={200}
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/product/${item.subproduct?.product?.imgUrl}`}
+                          className="w-32 h-36 object-cover rounded-xl"
+                          alt={item.subproduct?.product?.description || ""}
+                        />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <h3 className="text-base text-white font-bold">
+                          {item.subproduct?.product?.description}
+                        </h3>
+                        <ul className="text-xs text-white space-y-2 mt-2">
+                          <li className="flex flex-wrap gap-4">
+                            Cantidad{" "}
+                            <span className="ml-auto">{item.quantity}</span>
+                          </li>
+                          <li className="flex flex-wrap gap-4">
+                            Producto{" "}
                             <span className="ml-auto">
-                              -$
+                              ${Number(item.subproduct?.price || 0)}
+                            </span>
+                          </li>
+                          <li className="flex flex-wrap gap-4">
+                            Subtotal
+                            <span className="ml-auto font-bold">
+                              $
                               {(
                                 Number(item.subproduct?.price || 0) *
-                                Number(item.quantity) *
-                                (item.subproduct?.discount / 100)
+                                Number(item.quantity)
                               ).toFixed(2)}
                             </span>
-                          )}
-                        </li>
-                      </ul>
+                          </li>
+                          <li className="flex flex-wrap gap-4">
+                            Descuento
+                            {item.subproduct?.discount > 0 && (
+                              <span className="ml-auto">
+                                -$
+                                {(
+                                  Number(item.subproduct?.price || 0) *
+                                  Number(item.quantity) *
+                                  (item.subproduct?.discount / 100)
+                                ).toFixed(2)}
+                              </span>
+                            )}
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
             <div className="bg-teal-800 py-4 px-8 rounded-b-xl gap-6 flex flex-col">

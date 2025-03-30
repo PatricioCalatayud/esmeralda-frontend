@@ -20,6 +20,7 @@ export interface IOrderCheckout {
         subproductId: string;
         quantity: number | undefined;
     }[];
+    invoiceType?: string;
 }
 
 export interface Receipt {

@@ -153,7 +153,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUserId(undefined);
       setToken(undefined);
     }
-    Swal.fire("¡Hasta luego!", "Has cerrado sesión exitosamente", "success");
     router.push("/");
   };
 

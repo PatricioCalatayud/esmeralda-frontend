@@ -51,7 +51,7 @@ const UsersId = ({ params }: { params: { id: string } }) => {
       if (token) {
         const response = await getOrders(params.id, token);
         if (response) {
-          const orders = response;
+          const orders = response.data;
 
           setOrders(orders);
           setTotalPages(Math.ceil(orders.length / ORDERS_PER_PAGE));
