@@ -92,7 +92,6 @@ const Cart = () => {
     const fetchUser = async () => {
       if (token && session) {
         const response = await getUser(session.id, token);
-        console.log(response);
 
         if (response) {
           const accountData = response.account;
@@ -247,7 +246,7 @@ const Cart = () => {
         boton === "Cliente Cuenta Corriente" && {
           account: "Cuenta corriente",
         }),
-      ...(needsInvoice && { invoiceType }),
+      ...(invoiceType && { invoiceType }),
     };
     orderCheckout.identification = String(session?.cuit);
 
