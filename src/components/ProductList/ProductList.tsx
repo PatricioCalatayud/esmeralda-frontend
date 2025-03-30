@@ -248,14 +248,14 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
       </div>
 
       <div className="flex flex-col lg:flex-row m-10">
-        <div className="w-full lg:w-1/4 p-4 px-16 lg:px-4 border border-teal-600 rounded-xl lg:mr-10 mr-0">
+        <div className="w-full lg:w-[20%] p-4 px-16 lg:px-4 border border-teal-600 rounded-xl lg:mr-10 mr-0">
           <h2 className="text-lg font-bold mb-4 text-gray-600">Categorías</h2>
           <hr className="border-teal-600" />
-          <ul className="mt-4 flex flex-col gap-2">
+          <ul className="mt-4 flex flex-col gap-4">
             <li>
               <button
                 onClick={() => handleCategoryChange(null)}
-                className={`text-lg ${
+                className={`text-xl ${
                   selectedCategory === null
                     ? "font-bold text-teal-800"
                     : "text-teal-600"
@@ -267,7 +267,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
             <li>
               <button
                 onClick={() => handleCategoryChange("promociones")}
-                className={`text-lg ${
+                className={`text-xl ${
                   selectedCategory === "promociones"
                     ? "font-bold text-teal-800"
                     : "text-teal-600"
@@ -280,7 +280,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
               <li key={cat.id}>
                 <button
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`text-lg ${
+                  className={`text-xl ${
                     selectedCategory === cat.id
                       ? "font-bold text-teal-800"
                       : "text-teal-600"
@@ -312,7 +312,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                 return (
                   <div
                   key={index}
-                  className="relative flex flex-col rounded-lg h-[720px] shadow-lg hover:scale-105 transition-transform cursor-pointer" // Aumentamos la altura a 600px
+                  className="relative flex flex-col rounded-lg h-[700px] shadow-lg cursor-pointer" // Aumentamos la altura a 600px
                   onClick={() => router.push(`/products/${product.id}`)}
                 >
                   <Image
@@ -330,8 +330,16 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                     )}
                     <h2 className="text-lg font-bold">{product.description}</h2>
 
-                    <p className=" text-sm font-medium text-gray-700">Presentación: {product.presentacion}</p>
-                    <p className=" text-sm font-medium text-gray-700">Tipo de grano: {product.tipoGrano}</p>
+                    {
+                      product.presentacion && (
+                        <p className=" text-sm font-medium text-gray-700">Presentación: {product.presentacion}</p>
+                      )
+                    }
+                    {
+                      product.tipoGrano && (
+                        <p className=" text-sm font-medium text-gray-700">Tipo de grano: {product.tipoGrano}</p>
+                      )
+                    }
 
                     {product.subproducts
                       .filter((subproduct) => subproduct.discount > 0)
