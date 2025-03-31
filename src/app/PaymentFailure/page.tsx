@@ -15,19 +15,22 @@ const PaymentFailure: React.FC = () => {
     setSearchParams(params);
     const id = params.get('orderId');
 
+    console.log(id)
+    console.log(process.env.NEXT_PUBLIC_API_URL)
     if (id) {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          const date = new Date(data.date);
+          const date = new Date(data.create);
           const formattedDate = date.toLocaleDateString();
           const formattedTime = date.toLocaleTimeString();
-
-          const products = data.productsOrder.map((productOrder: any) => ({
-            description: productOrder.product.description,
-            imgUrl: productOrder.product.imgUrl,
-            quantity: productOrder.quantity,
-          }));
+          const products = data.productsOrder.map((productOrder: any) => {
+            return {
+              description: productOrder.subproduct.product.description,
+              imgUrl: `${process.env.NEXT_PUBLIC_API_URL}/product/${productOrder.subproduct.product.imgUrl}`,
+              quantity: productOrder.quantity,
+            };
+          });
 
           setOrderDetails({
             orderId: data.id,
@@ -43,7 +46,35 @@ const PaymentFailure: React.FC = () => {
   }, []);
 
   if (!orderDetails) {
-    return <div>Loading...</div>;
+    return (
+      <div className="payment__container mx-auto bg-white p-20 rounded-lg flex flex-col items-center justify-evenly shadow-lg animate-pulse">
+        <div className="h-10 w-64 bg-gray-200 rounded mb-5"></div>
+        <div className="w-24 h-24 bg-gray-200 rounded-full mb-5"></div>
+        <div className="h-8 w-48 bg-gray-200 rounded mb-2"></div>
+        <div className="h-8 w-32 bg-gray-200 rounded mb-5"></div>
+
+        <div className="order-details bg-gray-100 p-6 rounded-lg mb-5 w-full max-w-md">
+          <div className="h-6 w-48 bg-gray-200 rounded mb-2"></div>
+          <div className="h-6 w-48 bg-gray-200 rounded mb-4"></div>
+          
+          {/* Skeleton para 2 productos */}
+          {[1, 2].map((_, index) => (
+            <div key={index} className="flex items-center mt-4">
+              <div className="w-24 h-24 bg-gray-200 rounded-md mr-4"></div>
+              <div className="flex-1">
+                <div className="h-6 w-full bg-gray-200 rounded mb-2"></div>
+                <div className="h-6 w-24 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-around w-full max-w-md">
+          <div className="h-14 w-40 bg-gray-200 rounded-full"></div>
+          <div className="h-14 w-40 bg-gray-200 rounded-full"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -76,10 +107,10 @@ const PaymentFailure: React.FC = () => {
       </div>
 
       <div className="flex justify-around w-full max-w-md">
-        <a href="/" className="payment__container-btn text-black bg-yellow-500 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
+        <a href="/" className="payment__container-btn text-white bg-teal-700 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
           Volver a Home
         </a>
-        <a href="/cart" className="payment__container-btn text-black bg-yellow-500 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
+        <a href="/cart" className="payment__container-btn text-white bg-teal-700 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
           Volver al Carro
         </a>
       </div>

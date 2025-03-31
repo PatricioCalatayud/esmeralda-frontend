@@ -239,7 +239,6 @@ const Cart = () => {
             province: session?.address?.province,
             zipcode: session?.address?.zipcode || "",
           },
-      discount: 10,
       ...(session?.role === "Cliente" &&
         boton === "Cliente Transferencia" && { account: "Transferencia" }),
       ...(session?.role === "Cliente" &&
