@@ -33,7 +33,7 @@ const Navbar = () => {
   const { searchResults: searchProductResults, searchProducts } =
     useProductContext();
   const { session, handleSignOut: signOut } = useAuthContext();
-  const { cartItemCount, setCartItemCount } = useCartContext(); // Importando setCartItemCount
+  const { cartItemCount, setCartItemCount } = useCartContext();
 
   const hideNavbar =
     pathname === "/login" ||

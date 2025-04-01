@@ -21,34 +21,35 @@ const ForgotPassword: React.FC = () => {
   const [verification_code, setVerification_code] = useState("");
   const [codeError, setCodeError] = useState("");
 
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const idUserString = localStorage.getItem("idUser");
-    const userId = idUserString ? Number(idUserString) : null; // 
+    const userId = idUserString ? Number(idUserString) : null; //
     if (!verification_code) {
-      setCodeError("Por favor, introduce un codigo valido.");
+      setCodeError("Por favor, introduce un código válido.");
       return;
     } else {
       setCodeError(""); // Limpia el mensaje de error si el correo es válido
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ verification_code,userId}),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ verification_code, userId }),
+        }
+      );
 
       console.log("Response status:", response.status); // Verifica el estado de la respuesta
 
       if (response.ok) {
         Swal.fire({
           icon: "success",
-          title: "Codigo valido",
+          title: "Código válido",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -61,7 +62,7 @@ const ForgotPassword: React.FC = () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "El codigo no es valido",
+          text: "El código no es válido",
         });
       }
     } catch (error) {
@@ -76,34 +77,36 @@ const ForgotPassword: React.FC = () => {
   const handleResetCode = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    
-  const idUserString = localStorage.getItem("idUser");
-  const userId = idUserString ? Number(idUserString) : null; // 
-
+    const idUserString = localStorage.getItem("idUser");
+    console.log(idUserString);
+    const userId = idUserString ? Number(idUserString) : null; //
+    console.log(userId);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/resend-code`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId}),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+        }
+      );
 
       console.log("Response status:", response.status); // Verifica el estado de la respuesta
 
       if (response.ok) {
         Swal.fire({
           icon: "success",
-          title: "El codigo ha sido enviado",
+          title: "El código ha sido enviado",
           showConfirmButton: false,
           timer: 1500,
         });
-
       } else {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "El codigo no puede ser enviado",
+          text: "El código no puede ser enviado",
         });
       }
     } catch (error) {
@@ -114,7 +117,7 @@ const ForgotPassword: React.FC = () => {
         text: "Ocurrió un error inesperado. Por favor, intenta de nuevo.",
       });
     }
-  }
+  };
   // Ocultar Navbar y Footer
   const showHeaderFooter = false;
 

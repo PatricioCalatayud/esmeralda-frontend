@@ -59,6 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // si hay token decodificado
         if (decodedToken) {
           setUserId(decodedToken.sub);
+          localStorage.setItem("idUser", decodedToken.sub);
           // seteo la sesion con el token decodificado
           setSession({
             id: decodedToken.sub,

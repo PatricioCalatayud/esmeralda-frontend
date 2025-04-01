@@ -239,7 +239,6 @@ const Cart = () => {
             province: session?.address?.province,
             zipcode: session?.address?.zipcode || "",
           },
-      discount: 10,
       ...(session?.role === "Cliente" &&
         boton === "Cliente Transferencia" && { account: "Transferencia" }),
       ...(session?.role === "Cliente" &&
@@ -266,6 +265,9 @@ const Cart = () => {
       if (order?.status === 200 || order?.status === 201) {
         setTimeout(() => {
           if (session?.role === "Usuario") {
+            setCart([]);
+            setCartItemCount(0);
+            localStorage.removeItem("cart");
             router.push(`/checkout/${order.data.id}`);
           } else if (
             session?.role === "Cliente" &&
