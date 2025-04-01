@@ -22,8 +22,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import {signInWithGoogle} from "@/utils/singGoogle";
 import { useAuthContext } from "@/context/auth.context";
 import { jwtDecode } from "jwt-decode";
-import { faHouse } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IoHome } from "react-icons/io5";
 const theme = createTheme();
 
@@ -100,6 +98,7 @@ const Login = () => {
           cuit: decodedToken.exp
         })
         setUserId(decodedToken.sub);
+        localStorage.setItem("idUser", decodedToken.sub);
         responseData.accessToken && setToken(responseData.accessToken);
         if(decodedToken.email_verified === false  && decodedToken.roles[0] !== "Administrador"){
           setTimeout(() => {

@@ -40,7 +40,7 @@ const nextConfig = {
           },
 
         ],
-        domains: ['www.cafelaesmeralda.com.ar','localhost'],
+        domains: ['www.cafelaesmeralda.com.ar','localhost','18.231.148.97', 'esmeralda-frontend-git-brunodev-patricio-calatayuds-projects.vercel.app'],
       },
 };
 

@@ -22,7 +22,6 @@ import { IoHome } from "react-icons/io5";
 
 // Verificar si apiURL está definida correctamente
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
-console.log("API URL:", apiURL);
 
 const provinceMapping: Record<number, string> = {
   1: "Buenos Aires",
@@ -147,9 +146,23 @@ const RegisterUser = () => {
         [name]: value,
       }));
     }
+
+    // Validar el campo específico que cambió
+    const updatedData = {
+      ...dataUser,
+      [name]: name === "province" ? provinceMapping[Number(value)] : 
+              name === "cuit" ? Number(value) : 
+              name === "number" ? Number(value) : 
+              value
+    };
+    
+    const fieldErrors = validateRegisterUserForm(updatedData);
+    setError(prevError => ({
+      ...prevError,
+      [name]: fieldErrors[name as keyof IUserErrorProps]
+    }));
   };
 
-  console.log(dataUser);
 
   const validateRegisterUserForm = (data: IUserProps): IUserErrorProps => {
     const errors: IUserErrorProps = {
@@ -284,7 +297,6 @@ const RegisterUser = () => {
     setLoading(true);
 
     try {
-      console.log("Haciendo la petición POST a la API");
       const response = await axios.post(
         `${apiURL}/auth/signup`,
         { ...dataUser, name: dataUser.name + " " + dataUser.lastname },
@@ -295,7 +307,6 @@ const RegisterUser = () => {
         }
       );
 
-      console.log(response);
 
       Swal.close();
 
@@ -339,7 +350,7 @@ const RegisterUser = () => {
     error.province !== "" ||
     error.arca_identification !== "" ||
     error.cuit !== "";
-  console.log(isDisabled);
+  console.log(error.province);
   return (
     <>
       <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">

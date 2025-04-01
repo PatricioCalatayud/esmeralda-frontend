@@ -88,7 +88,7 @@ const Products = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 place-items-center gap-4 px-10">
               {products?.map((product: IProductList) => (
                 <Link
-                  href={`/categories/${product.id}`}
+                  href={`/products/${product.id}`}
                   key={product.id}
                   className="shadow-lg bg-blue-gray-50 rounded-lg  border w-full"
                 >

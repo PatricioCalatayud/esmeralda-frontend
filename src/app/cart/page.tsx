@@ -265,6 +265,9 @@ const Cart = () => {
       if (order?.status === 200 || order?.status === 201) {
         setTimeout(() => {
           if (session?.role === "Usuario") {
+            setCart([]);
+            setCartItemCount(0);
+            localStorage.removeItem("cart");
             router.push(`/checkout/${order.data.id}`);
           } else if (
             session?.role === "Cliente" &&
