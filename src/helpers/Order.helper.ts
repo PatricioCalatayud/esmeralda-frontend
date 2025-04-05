@@ -12,8 +12,9 @@ export async function getAllOrders( token: string | undefined , page?: number, l
         page,  // Pasar el número de página
         limit, // Pasar el límite de resultados por página
       },});
+    console.log("response de orders" ,response)
     const products: IOrders[] = response.data.data;
-    return products;
+    return {products, totalOrders: response.data.total};
   } catch (error: any) {
     console.log(error);
   }
