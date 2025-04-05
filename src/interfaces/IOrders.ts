@@ -32,7 +32,18 @@ export interface OrderDetail {
     deliveryDate:    string;
     totalPrice:      string;
     transactions:    Transactions;
-    addressDelivery: string;
+    deliveryAddress: OrderAddress;
+    trackingNumber: string;
+}
+export interface OrderAddress  {
+    store?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    postalCode?: string;
+    phone?: string;
+    email?: string;
 }
 
 export interface Transactions {
