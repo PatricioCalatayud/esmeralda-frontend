@@ -11,7 +11,12 @@ import { getAllOrders, putOrder } from "@/helpers/Order.helper";
 import Image from "next/image";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faDownload, faEdit, faX } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faDownload,
+  faEdit,
+  faX,
+} from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "flowbite-react";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -64,47 +69,54 @@ const OrderList = () => {
     }
   };
 
- 
- //! Función para manejar el cambio en el estado de la orden
-const handleChange = async (
-  e: React.ChangeEvent<HTMLSelectElement>,
-  id: string
-) => {
-  const newStatus = { status: e.target.value };
-  const response = await fetch(`http://localhost:3001/order/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(newStatus),
-  });
+  //! Función para manejar el cambio en el estado de la orden
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    id: string
+  ) => {
+    const newStatus = { status: e.target.value };
+    const response = await fetch(`http://localhost:3001/order/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newStatus),
+    });
 
-  if (response.ok) {
-    Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success");
+    if (response.ok) {
+      Swal.fire(
+        "¡Éxito!",
+        "El estado de la orden ha sido actualizado.",
+        "success"
+      );
 
-    // Actualizar el estado local
-    setOrders(
-      orders.map((order) =>
-        order.id === id
-          ? {
-              ...order,
-              orderDetail: {
-                ...order.orderDetail,
-                transactions: {
-                  ...order.orderDetail.transactions,
-                  status: newStatus.status,
+      // Actualizar el estado local
+      setOrders(
+        orders.map((order) =>
+          order.id === id
+            ? {
+                ...order,
+                orderDetail: {
+                  ...order.orderDetail,
+                  transactions: {
+                    ...order.orderDetail.transactions,
+                    status: newStatus.status,
+                  },
                 },
-              },
-            }
-          : order
-      )
-    );
-  } else {
-    console.error("Error updating order:", response);
-    Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
-  }
-};
+              }
+            : order
+        )
+      );
+    } else {
+      console.error("Error updating order:", response);
+      Swal.fire(
+        "¡Error!",
+        "No se pudo actualizar el estado de la orden.",
+        "error"
+      );
+    }
+  };
   //! Función para manejar el cambio en el campo de búsqueda
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -136,7 +148,10 @@ const handleChange = async (
           { transferStatus: "Comprobante verificado", orderStatus: true },
           token
         );
-        if (response && (response?.status === 200 || response?.status === 201)) {
+        if (
+          response &&
+          (response?.status === 200 || response?.status === 201)
+        ) {
           setOrders(
             orders.map((order) =>
               order.id === id
@@ -147,22 +162,25 @@ const handleChange = async (
                       transactions: {
                         ...order.orderDetail.transactions,
                         status: "En preparación",
-                        
                       },
                     },
                     receipt: {
                       ...order.receipt,
                       status: "Comprobante verificado",
                       id: order.receipt?.id || undefined,
-            image: order.receipt?.image || "",
+                      image: order.receipt?.image || "",
                     },
-                  } 
+                  }
                 : order
             )
           );
           Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.");
         } else {
-          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+          Swal.fire(
+            "¡Error!",
+            "No se pudo actualizar el estado de la orden.",
+            "error"
+          );
         }
       }
     });
@@ -187,8 +205,15 @@ const handleChange = async (
           },
         });
 
-        const response = await putOrder(id, { transferStatus: "Rechazado" }, token);
-        if (response && (response?.status === 200 || response?.status === 201)) {
+        const response = await putOrder(
+          id,
+          { transferStatus: "Rechazado" },
+          token
+        );
+        if (
+          response &&
+          (response?.status === 200 || response?.status === 201)
+        ) {
           setOrders(
             orders.map((order) =>
               order.id === id
@@ -201,11 +226,20 @@ const handleChange = async (
                     },
                   }
                 : order
-            ))
-          
-          Swal.fire("¡Correcto!", "El estado de la orden ha sido actualizado.", "success");
+            )
+          );
+
+          Swal.fire(
+            "¡Correcto!",
+            "El estado de la orden ha sido actualizado.",
+            "success"
+          );
         } else {
-          Swal.fire("¡Error!", "No se pudo actualizar el estado de la orden.", "error");
+          Swal.fire(
+            "¡Error!",
+            "No se pudo actualizar el estado de la orden.",
+            "error"
+          );
         }
       }
     });
@@ -218,15 +252,20 @@ const handleChange = async (
         const blob = await response.blob(); // Convertimos la respuesta a Blob
         return URL.createObjectURL(blob); // Creamos una URL temporal
       } else {
-        throw new Error(`Error al cargar la imagen para el producto ${productId}`);
+        throw new Error(
+          `Error al cargar la imagen para el producto ${productId}`
+        );
       }
     } catch (error) {
-      console.error(`Error al obtener la imagen para el producto ${productId}:`, error);
+      console.error(
+        `Error al obtener la imagen para el producto ${productId}:`,
+        error
+      );
       return null;
     }
   };
-   // useEffect para cargar las imágenes
-   useEffect(() => {
+  // useEffect para cargar las imágenes
+  useEffect(() => {
     const fetchAllImages = async () => {
       try {
         // Creamos un array de promesas para todas las imágenes
@@ -244,34 +283,43 @@ const handleChange = async (
             })
           )
         );
-  
+
         // Convertimos el array en un objeto de mapeo { id: url }
-        const urlMap = urls.reduce((acc : any, item) => {
+        const urlMap = urls.reduce((acc: any, item) => {
           if (item?.id && item?.url) {
-            acc[item.id]  = item.url;
+            acc[item.id] = item.url;
           }
           return acc;
         }, {});
-  
+
         setImageUrls(urlMap); // Verificamos el resultado
       } catch (error) {
         console.error("Error fetching images:", error);
       }
     };
-  
+
     fetchAllImages();
   }, [orders, apiURL]);
-    console.log(imageUrls);
+  console.log(imageUrls);
 
   //! Renderizar columna de "Estado" (Comprobante)
   const renderStatusColumn = (order: IOrders) => {
     return order.receipt ? (
       <div className="flex justify-center items-center gap-4">
         <div>
-          {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
+          {order.receipt.status ? (
+            <p className="w-40">{order.receipt.status}</p>
+          ) : null}
           {order.receipt.image ? (
-            <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
-              <FontAwesomeIcon icon={faDownload} style={{ color: "teal", width: "20px", height: "20px" }} />
+            <a
+              href={order.receipt.image}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FontAwesomeIcon
+                icon={faDownload}
+                style={{ color: "teal", width: "20px", height: "20px" }}
+              />
             </a>
           ) : null}
         </div>
@@ -306,14 +354,18 @@ const handleChange = async (
   //! Renderizar columna de "Acciones" (Cambio de estado)
   const renderActionsColumn = (order: IOrders) => {
     const isRejected = order.receipt?.status === "Rechazado";
-  
+
     return (
       <select
         id="status"
         name="status"
         className="bg-gray-50 border text-sm rounded-lg block w-full p-2.5"
         onChange={(e) => handleChange(e, order.id)}
-        value={isRejected ? "Pendiente de pago" : order.orderDetail.transactions.status}
+        value={
+          isRejected
+            ? "Pendiente de pago"
+            : order.orderDetail.transactions.status
+        }
         disabled={isRejected} // Deshabilitamos el select si el estado es "Rechazado"
       >
         <option value="Pendiente de pago">Pendiente de pago</option>
@@ -323,11 +375,6 @@ const handleChange = async (
         <option value="Entregado">Entregado</option>
       </select>
     );
-  };
-
-  //! Renderizar columna de "Necesita Factura"
-  const renderInvoiceColumn = (order: IOrders) => {
-    return order.bill ? "Sí" : "No";
   };
 
   //! Renderizar columna de "Archivo Factura"
@@ -347,7 +394,9 @@ const handleChange = async (
               <Tooltip content="Eliminar archivo">
                 <button
                   type="button"
-                  onClick={() => handleDeleteFile(order.id, order.user.email ?? "", bill.id)}
+                  onClick={() =>
+                    handleDeleteFile(order.id, order.user.email ?? "", bill.id)
+                  }
                   className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
                 >
                   <FontAwesomeIcon icon={faX} />
@@ -358,7 +407,9 @@ const handleChange = async (
             <>
               <input
                 type="file"
-                onChange={(e) => handleUploadFile(e, order.id, order.user.email ?? "", bill.id)}
+                onChange={(e) =>
+                  handleUploadFile(e, order.id, order.user.email ?? "", bill.id)
+                }
               />
             </>
           )}
@@ -369,9 +420,11 @@ const handleChange = async (
     }
   };
   //! Renderizar columna de "CUIT/DNI"
-const renderIdentificationColumn = (order: IOrders) => {
-  return order.bill && order.bill.identification ? order.bill.identification : "--";
-};
+  const renderIdentificationColumn = (order: IOrders) => {
+    return order.bill && order.bill.identification
+      ? order.bill.identification
+      : "--";
+  };
 
   //! Funciones para subir/eliminar archivos de factura
   const handleUploadFile = async (
@@ -396,7 +449,11 @@ const renderIdentificationColumn = (order: IOrders) => {
       });
 
       if (response.ok) {
-        Swal.fire("¡Archivo subido!", "El archivo ha sido subido correctamente.", "success");
+        Swal.fire(
+          "¡Archivo subido!",
+          "El archivo ha sido subido correctamente.",
+          "success"
+        );
 
         const updatedOrders = orders.map((order) => {
           if (order.id === orderId && order.bill) {
@@ -414,22 +471,30 @@ const renderIdentificationColumn = (order: IOrders) => {
 
         setOrders(updatedOrders);
       } else {
-        Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+        Swal.fire(
+          "¡Error!",
+          `Error: ${response.status} - ${response.statusText}`,
+          "error"
+        );
       }
     }
   };
 
-  const handleDeleteFile = async (orderId: string, userEmail: string, billId: string | undefined) => {
+  const handleDeleteFile = async (
+    orderId: string,
+    userEmail: string,
+    billId: string | undefined
+  ) => {
     if (!billId) {
       Swal.fire("¡Error!", "No se encontró la ID de la factura.", "error");
       return;
     }
-  
+
     const response = await fetch(`${apiURL}/image/bill`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json', // Asegura que se envíe como JSON
+        "Content-Type": "application/json", // Asegura que se envíe como JSON
       },
       body: JSON.stringify({
         to: userEmail,
@@ -437,10 +502,14 @@ const renderIdentificationColumn = (order: IOrders) => {
         imgUrl: null, // Enviar el valor nulo en JSON
       }),
     });
-  
+
     if (response.ok) {
-      Swal.fire("¡Archivo eliminado!", "El archivo ha sido eliminado correctamente.", "success");
-  
+      Swal.fire(
+        "¡Archivo eliminado!",
+        "El archivo ha sido eliminado correctamente.",
+        "success"
+      );
+
       const updatedOrders = orders.map((order) => {
         if (order.id === orderId && order.bill) {
           return {
@@ -454,16 +523,25 @@ const renderIdentificationColumn = (order: IOrders) => {
         }
         return order;
       });
-  
+
       setOrders(updatedOrders);
     } else {
-      Swal.fire("¡Error!", `Error: ${response.status} - ${response.statusText}`, "error");
+      Swal.fire(
+        "¡Error!",
+        `Error: ${response.status} - ${response.statusText}`,
+        "error"
+      );
     }
   };
   console.log(orders);
   return loading ? (
     <div className="flex items-center justify-center h-screen">
-      <Spinner color="teal" className="h-12 w-12" onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
+      <Spinner
+        color="teal"
+        className="h-12 w-12"
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+      />
     </div>
   ) : (
     <DashboardComponent
@@ -480,10 +558,8 @@ const renderIdentificationColumn = (order: IOrders) => {
         "Productos",
         "Estado",
         "Acciones",
-        "Necesita Factura?",
-       "Archivo Factura",
-       "CUIT/DNI",
-        
+        "Archivo Factura",
+        "CUIT/DNI",
       ]}
       noContent="No hay Ordenes disponibles"
     >
@@ -492,57 +568,82 @@ const renderIdentificationColumn = (order: IOrders) => {
           key={order.id}
           className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          <th
+            scope="row"
+            className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+          >
             {order.user.name}
           </th>
           <td className="px-4 py-3 text-center">
             $ {order.orderDetail.totalPrice}
           </td>
           <td className="px-4 py-3 text-center">
-            {order.create && format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
+            {order.create &&
+              format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
             <br />
             {order.orderDetail.deliveryDate &&
-              format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}
+              format(
+                new Date(order.orderDetail.deliveryDate),
+                "dd'-'MM'-'yyyy",
+                { locale: es }
+              )}
           </td>
           <td className="px-4 py-3 text-center">
-            {order.orderDetail.addressDelivery}
+            {order.orderDetail.addressDelivery} hhh
           </td>
           <td className="px-4 py-3">
-            {order.productsOrder.map((product, index) => (
-              console.log(product),
-              console.log(String(imageUrls[Number(product?.subproduct?.product?.id)])),
-              <div key={index} className="flex items-center">
-                {imageUrls  &&<Image
-                  width={50}
-                  height={50}
-                  src={String(imageUrls[Number(product?.subproduct?.product?.id)])  !== "undefined" && String(imageUrls[Number(product?.subproduct?.product?.id)]) !== "null" ? String(imageUrls[Number(product?.subproduct?.product?.id)]) : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`}
-                  alt={product.subproduct.product?.description || ""}
-                  className="w-10 h-10 inline-block mr-2 rounded-full"
-                />}
-                {product.subproduct.product?.description} x {product.quantity} un de {product.subproduct.amount} {product.subproduct.unit}
-              </div>
-            ))}
+            {order.productsOrder.map(
+              (product, index) => (
+                console.log(product),
+                console.log(
+                  String(imageUrls[Number(product?.subproduct?.product?.id)])
+                ),
+                (
+                  <div key={index} className="flex items-center">
+                    {imageUrls && (
+                      <Image
+                        width={50}
+                        height={50}
+                        src={
+                          String(
+                            imageUrls[Number(product?.subproduct?.product?.id)]
+                          ) !== "undefined" &&
+                          String(
+                            imageUrls[Number(product?.subproduct?.product?.id)]
+                          ) !== "null"
+                            ? String(
+                                imageUrls[
+                                  Number(product?.subproduct?.product?.id)
+                                ]
+                              )
+                            : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`
+                        }
+                        alt={product.subproduct.product?.description || ""}
+                        className="w-10 h-10 inline-block mr-2 rounded-full"
+                      />
+                    )}
+                    {product.subproduct.product?.description} x{" "}
+                    {product.quantity} un de {product.subproduct.amount}{" "}
+                    {product.subproduct.unit}
+                  </div>
+                )
+              )
+            )}
           </td>
           {/* Columna de "Estado" */}
-          <td className="px-4 py-3 text-center">
-            {renderStatusColumn(order)}
-          </td>
+          <td className="px-4 py-3 text-center">{renderStatusColumn(order)}</td>
           {/* Columna de "Acciones" */}
           <td className="px-4 py-3 text-center">
             {renderActionsColumn(order)}
           </td>
-          {/* Columna de "Necesita Factura" */}
-          <td className="px-4 py-3 text-center">
-            {renderInvoiceColumn(order)}
-          </td>
-          
+
           {/* Columna de "Archivo Factura" */}
           <td className="px-4 py-3 text-center">
             {renderFileActionsColumn(order)}
           </td>
           <td className="px-4 py-3 text-center">
-  {renderIdentificationColumn(order)}
-</td>
+            {renderIdentificationColumn(order)}
+          </td>
         </tr>
       ))}
     </DashboardComponent>

@@ -97,7 +97,7 @@ const PaymentSuccess: React.FC = () => {
         src="https://res.cloudinary.com/dmnazxdav/image/upload/v1599736321/tick_hhudfj.svg" 
         alt="Pago Exitoso"
       />
-      <h3 className="payment__container-welcome text-3xl font-semibold text-center mb-2">Gracias por hacer tu compra en La Esmeralda!!</h3>
+      <h3 className="payment__container-welcome text-3xl font-semibold text-center mb-2">¡Gracias por hacer tu compra en La Esmeralda!</h3>
       <p className="payment__container-text text-xl font-normal text-center mb-5">
         Una comunidad apasionada por el mejor café.
       </p>
@@ -127,7 +127,7 @@ const PaymentSuccess: React.FC = () => {
           href={`http://localhost:3000/dashboard/cliente/order/${orderId}`}  // Incluimos el orderId en la URL
           className="payment__container-btn text-white bg-teal-500 text-2xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out"
         >
-          Explora el estado de tu pedido!
+          ¡Explora el estado de tu pedido!
         </a>
       )}
     </div>

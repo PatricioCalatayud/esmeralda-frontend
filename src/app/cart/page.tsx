@@ -32,14 +32,14 @@ const Cart = () => {
   const { setCartItemCount } = useCartContext();
   const [account, setAccount] = useState<IAccountProps>();
   const [loading, setLoading] = useState(false);
-  const [needsInvoice, setNeedsInvoice] = useState(false);
+  const [needsInvoice, _setNeedsInvoice] = useState(false);
   const [invoiceType, setInvoiceType] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
-  const [address, setAddress] = useState(session?.address?.street || "");
-  const [number, setNumber] = useState(session?.address?.number || 0);
-  const [locality, setLocality] = useState(session?.address?.locality || "");
-  const [province, setProvince] = useState(session?.address?.province || "");
-  const [zipcode, setZipcode] = useState(session?.address?.zipcode || "");
+  const [address, setAddress] = useState("");
+  const [number, setNumber] = useState(0);
+  const [locality, setLocality] = useState("");
+  const [province, setProvince] = useState("");
+  const [zipcode, setZipcode] = useState("");
   const [tempAddress, setTempAddress] = useState({
     street: "",
     number: "",
@@ -80,7 +80,6 @@ const Cart = () => {
       label: provinceMapping[Number(key)],
     }))
   );
-
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -258,16 +257,16 @@ const Cart = () => {
         });
         return;
       }
-      console.log("orderCheckout",orderCheckout);
       const order = await postOrder(orderCheckout, token);
-      console.log("order",order);
 
       if (order?.status === 200 || order?.status === 201) {
+        setLoading(true);
         setTimeout(() => {
           if (session?.role === "Usuario") {
             setCart([]);
             setCartItemCount(0);
             localStorage.removeItem("cart");
+            setLoading(false);
             router.push(`/checkout/${order.data.id}`);
           } else if (
             session?.role === "Cliente" &&
@@ -282,22 +281,25 @@ const Cart = () => {
             localStorage.removeItem("cart");
             router.push(`/dashboard/cliente/order`);
           }
-        }, 500);
+        }, 600);
       } else {
         throw new Error("Pedido no completado.");
       }
-    } catch (error: any) {
-      console.error("Error en el servidor:", error);
-      const errorMessage =
-        error.message || "Hubo un error al realizar tu pedido";
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Error en el pedido",
-        text: errorMessage,
-        showConfirmButton: false,
-        timer: 1500,
-      });
+    } catch (error) {
+      if (error instanceof Error) {
+        const errorMessage =
+          error.message || "Hubo un error al realizar tu pedido";
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Error en el pedido",
+          text: errorMessage,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        console.error("Error desconocido", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -339,6 +341,11 @@ const Cart = () => {
 
   return (
     <div className="font-sans w-3/4 mx-auto h-screen ">
+      {loading && (
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-teal-400 text-teal-400" />
+        </div>
+      )}
       <div className="grid md:flex md:flex-row gap-4 mt-8 justify-between py-10">
         <div className="bg-white rounded-md w-full 0">
           <h2 className="text-2xl font-bold text-gray-900 h-10 flex justify-center items-center">
@@ -512,8 +519,8 @@ const Cart = () => {
             >
               <Modal.Header>Detalle de envío</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
-                {loading === false ? (
-                  <>
+                {loading === false && (
+                  <div>
                     <div className="border rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <input
@@ -627,23 +634,6 @@ const Cart = () => {
                           <div className="flex gap-2 w-full">
                             <div className="w-1/2">
                               <label
-                                htmlFor="zipcode"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                              >
-                                Código Postal
-                              </label>
-                              <input
-                                type="text"
-                                name="zipcode"
-                                id="zipcode"
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-                                placeholder="Código Postal"
-                                value={zipcode}
-                                onChange={(e) => setZipcode(e.target.value)}
-                              />
-                            </div>
-                            <div className="w-1/2">
-                              <label
                                 htmlFor="locality"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                               >
@@ -657,6 +647,23 @@ const Cart = () => {
                                 placeholder="Localidad"
                                 value={locality}
                                 onChange={(e) => setLocality(e.target.value)}
+                              />
+                            </div>
+                            <div className="w-1/2">
+                              <label
+                                htmlFor="zipcode"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Código Postal
+                              </label>
+                              <input
+                                type="text"
+                                name="zipcode"
+                                id="zipcode"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                                placeholder="Código Postal"
+                                value={zipcode}
+                                onChange={(e) => setZipcode(e.target.value)}
                               />
                             </div>
                           </div>
@@ -719,15 +726,6 @@ const Cart = () => {
                         </button>
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center h-40">
-                    <Spinner
-                      color="teal"
-                      className="h-12 w-12"
-                      onPointerEnterCapture={undefined}
-                      onPointerLeaveCapture={undefined}
-                    />
                   </div>
                 )}
               </Modal.Body>
