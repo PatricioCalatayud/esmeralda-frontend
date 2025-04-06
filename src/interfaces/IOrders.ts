@@ -1,5 +1,6 @@
 export interface IOrders {
     id:            string;
+    trackingNumber: string;
     create:          string;
     user:          User;
     productsOrder: ProductsOrder[];
@@ -33,7 +34,6 @@ export interface OrderDetail {
     totalPrice:      string;
     transactions:    Transactions;
     deliveryAddress: OrderAddress;
-    trackingNumber: string;
 }
 export interface OrderAddress  {
     store?: string;

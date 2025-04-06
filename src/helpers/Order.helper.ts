@@ -31,8 +31,9 @@ export async function getOrders(userId: string, token: string | undefined , page
           limit,
         },});
       const data = response.data.data;
+      console.log("response",response);
       console.log("data",data);
-      return {data};
+      return {data, totalOrders: response.data.total};
     } catch (error: any) {
       console.log(error);
     }
