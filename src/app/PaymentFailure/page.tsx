@@ -110,8 +110,8 @@ const PaymentFailure: React.FC = () => {
         <a href="/" className="payment__container-btn text-white bg-teal-700 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
           Volver a Home
         </a>
-        <a href="/cart" className="payment__container-btn text-white bg-teal-700 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
-          Volver al Carro
+        <a href="/products" className="payment__container-btn text-white bg-teal-700 text-1xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out">
+          Volver a comprar
         </a>
       </div>
     </div>

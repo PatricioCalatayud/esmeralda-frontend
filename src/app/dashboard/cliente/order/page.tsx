@@ -245,13 +245,13 @@ const Dashboard = () => {
               $ {order.orderDetail.totalPrice}
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {session?.role === "Usuario" && order.orderDetail.transactions.status === "Pendiente de pago" && (
+              {session?.role === "Usuario" && !order.status && (
                 <div
                   className={`flex items-center justify-center ${
-                    order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"
+                    order.status ? "text-teal-500" : "text-red-500"
                   }`}
                 >
-                  <p>{order.orderDetail.transactions.status}</p>
+                  <p>{order.status ? "Pago exitoso" : "Pendiente de pago"}</p>
                 </div>
               )}
               {session?.role === "Cliente" &&

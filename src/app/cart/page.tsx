@@ -528,25 +528,7 @@ const Cart = () => {
                               />
                             </div>
                           </div>
-                          <div>
-                            <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-1">
-                              Provincia
-                            </label>
-                            <select
-                              name="province"
-                              id="province"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-                              value={province}
-                              onChange={(e) => setProvince(e.target.value)}
-                            >
-                              <option value="">Seleccione una provincia</option>
-                              {Object.entries(provinceMapping).map(([key, value]) => (
-                                <option key={key} value={value}>
-                                  {value}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                         
 
                           <div className="flex gap-2 w-full">
                             <div className="w-1/2">
@@ -577,6 +559,25 @@ const Cart = () => {
                                 onChange={(e) => setZipcode(e.target.value)}
                               />
                             </div>
+                          </div>
+                          <div>
+                            <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-1">
+                              Provincia
+                            </label>
+                            <select
+                              name="province"
+                              id="province"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                              value={province}
+                              onChange={(e) => setProvince(e.target.value)}
+                            >
+                              <option value="">Seleccione una provincia</option>
+                              {Object.entries(provinceMapping).map(([key, value]) => (
+                                <option key={key} value={value}>
+                                  {value}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         </div>
                       )}
