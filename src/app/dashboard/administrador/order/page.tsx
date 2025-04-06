@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
 import type React from "react"
-
 import Swal from "sweetalert2"
 import { useRouter } from "next/navigation"
 import type { IOrders } from "@/interfaces/IOrders"
@@ -46,21 +45,17 @@ const OrderList = () => {
         )
 
         if (response) {
-          console.log("Response de las ordenes:", response)
           setOrders(response.products)
           setTotalOrders(response.totalOrders)
 
           // Calcular correctamente el número total de páginas
           const calculatedTotalPages = Math.ceil(response.totalOrders / ORDERS_PER_PAGE)
-          console.log(
-            `Total de órdenes: ${response.totalOrders}, Órdenes por página: ${ORDERS_PER_PAGE}, Total de páginas calculadas: ${calculatedTotalPages}`,
-          )
           setTotalPages(calculatedTotalPages)
 
           // Inicializar los inputs de tracking con los valores actuales
           const initialTrackingInputs: Record<string, string> = {}
           response.products.forEach((order) => {
-            initialTrackingInputs[order.id] = order.orderDetail.trackingNumber || ""
+            initialTrackingInputs[order.id] = order.trackingNumber || ""
           })
           setTrackingInputs(initialTrackingInputs)
         } else {
@@ -408,9 +403,17 @@ const OrderList = () => {
     }))
 
     try {
-      const response = await putOrder(orderId, { trackingNumber }, token)
+      // Usar el nuevo endpoint específico para tracking
+      const response = await fetch(`${apiURL}/order/tracking/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ trackingNumber }),
+      })
 
-      if (response && (response?.status === 200 || response?.status === 201)) {
+      if (response.ok) {
         // Actualizar el estado local
         setOrders(
           orders.map((order) =>
