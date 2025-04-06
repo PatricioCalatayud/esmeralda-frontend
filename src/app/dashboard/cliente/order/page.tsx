@@ -134,6 +134,10 @@ const Dashboard = () => {
     )
   }
 
+  const renderTrackingIdColumn = (order: IOrders) => {
+    return order.trackingNumber ? <span>{order.trackingNumber}</span> : "--"
+  }
+
   console.log("orders", orders)
   return (
     <>
@@ -144,7 +148,7 @@ const Dashboard = () => {
         totalPages={totalPages}
         currentPage={currentPage}
         setCurrentPage={onPageChange}
-        tdTable={["Fecha", "Cantidad", "Productos", "Total", "Estado", "Acciones"]}
+        tdTable={["Fecha", "Cantidad", "Productos", "Total", "Estado", "Tracking ID", "Acciones"]}
         noContent="No hay ordenes disponibles"
       >
         {orders?.map((order, index) => (
@@ -283,6 +287,9 @@ const Dashboard = () => {
                     <p>{order.orderDetail.transactions.status}</p>
                   </div>
                 )}
+            </td>
+            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+              {renderTrackingIdColumn(order)}
             </td>
 
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
