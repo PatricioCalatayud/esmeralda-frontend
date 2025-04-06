@@ -109,7 +109,6 @@ const RegisterUser = () => {
   const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -150,19 +149,22 @@ const RegisterUser = () => {
     // Validar el campo específico que cambió
     const updatedData = {
       ...dataUser,
-      [name]: name === "province" ? provinceMapping[Number(value)] : 
-              name === "cuit" ? Number(value) : 
-              name === "number" ? Number(value) : 
-              value
+      [name]:
+        name === "province"
+          ? provinceMapping[Number(value)]
+          : name === "cuit"
+          ? Number(value)
+          : name === "number"
+          ? Number(value)
+          : value,
     };
-    
+
     const fieldErrors = validateRegisterUserForm(updatedData);
-    setError(prevError => ({
+    setError((prevError) => ({
       ...prevError,
-      [name]: fieldErrors[name as keyof IUserErrorProps]
+      [name]: fieldErrors[name as keyof IUserErrorProps],
     }));
   };
-
 
   const validateRegisterUserForm = (data: IUserProps): IUserErrorProps => {
     const errors: IUserErrorProps = {
@@ -307,7 +309,6 @@ const RegisterUser = () => {
         }
       );
 
-
       Swal.close();
 
       if (response.status === 200 || response.status === 201) {
@@ -332,7 +333,7 @@ const RegisterUser = () => {
         icon: "error",
         title: "Error al registrar",
         text:
-          error.response?.data.message || "Ha ocurrido un error inesperado.",
+        error.response?.data.message || "Ha ocurrido un error inesperado.",
       });
     } finally {
       setLoading(false);
@@ -471,26 +472,6 @@ const RegisterUser = () => {
                   }}
                   autoComplete="current-password"
                 />
-                <TextField
-                  select
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="province"
-                  label="Provincia"
-                  name="province"
-                  value={selectedProvince}
-                  onChange={handleChange}
-                  error={!!error.province}
-                  helperText={error.province}
-                  InputLabelProps={{ style: { color: "teal" } }}
-                >
-                  {provinces.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
                 <div className="grid grid-cols-2 gap-4">
                   <TextField
                     margin="normal"
@@ -547,21 +528,27 @@ const RegisterUser = () => {
                     InputLabelProps={{ style: { color: "teal" } }}
                   />
                 </div>
-
+                <TextField
+                  select
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="province"
+                  label="Provincia"
+                  name="province"
+                  value={selectedProvince}
+                  onChange={handleChange}
+                  error={!!error.province}
+                  helperText={error.province}
+                  InputLabelProps={{ style: { color: "teal" } }}
+                >
+                  {provinces.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="cuit"
-                    label="CUIL/CUIT"
-                    name="cuit"
-                    value={dataUser.cuit === 0 ? "" : dataUser.cuit}
-                    onChange={handleChange}
-                    error={!!error.cuit}
-                    helperText={error.cuit}
-                    InputLabelProps={{ style: { color: "teal" } }}
-                  />
                   <TextField
                     select
                     margin="normal"
@@ -582,6 +569,19 @@ const RegisterUser = () => {
                       </MenuItem>
                     ))}
                   </TextField>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="cuit"
+                    label="CUIL/CUIT"
+                    name="cuit"
+                    value={dataUser.cuit === 0 ? "" : dataUser.cuit}
+                    onChange={handleChange}
+                    error={!!error.cuit}
+                    helperText={error.cuit}
+                    InputLabelProps={{ style: { color: "teal" } }}
+                  />
                 </div>
                 <Button
                   type="submit"

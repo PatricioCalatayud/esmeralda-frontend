@@ -9,16 +9,11 @@ import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import Image from "next/image";
-import RatingStars from "@/components/ratingStars/ratingStars";
-import axios from "axios";
-import Swal from "sweetalert2";
 
 const Tracking = ({ params }: { params: { id: string } }) => {
-  const { token, session, userId } = useAuthContext();
+  const { token } = useAuthContext();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<IOrders | null>(null);
-  const [ratings, setRatings] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     async function fetchOrder() {
@@ -36,39 +31,6 @@ const Tracking = ({ params }: { params: { id: string } }) => {
 
   const statusDefault = ["En preparación", "Empaquetado", "Transito", "Entregado"];
   
-  const handleRatingChange = (rating: number, productId: string) => {
-    setRatings((prevRatings) => ({
-      ...prevRatings,
-      [productId]: rating,
-    }));
-  };
-
-  const handleSendRating = async (productId: string) => {
-    const rating = ratings[productId];
-    if (!rating || !userId) return;
-
-    const ratingPayload = {
-      productId,
-      userId,
-      rating,
-    };
-
-    try {
-      await axios.post("http://localhost:3001/product-rating", ratingPayload);
-      Swal.fire({
-        icon: "success",
-        title: "Calificación Exitosa",
-        text: "¡Gracias por tu calificación!",
-      });
-    } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.response?.data?.message || "Error al enviar la calificación",
-      });
-    }
-  };
-
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner
@@ -159,63 +121,6 @@ const Tracking = ({ params }: { params: { id: string } }) => {
               </p>
             )}
           </div>
-          
-          {/* Aquí movemos la sección de calificación al final */}
-          {order.orderDetail.transactions.status !== "En preparación" &&
-          <div className="p-4 w-full flex flex-col justify-center items-center">
-            <h2 className="text-xl font-medium mb-4">Califica los productos:</h2>
-            {order.productsOrder &&
-              order.productsOrder.map((product, productIndex) => (
-                <><div
-                  key={productIndex}
-                  className="mb-6 text-start flex flex-col gap-4 p-4 border-b border-gray-300 w-full justify-center items-center"
-                >
-                  <div className="flex items-center gap-4">
-                    <Image
-                      width={80}
-                      height={80}
-                      priority={true}
-                      src={
-                        product.subproduct.product
-                          ? product.subproduct?.product.imgUrl
-                          : ""
-                      }
-                      alt={
-                        product.subproduct.product
-                          ? product.subproduct?.product.description
-                          : ""
-                      }
-                      className="w-16 h-16 rounded-lg"
-                    />
-                    <div className="flex flex-col">
-                      <span>
-                        {product.subproduct.product &&
-                          product.subproduct?.product.description}
-                      </span>
-                      <span>
-                        x {product.subproduct?.amount} {product.subproduct?.unit}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <RatingStars
-                      onChange={(rating) =>
-                        handleRatingChange(rating, product?.subproduct?.product?.id ?? "")
-                      }
-                      id={product.id}
-                    />
-                  </div>
-                  
-                </div>
-                <button
-                className="mt-2 bg-teal-500 text-white px-4 py-2 rounded-lg"
-                onClick={() => handleSendRating(product.subproduct.product?.id ?? "")}
-              >
-                Envía tu Calificación
-              </button>
-              </>))}
-          </div>}
-
           <div className="flex justify-start w-full items-center border-t-gray-300 border h-20 px-10 bg-gray-100">
             <Link
               href={"/dashboard/cliente/order"}
