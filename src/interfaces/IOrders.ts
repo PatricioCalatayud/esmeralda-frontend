@@ -36,8 +36,10 @@ export interface OrderDetail {
     deliveryAddress: OrderAddress;
 }
 export interface OrderAddress  {
-    store?: string;
+    store?: string | boolean;
     address?: string;
+    street?: string;
+    number?: string;
     city?: string;
     state?: string;
     country?: string;

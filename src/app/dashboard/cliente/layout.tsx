@@ -31,19 +31,17 @@ export default function DashboardLayout({
   //! Obtener token de usuario-Session
   useEffect(() => {
     console.log(authLoading);
-console.log(session);
+    console.log(session);
     if (!authLoading) {
       if (!session) {
         Swal.fire(
           "¡Error!",
           "Sesión de usuario no encontrada. Por favor, inicia sesión.",
           "error"
-        )
-          router.push("/login")
-        };
-        
+        );
+        router.push("/login");
       }
-    
+    }
   }, [authLoading, session]);
 
   return (
@@ -55,14 +53,13 @@ console.log(session);
             <p className="text-xl text-white font-semibold mb-4 flex items-center text-center p-2">
               <FontAwesomeIcon
                 icon={faScrewdriverWrench}
-                style={{ marginRight: "10px",
+                style={{
+                  marginRight: "10px",
                   width: "20px",
                   height: "20px",
-                  transition: "none", }}
-                  
-
-              />
-              {" "}
+                  transition: "none",
+                }}
+              />{" "}
               Panel de control
             </p>
             <ul className="space-y-2 pb-2 ">

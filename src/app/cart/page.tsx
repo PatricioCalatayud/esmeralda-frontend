@@ -219,6 +219,8 @@ const Cart = () => {
     }
     orderCheckout.identification = String(session?.cuit)
 
+    console.log(invoiceType)
+
     try {
       if (!invoiceType) {
         Swal.fire({
@@ -450,7 +452,7 @@ const Cart = () => {
               <Modal.Header>Detalle de envío</Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
                 {loading === false && (
-                  <div>
+                  <div className="flex flex-col gap-4">
                     <div className="border rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <input
