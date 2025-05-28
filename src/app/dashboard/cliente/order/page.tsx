@@ -138,6 +138,7 @@ const Dashboard = () => {
     return order.trackingNumber ? <span>{order.trackingNumber}</span> : "--"
   }
 
+  console.log("orders", orders?.map((order) => order.status))
   console.log("orders", orders)
   return (
     <>
@@ -151,7 +152,7 @@ const Dashboard = () => {
         tdTable={["Fecha", "Cantidad", "Productos", "Total", "Estado", "Tracking ID", "Acciones"]}
         noContent="No hay ordenes disponibles"
       >
-        {orders?.map((order, index) => (
+        {orders?.map((order: IOrders, index) => (
           <tr key={index} className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               {format(new Date(order.create), "dd'-'MM'-'yyyy", {
@@ -244,56 +245,15 @@ const Dashboard = () => {
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               $ {order.orderDetail.totalPrice}
             </td>
-            <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {session?.role === "Usuario" && !order.status && (
-                <div
-                  className={`flex items-center justify-center ${
-                    order.status ? "text-teal-500" : "text-red-500"
-                  }`}
-                >
-                  <p>{order.status ? "Pago exitoso" : "Pendiente de pago"}</p>
-                </div>
-              )}
-              {session?.role === "Cliente" &&
-                order.orderDetail.transactions.status === "Pendiente de pago" &&
-                order?.receipt?.status !== "Pendiente de revisión de comprobante" &&
-                order?.receipt?.status !== "Rechazado" && (
-                  <div
-                    className={`flex items-center justify-center ${
-                      order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"
-                    }`}
-                  >
-                    <p>{order.orderDetail.transactions.status}</p>
-                  </div>
-                )}
-              {session?.role === "Cliente" &&
-                order.orderDetail.transactions.status === "Pendiente de pago" &&
-                order?.receipt?.status === "Pendiente de revisión de comprobante" && (
-                  <div className={`flex items-center justify-center text-teal-500`}>
-                    <p>{order?.receipt?.status}</p>
-                  </div>
-                )}
-              {session?.role === "Cliente" &&
-                order.orderDetail.transactions.status === "Pendiente de pago" &&
-                order?.receipt?.status === "Rechazado" && (
-                  <div className={`flex items-center justify-center text-red-500`}>
-                    <p>{order?.receipt?.status}</p>
-                  </div>
-                )}
-              {session?.role === "Cliente" &&
-                order.orderDetail.transactions.status !== "Pendiente de pago" &&
-                order?.receipt?.status === "Comprobante verificado" && (
-                  <div className={`flex items-center justify-center text-teal-500`}>
-                    <p>{order.orderDetail.transactions.status}</p>
-                  </div>
-                )}
+            <td className={`px-4 py-3 font-medium ${order.status ? "text-teal-500" : "text-red-500"} whitespace-nowrap`}>
+              {order.status ? "Orden exitosa" : "Pendiente"}
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               {renderTrackingIdColumn(order)}
             </td>
 
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {order.orderDetail.transactions.status !== "Pendiente de pago" && (
+              {order.status && (
                 <Link
                   type="button"
                   data-drawer-target="drawer-update-product"

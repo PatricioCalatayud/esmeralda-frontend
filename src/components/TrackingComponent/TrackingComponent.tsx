@@ -12,7 +12,7 @@ const TrackingComponent1: React.FC<TrackingComponent1Props> = ({
   height = 264,
 }) => {
   const steps = [
-    { name: "Recibido", activeColor: "#00695C", inactiveColor: "#D1D5DB" },
+    { name: "En preparación", activeColor: "#00695C", inactiveColor: "#D1D5DB" },
     { name: "Empaquetado", activeColor: "#00695C", inactiveColor: "#D1D5DB" },
     { name: "Transito", activeColor: "#00695C", inactiveColor: "#D1D5DB" },
     { name: "Entregado", activeColor: "#00695C", inactiveColor: "#D1D5DB" },

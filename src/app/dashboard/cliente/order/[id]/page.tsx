@@ -31,6 +31,8 @@ const Tracking = ({ params }: { params: { id: string } }) => {
 
   const statusDefault = ["En preparación", "Empaquetado", "Transito", "Entregado"];
   
+  console.log(order)
+
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner
@@ -82,9 +84,6 @@ const Tracking = ({ params }: { params: { id: string } }) => {
                           (status === "Entregado" && (
                             <p>
                               Tu pedido ya fue entregado.
-                              <b className="font-bold">
-                                Ayúdanos a calificar los productos.
-                              </b>
                             </p>
                           ))}
                       </div>
@@ -94,21 +93,16 @@ const Tracking = ({ params }: { params: { id: string } }) => {
               </div>
             </div>
             <h4 className="text-center">
-              Tu orden fue realizada el:{" "}
+              Tu orden fue realizada el {""}
               <b className="font-bold">
                 {format(new Date(order.date ?? Date.now()), "d 'de' MMMM 'de' yyyy", {
                   locale: es,
                 })}
               </b>
             </h4>
-            {order.orderDetail.transactions.status === "En preparación" && (
+            {order.orderDetail.transactions.status !== "Entregado" && (
               <p className="text-center">
-                Proximamente sabras la fecha de entrega
-              </p>
-            )}
-            {order.orderDetail.transactions.status !== "Recibido" && (
-              <p className="text-center">
-                Tu orden llegará a tu domicilio antes del:{" "}
+                Tu orden llegará a tu domicilio antes del {" "}
                 <b className="font-bold">
                   {format(
                     new Date(order.orderDetail.deliveryDate),

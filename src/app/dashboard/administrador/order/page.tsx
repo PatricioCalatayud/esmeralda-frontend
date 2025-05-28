@@ -283,41 +283,12 @@ const OrderList = () => {
 
   //! Renderizar columna de "Estado" (Comprobante)
   const renderStatusColumn = (order: IOrders) => {
-    return order.receipt ? (
+    return (
       <div className="flex justify-center items-center gap-4">
-        <div>
-          {order.receipt.status ? <p className="w-40">{order.receipt.status}</p> : null}
-          {order.receipt.image ? (
-            <a href={order.receipt.image} target="_blank" rel="noopener noreferrer">
-              <FontAwesomeIcon icon={faDownload} style={{ color: "teal", width: "20px", height: "20px" }} />
-            </a>
-          ) : null}
+        <div className={`${order.status ? "text-teal-500" : "text-red-500"}`}>
+          {order.status ? "Exito" : "Pendiente"}
         </div>
-        {order.receipt.status !== "Pendiente de subir comprobante" && (
-          <>
-            <Tooltip content="Aceptar">
-              <button
-                type="button"
-                onClick={() => handleTransferOk(order.id)}
-                className="py-2 px-3 flex items-center text-sm text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 hover:text-white"
-              >
-                <FontAwesomeIcon icon={faCheck} />
-              </button>
-            </Tooltip>
-            <Tooltip content="Rechazar">
-              <button
-                type="button"
-                onClick={() => handleTransferReject(order.id)}
-                className="py-2 px-3 flex items-center text-sm text-red-600 border-red-600 border rounded-lg hover:bg-red-600 hover:text-white"
-              >
-                <FontAwesomeIcon icon={faX} />
-              </button>
-            </Tooltip>
-          </>
-        )}
       </div>
-    ) : (
-      "--"
     )
   }
 
@@ -456,6 +427,11 @@ const OrderList = () => {
   //! Renderizar columna de "Tracking ID"
   const renderTrackingIdColumn = (order: IOrders) => {
     const isSaving = savingTracking[order.id] || false
+    const isStorePickup = order.orderDetail.deliveryAddress?.store
+
+    if (isStorePickup) {
+      return <div className="text-center">Retiro de local</div>
+    }
 
     return (
       <div className="flex items-center justify-center gap-2">
@@ -592,6 +568,9 @@ const OrderList = () => {
   // Mostrar órdenes filtradas si hay término de búsqueda, de lo contrario mostrar las órdenes de la página actual
   const ordersToDisplay = searchTerm ? filterOrders() : orders
 
+  console.log(ordersToDisplay)
+
+
   return (
     <>
       {loading ? (
@@ -640,10 +619,10 @@ const OrderList = () => {
                 </td>
                 <td className="px-4 py-3 text-center">
                   {order.orderDetail.deliveryAddress ? (
-                    <div className="text-sm">{order.orderDetail.deliveryAddress.store}</div>
+                    <div className="text-sm">{order.orderDetail.deliveryAddress.store ? "Retiro de local" : order.orderDetail.deliveryAddress.street + " " + order.orderDetail.deliveryAddress.number}</div>
                   ) : (
                     "--"
-                  )}
+                  )} 
                 </td>
                 <td className="px-4 py-3">
                   {order.productsOrder.length > 0 && (
