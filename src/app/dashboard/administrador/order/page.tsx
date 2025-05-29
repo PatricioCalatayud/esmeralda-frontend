@@ -117,6 +117,7 @@ const OrderList = () => {
           order.id === id
             ? {
                 ...order,
+                status: newStatus.status === "Entregado" ? true : false,
                 orderDetail: {
                   ...order.orderDetail,
                   transactions: {
@@ -506,16 +507,14 @@ const OrderList = () => {
       return
     }
 
-    const response = await fetch(`${apiURL}/image/bill`, {
+    const response = await fetch(`${apiURL}/bill/${billId}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json", // Asegura que se envíe como JSON
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        to: userEmail,
-        id: billId,
-        imgUrl: null, // Enviar el valor nulo en JSON
+        imgUrl: null,
       }),
     })
 

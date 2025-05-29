@@ -6,7 +6,7 @@ export interface IOrders {
     productsOrder: ProductsOrder[];
     orderDetail:   OrderDetail;
     receipt?:      Receipt;
-    status:        string;
+    status:        string | boolean;
     invoiceType?:  string;
     bill?:         Bill; // Estructura del módulo Bill 
     date?: number;

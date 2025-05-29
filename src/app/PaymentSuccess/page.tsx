@@ -124,7 +124,7 @@ const PaymentSuccess: React.FC = () => {
 
       {orderId && (
         <a
-          href={`http://localhost:3000/dashboard/cliente/order/${orderId}`}  // Incluimos el orderId en la URL
+          href={`https://valentino-tunnel.flamefactory.io//dashboard/cliente/order/${orderId}`}
           className="payment__container-btn text-white bg-teal-500 text-2xl py-4 px-10 rounded-full font-normal shadow-lg hover:opacity-80 transition duration-150 ease-in-out"
         >
           ¡Explora el estado de tu pedido!
