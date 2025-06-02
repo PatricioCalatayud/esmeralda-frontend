@@ -19,8 +19,6 @@ function HeadlineCards() {
       setAccessoriesCategoryId(accessoriesCategory.id);
     }
     setLoading(false);
-  } else {
-    console.log('Categories loading...');
   }
 }, [categoriesLoading, categories]);
 
@@ -31,7 +29,7 @@ function HeadlineCards() {
     className="h-12 w-12"
     onPointerEnterCapture={() => {}}
     onPointerLeaveCapture={() => {}}
-  /></div>; // Puedes personalizar este mensaje de carga si es necesario
+  /></div>;
   }
 
   return (

@@ -166,7 +166,6 @@ const ProductList = () => {
       isAvailable: true as boolean
     }
     ] };
-    console.log(typeof dataProducts.subproducts[0].isAvailable);
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -175,11 +174,9 @@ const ProductList = () => {
       );
       return;
     }
-    console.log(dataProducts);
 
       const response = await putProducts(dataProducts, id, token);
 
-      console.log("Producto habilitado:", response);
    if(response && (response.status === 200 || response.status === 201)){
     setProducts((prevProducts) =>
       prevProducts?.map((product) => {
@@ -214,7 +211,6 @@ const ProductList = () => {
       isAvailable: false as boolean
     }
     ] };
-    console.log(typeof dataProducts.subproducts[0].isAvailable);
     if (!token) {
       Swal.fire(
         "¡Error!",
@@ -224,7 +220,6 @@ const ProductList = () => {
       return;
     }
       const response = await putProducts(dataProducts, id, token);
-      console.log("Producto deshabilitado:", response);
     if(response && (response.status === 200 || response.status === 201)){
       setProducts((prevProducts) =>
         prevProducts?.map((product) => {
@@ -254,14 +249,12 @@ const ProductList = () => {
 
   //! Funciónes para editar un subproducto
   const handleEditProduct = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, subproductId: number) => {
-console.log(subproductId);
     const { name, value } = e.target;
     setEditProductId((prev) => ({
       ...prev,
       [name]: value,
       id : subproductId, // Incluye el ID del subproducto o producto principal
     }));
-    console.log(editProductId);
   };
 
   const handleEditSubproductCheck = async(id: string,subproduct:ISubProduct) => {
@@ -290,7 +283,6 @@ console.log(subproductId);
                 ? { ...editProductId, id: subproduct.id } // Reemplaza completamente el subproducto
                 : sp
             );
-            console.log(product);
             return { ...product, subproducts: updatedSubproducts };
           }
           return product;
@@ -317,7 +309,6 @@ console.log(subproductId);
       [name]: value,
       //id, // Incluye el ID del subproducto o producto principal
     }));
-    console.log(addSubproductId);
   };
   const handleAddSubproductCheck = async(id: string) => {
     if (addSubproductId.stock === 0 && addSubproductId.amount ==="" && addSubproductId.unit === "" && addSubproductId.price === "" && addSubproductId.discount === undefined) {
@@ -417,8 +408,6 @@ console.log(subproductId);
     fetchAllImages();
   }, [products, apiURL]);
 
-
-  console.log(imageUrls);
   return loading ? (
     <div className="flex items-center justify-center h-screen">
       <Spinner

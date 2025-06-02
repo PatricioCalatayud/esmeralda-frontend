@@ -185,14 +185,12 @@ const RegisterUser = () => {
     // Validación del nombre
     if (!data.name) {
       errors.name = "El nombre es obligatorio";
-      console.log("Error en nombre:", errors.name);
     } else if (!/^[a-zA-ZÀ-ÿ\s]{1,40}$/.test(data.name)) {
       errors.name = "El nombre solo puede contener letras y espacios";
     }
 
     if (!data.lastname) {
       errors.lastname = "El apellido es obligatorio";
-      console.log("Error en apellido:", errors.lastname);
     } else if (!/^[a-zA-ZÀ-ÿ\s]{1,40}$/.test(data.lastname)) {
       errors.lastname = "El apellido solo puede contener letras y espacios";
     }
@@ -209,7 +207,6 @@ const RegisterUser = () => {
     // Validación de la contraseña
     if (!data.password) {
       errors.password = "La contraseña es obligatoria";
-      console.log("Error en contraseña:", errors.password);
     } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,15}$/.test(data.password)) {
       errors.password =
         "La contraseña debe tener entre 8 y 15 caracteres, incluyendo al menos una mayúscula, una minúscula y un número";
@@ -218,7 +215,6 @@ const RegisterUser = () => {
     // Validación del teléfono
     if (!data.phone) {
       errors.phone = "El teléfono es obligatorio";
-      console.log("Error en teléfono:", errors.phone);
     } else if (!/^\d{7,14}$/.test(data.phone)) {
       errors.phone = "El teléfono debe tener entre 7 y 14 dígitos";
     }
@@ -252,17 +248,11 @@ const RegisterUser = () => {
       errors.zipcode = "El código postal es obligatorio";
     }
 
-    console.log("Errores generados en la validación:", errors);
-
     return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log("Enviando datos del formulario");
-    console.log("Datos del usuario antes de enviar:", dataUser);
-
     // Obtener errores después de validar
     const errors = validateRegisterUserForm(dataUser);
     setError(errors);
@@ -278,7 +268,6 @@ const RegisterUser = () => {
     });
 
     if (hasErrors) {
-      console.log("Errores detectados. No se envía el formulario.");
       Swal.fire({
         icon: "error",
         title: "Error en el formulario",
@@ -328,7 +317,6 @@ const RegisterUser = () => {
       }
     } catch (error: any) {
       Swal.close();
-      console.log("Error capturado en el catch:", error);
       Swal.fire({
         icon: "error",
         title: "Error al registrar",
@@ -351,7 +339,6 @@ const RegisterUser = () => {
     error.province !== "" ||
     error.arca_identification !== "" ||
     error.cuit !== "";
-  console.log(error.province);
   return (
     <>
       <div className="relative flex justify-center items-center font-sans h-full min-h-screen p-4">

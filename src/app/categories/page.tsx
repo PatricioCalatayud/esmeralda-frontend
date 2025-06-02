@@ -12,7 +12,6 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       try {
         const products = await getProducts();
-        console.log(products);
         if (products) {
           setProducts(products);
         }

@@ -21,13 +21,11 @@ const PaymentSuccess: React.FC = () => {
     if (!searchParams) return;
 
     const id = searchParams.get('orderId');
-    console.log("Order ID from URL:", id);  // Para verificar que el orderId se esté capturando correctamente
 
     if (id) {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log("API Response:", data);  // Para ver la respuesta completa de la API
 
           const date = new Date(data.create);
           const formattedDate = date.toLocaleDateString();
@@ -39,12 +37,6 @@ const PaymentSuccess: React.FC = () => {
             quantity: productOrder.quantity,
           }));
 
-          console.log("Formatted Order Details:", {
-            date: formattedDate,
-            time: formattedTime,
-            products,
-          });  // Para ver cómo se están formateando los datos antes de guardarlos en el estado
-
           setOrderDetails({
             date: formattedDate,
             time: formattedTime,
@@ -52,7 +44,7 @@ const PaymentSuccess: React.FC = () => {
           });
         })
         .catch((error) => {
-          console.error('Error fetching order details:', error);  // Para capturar y mostrar errores de la solicitud
+          console.error('Error fetching order details:', error);
         });
     }
   }, [searchParams]);
@@ -93,7 +85,7 @@ const PaymentSuccess: React.FC = () => {
     <div className="payment__container mx-auto bg-white p-20 rounded-lg flex flex-col items-center justify-evenly shadow-lg">
       <h3 className="payment__container-heading text-4xl font-semibold text-center mb-5">¡Pago Exitoso!</h3>
       <img 
-        className="payment__container-image w-24 mb-5" 
+        className="payment__container-image w-24 h-24 mb-5" 
         src="https://res.cloudinary.com/dmnazxdav/image/upload/v1599736321/tick_hhudfj.svg" 
         alt="Pago Exitoso"
       />

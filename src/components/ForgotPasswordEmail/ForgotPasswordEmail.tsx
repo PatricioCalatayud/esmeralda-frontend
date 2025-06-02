@@ -17,7 +17,7 @@ const ForgotPasswordEmail: React.FC<{ resetLink: string }> = ({ resetLink }) => 
             textAlign: 'center', // Centra el contenido en todo el div
         }}>
             <div style={{ paddingBottom: '20px' }}>
-                <img src="logo.png" alt="Logo de la empresa" style={{ maxWidth: '150px', margin: '0 auto', display: 'block' }} />
+                <img src="logo.png" alt="Logo de la empresa" style={{ maxWidth: '150px', height: '150px', margin: '0 auto', display: 'block' }} />
             </div>
             <div style={{ fontSize: '16px', lineHeight: '1.5' }}>
                 <p>Hola,</p>

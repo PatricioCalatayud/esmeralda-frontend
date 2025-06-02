@@ -55,7 +55,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         //decodifico el token
         const decodedToken: any = jwtDecode(token);
-        console.log("decodedToken",decodedToken);
         // si hay token decodificado
         if (decodedToken) {
           setUserId(decodedToken.sub);
@@ -128,8 +127,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           });
           router.push("/register");
         }
-      } else {
-        console.log("No hay sesión de Google activa");
       }
       setAuthLoading(false);
     };

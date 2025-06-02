@@ -50,7 +50,6 @@ const Transfer = ({ params }: { params: { id: string } }) => {
   const [errors, setErrors] = useState({
     imgUrl: "",
   });
-  console.log(session);
   useEffect(() => {
     if (!authLoading) {
       if (!session) {
@@ -69,7 +68,6 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     const fetchProduct = async () => {
       const response = await getOrder(params.id, token);
       if (response && response.receipt) {
-        console.log(response);
         setTotalPrice(response.orderDetail.totalPrice);
         setReceiptId(response.receipt?.id ?? "");
       }
@@ -111,7 +109,6 @@ const Transfer = ({ params }: { params: { id: string } }) => {
     });
 
     const response = await putOrderTransaction(formData, token);
-    console.log(response);
     if (response && (response.status === 201 || response.status === 200)) {
       Swal.fire({
         icon: "success",

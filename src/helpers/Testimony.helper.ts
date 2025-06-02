@@ -14,7 +14,7 @@ export async function CreateTestimony(data:any, token: string | undefined) {
     });
     return response;
   } catch (error: any) {
-    console.log("Error:", error);
+    console.error(error);
     return error;
   }
 

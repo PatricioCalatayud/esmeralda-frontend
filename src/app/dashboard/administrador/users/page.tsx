@@ -30,7 +30,6 @@ const Users = () => {
             const limit = USER_PER_PAGE;
             const page = currentPage;
             const response = await getUsers(token);
-            console.log(response);
             setUsers(response);
             if (response) setTotalPages(Math.ceil(response.length / USER_PER_PAGE));
             

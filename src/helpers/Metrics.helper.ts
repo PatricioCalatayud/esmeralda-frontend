@@ -12,7 +12,7 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
       const products = response.data;
       return products;
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -32,11 +32,10 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
           Authorization: `Bearer ${token}`,
         },
         });
-        console.log(response.data);
       const products = response.data;
       return products;
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -55,11 +54,10 @@ const apiURL = process.env.NEXT_PUBLIC_API_URL;
           Authorization: `Bearer ${token}`,
         },
         });
-        console.log(response.data);
       const products = response.data;
       return products;
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
     
   }

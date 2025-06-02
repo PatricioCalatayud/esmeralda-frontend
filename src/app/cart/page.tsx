@@ -60,12 +60,6 @@ const Cart = () => {
     23: "Tucumán",
     24: "Ciudad Autónoma de Buenos Aires",
   }
-  const [provinces] = useState(
-    Object.keys(provinceMapping).map((key) => ({
-      value: Number(key),
-      label: provinceMapping[Number(key)],
-    })),
-  )
 
   //! Obtiene los datos del carro
   useEffect(() => {
@@ -219,8 +213,6 @@ const Cart = () => {
     }
     orderCheckout.identification = String(session?.cuit)
 
-    console.log(invoiceType)
-
     try {
       if (!invoiceType) {
         Swal.fire({
@@ -234,7 +226,6 @@ const Cart = () => {
       }
 
       const order = await postOrder(orderCheckout, token)
-
       if (order?.status === 200 || order?.status === 201) {
         // Limpiar el carrito antes de la redirección
         if (session?.role === "Usuario" || (session?.role === "Cliente" && boton === "Cliente Cuenta Corriente")) {

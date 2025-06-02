@@ -42,7 +42,6 @@ const Metricas = () => {
       if (token) {
         const response3 = await getDebts(token);
         setDebts(response3);
-        console.log(response3);
       }
     };
     fetchData();
@@ -58,12 +57,10 @@ const Metricas = () => {
       filter
     );
     setProductsSold(response8);
-    console.log(response8);
   };
   const handleSales = async () => {
     const response9 = await getSales(token, startDate, endDate);
     setSales(response9);
-    console.log(response9);
   };
 
   return (
@@ -146,7 +143,6 @@ const Metricas = () => {
                       <tbody>
                         {productsSold.products.map(
                           (product: any, index: number) => (
-                            console.log(product),
                             (
                               <tr
                                 key={index}
@@ -191,7 +187,6 @@ const Metricas = () => {
                   <tbody>
                     {debts?.clients.map(
                       (debt: any, index: number) => (
-                        console.log(debt),
                         (
                           <tr
                             key={index}

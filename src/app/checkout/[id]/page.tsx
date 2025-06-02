@@ -38,7 +38,6 @@ const Checkout = ({ params }: { params: { id: string } }) => {
         const data = await getOrder(params.id, token);
         if (data) {
           setOrder(data);
-          console.log(data)
         }
       } catch (error) {
         console.error("Error fetching order:", error);
@@ -69,12 +68,14 @@ const Checkout = ({ params }: { params: { id: string } }) => {
 
     if (order?.productsOrder?.length && order?.productsOrder?.length > 0) {
       const orderTotal = order.productsOrder.reduce((acc, item) => {
-        return acc + (Number(item.quantity) || 1) * Number(item.subproduct?.price || 0);
+        return (
+          acc +
+          (Number(item.quantity) || 1) * Number(item.subproduct?.price || 0)
+        );
       }, 0);
       const totalFinal = orderTotal * 1.21;
       createPreference(totalFinal);
-    }
-    else if (cart.length > 0) {
+    } else if (cart.length > 0) {
       const total = cart.reduce((acc, item) => {
         return acc + (Number(item.quantity) || 1) * Number(item.price || 0);
       }, 0);
@@ -82,8 +83,6 @@ const Checkout = ({ params }: { params: { id: string } }) => {
       createPreference(totalFinal);
     }
   }, [cart, order, params.id]);
-
-  console.log(cart);
 
   const shippingCost = 0;
 
@@ -126,8 +125,6 @@ const Checkout = ({ params }: { params: { id: string } }) => {
   const iva = calcularIVA();
   const total = calcularTotal();
 
-  console.log(order);
-
   return (
     <div className="font-sans bg-white h-full mb-20">
       <div className="max-w-7xl mx-auto w-full relative z-10">
@@ -138,26 +135,28 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                 color="teal"
                 className="h-12 w-12"
                 onPointerEnterCapture={() => {}}
-                onPointerLeaveCapture={() => {}}
+                onPointerLeaveCapture={undefined}
               />
             </div>
           ) : (
             <div className="lg:col-span-2 max-lg:order-1 px-6 max-w-4xl mx-auto w-full">
               {preferenceId ? (
-                <a
-                  href={preferenceId}
-                  target="_blank"
-                  className="flex justify-center items-center bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2"
-                >
-                  Pagar con Mercado Pago{" "}
-                  <MercadoPagoIcon
-                    color="#ffffff"
-                    height={"32px"}
-                    width={"32px"}
-                  />
-                </a>
+                <div className="flex justify-center items-center w-full h-full">
+                  <a
+                    href={preferenceId}
+                    target="_blank"
+                    className="flex justify-center items-center w-full bg-blue-500 hover:bg-blue-800 text-white gap-2 font-semibold rounded-xl py-2"
+                  >
+                    Pagar con Mercado Pago{" "}
+                    <MercadoPagoIcon
+                      color="#ffffff"
+                      height={"32px"}
+                      width={"32px"}
+                    />
+                  </a>
+                </div>
               ) : (
-                <div className="flex justify-center items-start w-full h-full">
+                <div className="flex justify-center items-center w-full h-full">
                   {showMessage && (
                     <h1 className="text-3xl">No existe link de mercado pago</h1>
                   )}
@@ -174,7 +173,9 @@ const Checkout = ({ params }: { params: { id: string } }) => {
               <hr className="my-6" />
               <div className="space-y-6 mt-10 max-h-[300px] overflow-y-auto px-2 w-full">
                 {!order?.productsOrder || order.productsOrder.length === 0 ? (
-                  <p className="text-white text-center">No hay productos en la orden</p>
+                  <p className="text-white text-center">
+                    No hay productos en la orden
+                  </p>
                 ) : (
                   order.productsOrder.map((item, index) => (
                     <div

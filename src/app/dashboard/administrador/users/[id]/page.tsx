@@ -65,7 +65,6 @@ const UsersId = ({ params }: { params: { id: string } }) => {
   }, []);
 
   const onPageChange = (page: number) => setCurrentPage(page);
-console.log(user);
   //! Función para calcular las ordenes a mostrar en la página actual
   const getCurrentPageOrders = () => {
     const filteredOrders = filterOrders();
@@ -77,7 +76,6 @@ console.log(user);
   //! Función para filtrar las ordenes
   const filterOrders = () => {
     if (searchTerm === "") {
-      console.log(orders);
       return orders;
     } else {
       return orders.filter((order) =>
@@ -91,7 +89,6 @@ console.log(user);
     id: string
   ) => {
     const newStatus = { status: e.target.value };
-    console.log(newStatus);
 
     const response = await putOrder(id, newStatus, token as string);
     if (response && (response?.status === 200 || response?.status === 201)) {
@@ -100,7 +97,6 @@ console.log(user);
           order.id === id ? { ...order, status: newStatus.status } : order
         )
       );
-      console.log("response", response);
       Swal.fire(
         "¡Éxito!",
         "El estado de la orden ha sido actualizado.",
@@ -193,7 +189,6 @@ console.log(user);
     setErrors(errors);
   }, []);
   useEffect(() => {
-    console.log(orders);
     const filterUnPaidOrders = orders.filter(
       (order) => order.orderDetail.transactions.status === "Pendiente de pago"
     );
@@ -202,11 +197,9 @@ console.log(user);
       .map((order) => Number(order.orderDetail.totalPrice))
       .reduce((a, b) => a + b, 0);
 
-    console.log(totalPaidOrders);
     setTotalPaidOrders(totalPaidOrders);
   }, [orders]);
   const handleTransferOk = async (id: string) => {
-    console.log(id);
     Swal.fire({
       title: "¿Estás seguro que el comprobante es correcto?",
       icon: "warning",
@@ -257,7 +250,6 @@ console.log(user);
     });
   };
   const handleTransferReject = async (id: string) => {
-    console.log(id);
     Swal.fire({
       title: "¿Estás seguro que el comprobante es incorrecto?",
       icon: "warning",

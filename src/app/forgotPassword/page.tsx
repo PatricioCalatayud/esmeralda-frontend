@@ -45,10 +45,7 @@ const ForgotPassword: React.FC = () => {
         body: JSON.stringify({ email }),
       });
 
-      console.log("Response status:", response.status); // Verifica el estado de la respuesta
-
       if (response.ok) {
-        console.log("Response is OK, triggering Swal..."); // Depuración
         Swal.fire({
           icon: "success",
           title: "¡Correo enviado!",

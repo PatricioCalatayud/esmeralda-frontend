@@ -22,7 +22,6 @@ export async function getProductsByCategory(
 ): Promise<IProductList[] | undefined> {
   try {
     const res = await axios.get(`${apiURL}/products?category=${categoryName}`);
-    console.log(res);
     const products: IProductList[] = res.data.data;
     return products;
   } catch (error: any) {

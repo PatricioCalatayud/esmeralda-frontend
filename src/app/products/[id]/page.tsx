@@ -194,24 +194,24 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
         const blob = await response.blob(); // Convertimos la respuesta a Blob
         return URL.createObjectURL(blob);
       } else {
-        console.error("Error al cargar la imagen:", response.status);
         return undefined;
       }
     } catch (error) {
-      console.error("Error al obtener la imagen:", error);
       return undefined;
     }
   };
 
   useEffect(() => {
     const loadImage = async () => {
-      const image = await fetchUrl(
-        `${apiURL}/product/${filteredProduct?.imgUrl}`
-      );
+      if (filteredProduct?.imgUrl) {
+        const image = await fetchUrl(
+          `${apiURL}/product/${filteredProduct?.imgUrl}`
+        );
       setImageUrl(
         image ||
           "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"
       ); // URL por defecto si la carga falla
+    }
     };
 
     loadImage();

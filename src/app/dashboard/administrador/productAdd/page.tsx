@@ -22,7 +22,6 @@ const InsertProduct = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const {token} = useAuthContext();
   const {categories, categoriesLoading} = useCategoryContext();
-  console.log(categories);
   const [subproducts, setSubproducts] = useState<ISubProductUpdate[]>([
     {  amount: "", 
       unit: "", 
@@ -107,10 +106,6 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     formData.append(`subproducts[${index}][discount]`, subproduct.discount);
   });
   
-  // Imprimir los datos de FormData en la consola usando forEach
-  Array.from(formData.entries()).forEach(([key, value]) => {
-    console.log(`${key}: ${value}`);
-  });
   
   //! Mostrar alerta de carga mientras se procesa la solicitud
   Swal.fire({
@@ -170,8 +165,6 @@ useEffect(() => {
     validateSubproduct(subproduct) // Debe devolver un objeto de errores si hay errores
   ));
 
-  console.log(validationResults);
-  
   // Filtrar subproductos inválidos
   const invalidSubproducts = validationResults.filter(result => Object.keys(result).length > 0);
 
@@ -188,7 +181,6 @@ useEffect(() => {
   setErrors(validationErrors);
 }, [dataProduct, subproducts]);
 
-console.log("Errores de producto:", errors);
 
 const areAllFieldsEmpty = (errorsSubproducts: Array<{ [key: string]: string }>): boolean => {
   return errorsSubproducts.every(subproduct => {

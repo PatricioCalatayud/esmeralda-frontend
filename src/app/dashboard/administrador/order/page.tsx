@@ -12,7 +12,7 @@ import { getAllOrders, putOrder } from "@/helpers/Order.helper"
 import Image from "next/image"
 import { useAuthContext } from "@/context/auth.context"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck, faDownload, faX, faEye, faTimes, faSave } from "@fortawesome/free-solid-svg-icons"
+import { faDownload, faX, faEye, faTimes, faSave, faSearch } from "@fortawesome/free-solid-svg-icons"
 import { Tooltip } from "flowbite-react"
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL
@@ -25,6 +25,7 @@ const OrderList = () => {
   const [totalPages, setTotalPages] = useState(0)
   const [totalOrders, setTotalOrders] = useState(0)
   const [searchTerm, setSearchTerm] = useState("")
+  const [activeSearchTerm, setActiveSearchTerm] = useState("") // The term actually being searched
   const { token } = useAuthContext()
   const [loading, setLoading] = useState(true)
   const [selectedProducts, setSelectedProducts] = useState<any[]>([])
@@ -32,27 +33,47 @@ const OrderList = () => {
   const [trackingInputs, setTrackingInputs] = useState<Record<string, string>>({})
   const [savingTracking, setSavingTracking] = useState<Record<string, boolean>>({})
 
-  //! Obtener las Ordenes
-  const fetchOrders = async (page: number) => {
+
+  const fetchOrders = async (page: number, searchId = "") => {
     if (token) {
       setLoading(true)
       try {
-        // Asegurarnos de que se envía el valor correcto de ORDERS_PER_PAGE
-        const response: { products: IOrders[]; totalOrders: number } | undefined = await getAllOrders(
-          token,
-          page,
-          ORDERS_PER_PAGE,
-        )
+        let response: { products: IOrders[]; totalOrders: number } | undefined
+
+        if (searchId.trim()) {
+          const searchResponse = await fetch(`${apiURL}/order/${searchId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          })
+
+          if (searchResponse.ok) {
+            const orderData = await searchResponse.json()
+            response = {
+              products: [orderData],
+              totalOrders: 1,
+            }
+          } else if (searchResponse.status === 404) {
+            response = {
+              products: [],
+              totalOrders: 0,
+            }
+          } else {
+            throw new Error(`Error ${searchResponse.status}: ${searchResponse.statusText}`)
+          }
+        } else {
+          response = await getAllOrders(token, page, ORDERS_PER_PAGE)
+        }
 
         if (response) {
           setOrders(response.products)
           setTotalOrders(response.totalOrders)
 
-          // Calcular correctamente el número total de páginas
-          const calculatedTotalPages = Math.ceil(response.totalOrders / ORDERS_PER_PAGE)
+          const calculatedTotalPages = searchId.trim() ? 1 : Math.ceil(response.totalOrders / ORDERS_PER_PAGE)
           setTotalPages(calculatedTotalPages)
 
-          // Inicializar los inputs de tracking con los valores actuales
           const initialTrackingInputs: Record<string, string> = {}
           response.products.forEach((order) => {
             initialTrackingInputs[order.id] = order.trackingNumber || ""
@@ -66,6 +87,9 @@ const OrderList = () => {
       } catch (error) {
         console.error("Error al obtener órdenes:", error)
         Swal.fire("Error", "No se pudieron cargar las órdenes", "error")
+        setOrders([])
+        setTotalOrders(0)
+        setTotalPages(0)
       } finally {
         setLoading(false)
       }
@@ -73,27 +97,36 @@ const OrderList = () => {
   }
 
   useEffect(() => {
-    fetchOrders(currentPage)
-  }, [token, currentPage])
+    fetchOrders(currentPage, activeSearchTerm)
+  }, [token, currentPage, activeSearchTerm])
 
   const onPageChange = (page: number) => {
     setCurrentPage(page)
-    // No es necesario llamar a fetchOrders aquí, ya que el useEffect se encargará de eso
-  }
-
-  //! Función para filtrar las órdenes
-  const filterOrders = () => {
-    if (searchTerm === "") {
-      return orders
-    } else {
-      return orders.filter((order) => order.user.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    }
   }
 
   //! Función para manejar el cambio en el campo de búsqueda
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value)
-    setCurrentPage(1) // Volver a la primera página al buscar
+    const value = e.target.value
+    setSearchTerm(value)
+
+    if (value.trim() === "") {
+      setActiveSearchTerm("")
+      setCurrentPage(1)
+    }
+  }
+
+  //! Función para ejecutar la búsqueda
+  const executeSearch = () => {
+    const trimmedSearch = searchTerm.trim()
+    setActiveSearchTerm(trimmedSearch)
+    setCurrentPage(1)
+  }
+
+  //! Función para manejar Enter en el input de búsqueda
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      executeSearch()
+    }
   }
 
   //! Función para manejar el cambio en el estado de la orden
@@ -111,7 +144,6 @@ const OrderList = () => {
     if (response.ok) {
       Swal.fire("¡Éxito!", "El estado de la orden ha sido actualizado.", "success")
 
-      // Actualizar el estado local
       setOrders(
         orders.map((order) =>
           order.id === id
@@ -245,11 +277,9 @@ const OrderList = () => {
       return null
     }
   }
-  // useEffect para cargar las imágenes
   useEffect(() => {
     const fetchAllImages = async () => {
       try {
-        // Creamos un array de promesas para todas las imágenes
         const urls = await Promise.all(
           orders.flatMap((order) =>
             order.productsOrder.map(async (product) => {
@@ -265,7 +295,6 @@ const OrderList = () => {
           ),
         )
 
-        // Convertimos el array en un objeto de mapeo { id: url }
         const urlMap = urls.reduce((acc: any, item) => {
           if (item?.id && item?.url) {
             acc[item.id] = item.url
@@ -273,7 +302,7 @@ const OrderList = () => {
           return acc
         }, {})
 
-        setImageUrls(urlMap) // Verificamos el resultado
+        setImageUrls(urlMap)
       } catch (error) {
         console.error("Error fetching images:", error)
       }
@@ -564,11 +593,7 @@ const OrderList = () => {
     }
   }, [isModalOpen])
 
-  // Mostrar órdenes filtradas si hay término de búsqueda, de lo contrario mostrar las órdenes de la página actual
-  const ordersToDisplay = searchTerm ? filterOrders() : orders
-
-  console.log(ordersToDisplay)
-
+  const ordersToDisplay = orders
 
   return (
     <>
@@ -577,107 +602,159 @@ const OrderList = () => {
           <Spinner
             color="teal"
             className="h-12 w-12"
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
+            onPointerEnterCapture={() => {}}
+            onPointerLeaveCapture={() => {}}
           />
         </div>
       ) : (
-        <DashboardComponent
-          setCurrentPage={onPageChange}
-          titleDashboard="Listado de Ordenes"
-          searchBar="Buscar cliente"
-          handleSearchChange={handleSearchChange}
-          totalPages={totalPages}
-          currentPage={currentPage}
-          tdTable={[
-            "Cliente",
-            "Precio total",
-            "Fecha de pedido - entrega",
-            "Lugar de envio",
-            "Productos",
-            "Estado",
-            "Acciones",
-            "Archivo Factura",
-            "CUIT/DNI",
-            "Tracking ID",
-          ]}
-          noContent="No hay Ordenes disponibles"
-        >
-          {ordersToDisplay.length > 0 ? (
-            ordersToDisplay.map((order: IOrders) => (
-              <tr key={order.id} className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {order.user.name}
-                </th>
-                <td className="px-4 py-3 text-center">$ {order.orderDetail.totalPrice}</td>
-                <td className="px-4 py-3 text-center">
-                  {order.create && format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
-                  <br />
-                  {order.orderDetail.deliveryDate &&
-                    format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {order.orderDetail.deliveryAddress ? (
-                    <div className="text-sm">{order.orderDetail.deliveryAddress.store ? "Retiro de local" : order.orderDetail.deliveryAddress.street + " " + order.orderDetail.deliveryAddress.number}</div>
-                  ) : (
-                    "--"
-                  )} 
-                </td>
-                <td className="px-4 py-3">
-                  {order.productsOrder.length > 0 && (
-                    <div className="flex items-center">
-                      {imageUrls && (
-                        <Image
-                          width={50}
-                          height={50}
-                          src={
-                            String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)]) !==
-                              "undefined" &&
-                            String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)]) !== "null"
-                              ? String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)])
-                              : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`
-                          }
-                          alt={order.productsOrder[0].subproduct.product?.description || ""}
-                          className="w-10 h-10 inline-block mr-2 rounded-full"
-                        />
-                      )}
-                      <div>
-                        {order.productsOrder[0].subproduct.product?.description} x {order.productsOrder[0].quantity} un
-                        de {order.productsOrder[0].subproduct.amount} {order.productsOrder[0].subproduct.unit}
+        <div>
+          {/* Custom search bar */}
+          <div className="mb-4 p-4 bg-white rounded-lg shadow">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onKeyPress={handleSearchKeyPress}
+                  placeholder="Buscar por ID de orden (presiona Enter o haz clic en la lupa)"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                />
+              </div>
+              <button
+                onClick={executeSearch}
+                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSearch} />
+                Buscar
+              </button>
+              {activeSearchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm("")
+                    setActiveSearchTerm("")
+                    setCurrentPage(1)
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
+            {activeSearchTerm && (
+              <div className="mt-2 text-sm text-gray-600">
+                Buscando orden con ID: <span className="font-semibold">{activeSearchTerm}</span>
+              </div>
+            )}
+          </div>
+
+          <DashboardComponent
+            setCurrentPage={onPageChange}
+            titleDashboard="Listado de Ordenes"
+            searchBar="" // Empty since we have custom search
+            handleSearchChange={() => {}} // Empty function
+            totalPages={activeSearchTerm.trim() ? 0 : totalPages} // Hide pagination when searching
+            currentPage={currentPage}
+            tdTable={[
+              "Orden ID",
+              "Precio total",
+              "Fecha de pedido - entrega",
+              "Lugar de envio",
+              "Productos",
+              "Estado",
+              "Acciones",
+              "Archivo Factura",
+              "CUIT/DNI",
+              "Tracking ID",
+            ]}
+            noContent={
+              activeSearchTerm.trim()
+                ? `No se encontró la orden con ID: ${activeSearchTerm}`
+                : "No hay Ordenes disponibles"
+            }
+          >
+            {ordersToDisplay.length > 0 ? (
+              ordersToDisplay.map((order: IOrders) => (
+                <tr key={order.id} className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {order.id}
+                  </th>
+                  <td className="px-4 py-3 text-center">$ {order.orderDetail.totalPrice}</td>
+                  <td className="px-4 py-3 text-center">
+                    {order.create && format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
+                    <br />
+                    {order.orderDetail.deliveryDate &&
+                      format(new Date(order.orderDetail.deliveryDate), "dd'-'MM'-'yyyy", { locale: es })}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {order.orderDetail.deliveryAddress ? (
+                      <div className="text-sm">
+                        {order.orderDetail.deliveryAddress.store
+                          ? "Retiro de local"
+                          : order.orderDetail.deliveryAddress.street + " " + order.orderDetail.deliveryAddress.number + ", " + order.orderDetail.deliveryAddress.locality + ", " + order.orderDetail.deliveryAddress.province}
                       </div>
+                    ) : (
+                      "--"
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {order.productsOrder.length > 0 && (
+                      <div className="flex items-center">
+                        {imageUrls && (
+                          <Image
+                            width={50}
+                            height={50}
+                            src={
+                              String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)]) !==
+                                "undefined" &&
+                              String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)]) !== "null"
+                                ? String(imageUrls[Number(order.productsOrder[0]?.subproduct?.product?.id)])
+                                : `https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740`
+                            }
+                            alt={order.productsOrder[0].subproduct.product?.description || ""}
+                            className="w-10 h-10 inline-block mr-2 rounded-full"
+                          />
+                        )}
+                        <div>
+                          {order.productsOrder[0].subproduct.product?.description} x {order.productsOrder[0].quantity}{" "}
+                          un de {order.productsOrder[0].subproduct.amount} {order.productsOrder[0].subproduct.unit}
+                        </div>
 
-                      {order.productsOrder.length > 1 && (
-                        <button
-                          onClick={() => handleOpenProductsModal(order.productsOrder)}
-                          className="ml-2 p-1 rounded-full bg-teal-100 hover:bg-teal-200 transition-colors"
-                          title="Ver más productos"
-                        >
-                          <FontAwesomeIcon icon={faEye} style={{ color: "#0d9488", width: "16px", height: "16px" }} />
-                        </button>
-                      )}
-                    </div>
-                  )}
+                        {order.productsOrder.length > 1 && (
+                          <button
+                            onClick={() => handleOpenProductsModal(order.productsOrder)}
+                            className="ml-2 p-1 rounded-full bg-teal-100 hover:bg-teal-200 transition-colors"
+                            title="Ver más productos"
+                          >
+                            <FontAwesomeIcon icon={faEye} style={{ color: "#0d9488", width: "16px", height: "16px" }} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                  {/* Columna de "Estado" */}
+                  <td className="px-4 py-3 text-center">{renderStatusColumn(order)}</td>
+                  {/* Columna de "Acciones" */}
+                  <td className="px-4 py-3 text-center">{renderActionsColumn(order)}</td>
+
+                  {/* Columna de "Archivo Factura" */}
+                  <td className="px-4 py-3 text-center">{renderFileActionsColumn(order)}</td>
+                  <td className="px-4 py-3 text-center">{renderIdentificationColumn(order)}</td>
+                  {/* Nueva columna de "Tracking ID" */}
+                  <td className="px-4 py-3">{renderTrackingIdColumn(order)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                  {activeSearchTerm.trim()
+                    ? `No se encontró la orden con ID: ${activeSearchTerm}`
+                    : "No hay Ordenes disponibles"}
                 </td>
-                {/* Columna de "Estado" */}
-                <td className="px-4 py-3 text-center">{renderStatusColumn(order)}</td>
-                {/* Columna de "Acciones" */}
-                <td className="px-4 py-3 text-center">{renderActionsColumn(order)}</td>
-
-                {/* Columna de "Archivo Factura" */}
-                <td className="px-4 py-3 text-center">{renderFileActionsColumn(order)}</td>
-                <td className="px-4 py-3 text-center">{renderIdentificationColumn(order)}</td>
-                {/* Nueva columna de "Tracking ID" */}
-                <td className="px-4 py-3">{renderTrackingIdColumn(order)}</td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
-                No hay órdenes disponibles
-              </td>
-            </tr>
-          )}
-        </DashboardComponent>
+            )}
+          </DashboardComponent>
+        </div>
       )}
 
       {/* Información de paginación */}
@@ -730,4 +807,3 @@ const OrderList = () => {
 }
 
 export default OrderList
-
