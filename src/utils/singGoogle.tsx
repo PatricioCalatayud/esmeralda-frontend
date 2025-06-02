@@ -23,7 +23,6 @@ const signOutWithGoogle = async() => {
 const getSessionGoogle = async () => {
   try {
     const session = await getSession();
-    console.log("session", session)
     return session;
   } catch (error) {
     console.error("Error en getSessionGoogle:", error);

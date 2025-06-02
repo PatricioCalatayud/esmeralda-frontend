@@ -44,8 +44,6 @@ const ForgotPassword: React.FC = () => {
         }
       );
 
-      console.log("Response status:", response.status); // Verifica el estado de la respuesta
-
       if (response.ok) {
         Swal.fire({
           icon: "success",
@@ -78,9 +76,7 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
 
     const idUserString = localStorage.getItem("idUser");
-    console.log(idUserString);
-    const userId = idUserString ? Number(idUserString) : null; //
-    console.log(userId);
+    const userId = idUserString ? Number(idUserString) : null;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-code`,
@@ -93,7 +89,6 @@ const ForgotPassword: React.FC = () => {
         }
       );
 
-      console.log("Response status:", response.status); // Verifica el estado de la respuesta
 
       if (response.ok) {
         Swal.fire({

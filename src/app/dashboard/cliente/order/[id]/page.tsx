@@ -30,8 +30,6 @@ const Tracking = ({ params }: { params: { id: string } }) => {
   }, [params.id, token]);
 
   const statusDefault = ["En preparación", "Empaquetado", "Transito", "Entregado"];
-  
-  console.log(order)
 
   return loading ? (
     <div className="flex items-center justify-center h-screen">
@@ -39,7 +37,7 @@ const Tracking = ({ params }: { params: { id: string } }) => {
         color="teal"
         className="h-12 w-12"
         onPointerEnterCapture={() => {}}
-        onPointerLeaveCapture={() => {}}
+        onPointerLeaveCapture={undefined}
       />
     </div>
   ) : order && order.orderDetail && order.orderDetail.transactions.status ? (

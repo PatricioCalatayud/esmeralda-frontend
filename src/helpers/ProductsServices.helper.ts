@@ -12,11 +12,10 @@ export async function getProducts(page?: number, limit?: number) {
       },
 
     });
-    console.log(res)
     const products: IProductList[] = res.data.data;
     return products;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -32,12 +31,11 @@ export async function getProductById(id: string, token: string | undefined) {
 
           return res;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
 export async function postProducts(dataProduct: any, token: string | undefined) {
-  console.log(token);
   try {
     const res = await axios.post(`${apiURL}/products`, dataProduct, {
       headers: {
@@ -47,7 +45,7 @@ export async function postProducts(dataProduct: any, token: string | undefined) 
     });
     return res;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -60,11 +58,10 @@ export async function putProducts(dataProduct: any,id: string, token: string | u
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(res);
     return res;
   } catch (error: any) {
     /*throw new Error(error);*/
-    console.log(error);
+    console.error(error);
   }
 }
 export async function putProductsFormData(dataProduct: any,id: string, token: string | undefined) {
@@ -76,11 +73,10 @@ export async function putProductsFormData(dataProduct: any,id: string, token: st
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log(res);
   return res;
 } catch (error: any) {
   /*throw new Error(error);*/
-  console.log(error);
+  console.error(error);
 }
 }
 
@@ -96,7 +92,7 @@ export async function deleteProducts(id: string, token: string) {
     return response;
   } catch (error: any) {
     /*throw new Error(error);*/
-    console.log(error);
+    console.error(error);
   }
 }
 

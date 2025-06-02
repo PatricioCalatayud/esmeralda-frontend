@@ -9,18 +9,16 @@ export async function getAllOrders( token: string | undefined , page?: number, l
         Authorization: `Bearer ${token}`,
       },
       params: {
-        page,  // Pasar el número de página
-        limit, // Pasar el límite de resultados por página
+        page,
+        limit,
       },});
-    console.log("response de orders" ,response)
     const products: IOrders[] = response.data.data;
     return {products, totalOrders: response.data.total};
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function getOrders(userId: string, token: string | undefined , page?: number, limit?: number) {
-  console.log("userId",userId);
     try {
       const response = await axios.get(`${apiURL}/order/user/${userId}`,{
         headers: {
@@ -31,11 +29,9 @@ export async function getOrders(userId: string, token: string | undefined , page
           limit,
         },});
       const data = response.data.data;
-      console.log("response",response);
-      console.log("data",data);
       return {data, totalOrders: response.data.total};
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   }
 // verificar
@@ -50,10 +46,11 @@ export async function getOrder(orderId: string, token: string | undefined ) {
     const product: IOrders = response.data;
     return product;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function postOrder(order: IOrderCheckout, token: string | undefined) { 
+
   try {
     const response = await axios.post(`${apiURL}/order`, order, {
       headers: {
@@ -85,15 +82,13 @@ export async function deleteOrder(orderId: string, token: string | undefined) {
     const product: IOrders = response.data;
     return product;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
 export async function putOrder(orderId: string, order: IOrders | {}, token: string | undefined) {
   
   try {
-    console.log(orderId);
-    console.log(order);
     const response = await axios.put(`${apiURL}/order/${orderId}`, order,{
       headers: {
         Authorization: `Bearer ${token}`,
@@ -101,7 +96,7 @@ export async function putOrder(orderId: string, order: IOrders | {}, token: stri
 
     return response;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 export async function putOrderTransaction( file: IOrders | {}, token: string | undefined) {
@@ -115,7 +110,7 @@ export async function putOrderTransaction( file: IOrders | {}, token: string | u
 
     return response;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -130,6 +125,6 @@ export async function putAccountPayment( data: IAccountPayment, token: string | 
 
     return response;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }

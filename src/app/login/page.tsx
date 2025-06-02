@@ -85,7 +85,6 @@ const Login = () => {
       const responseData = response?.data;
       if (response) {
         const decodedToken: any = jwtDecode(responseData.accessToken as string);
-        console.log(decodedToken);
         setSession({
           id: decodedToken.sub,
           name: decodedToken.name,

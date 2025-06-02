@@ -13,7 +13,6 @@ export async function LoginUser(user: ILoginProps) {
         "Content-Type": "application/json",
       },
     });
-    console.log(res)
     return res;
   } catch (error: any) {
     if (error.response) {
@@ -23,7 +22,7 @@ export async function LoginUser(user: ILoginProps) {
     } else if (error.request) {
       console.log("Error iniciando sesión: No se recibía respuesta del servidor.");
     } else {
-      console.log(`Error iniciando sesión: ${error.message}`);
+      console.error(`Error iniciando sesión: ${error.message}`);
     }
   }
 
@@ -92,11 +91,10 @@ export async function getUsers(token: string | undefined, page?: number, limit?:
         limit, // Pasar el límite de resultados por página
       },
     });
-    console.log(response);
     const users: ISession[] = response.data.data;
     return users;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -106,11 +104,10 @@ export async function getUser(userId: string, token: string | undefined) {
       headers: {
         Authorization: `Bearer ${token}`,
       },});
-      console.log(response);
     const user: IUserProps = response.data;
     return user;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -125,7 +122,7 @@ export async function putUser(user?: IUpdateProps, token?: string | undefined) {
 
     return response;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -140,7 +137,7 @@ export async function putUserLimit(userId: string, user: any, token: string | un
   
       return response;
     } catch (error: any) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -154,7 +151,7 @@ export async function deleteUser(userId: string, token: string | undefined) {
     const deletedUser: IUserProps = response.data; // Renombrar a 'deletedUser'
     return deletedUser;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
   }
 }
 

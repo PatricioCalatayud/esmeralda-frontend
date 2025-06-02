@@ -26,8 +26,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (cartItems) {
         const items = JSON.parse(cartItems);
         setCartItemCount(items.length);
-      } else {
-        console.log("No hay items en el carrito");
       }
     };
       updateCartItemCount();

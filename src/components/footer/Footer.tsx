@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AiFillInstagram } from "react-icons/ai";
-import { MdFacebook } from "react-icons/md";
+import { MdFacebook, MdWhatsapp } from "react-icons/md";
 import Container from "@/components/container/Container";
 import FooterList from "./FooterList";
 import { useCategoryContext } from "@/context/categories.context";
@@ -142,7 +142,11 @@ const Footer: React.FC = () => {
                 <Link href={"https://www.instagram.com/cafelaesmeralda/"} target="_blank">
                   <AiFillInstagram size={24} />
                 </Link>
+                <Link href={"https://wa.me/541150107956"} target="_blank">
+                  <MdWhatsapp size={24} />
+                </Link>
                 <Link
+
                   href={
                     "https://listado.mercadolibre.com.ar/_CustId_510408628?item_id=MLA1670664876&category_id=MLA409413&seller_id=510408628&client=recoview-selleritems&recos_listing=true"
                   }

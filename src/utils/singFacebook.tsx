@@ -10,7 +10,6 @@ const signOutWithFacebook = async() => {
 
   const getSessionFacebook= async () => {
     const session = await getSession();
-    console.log(session);
     return session;
   };
   

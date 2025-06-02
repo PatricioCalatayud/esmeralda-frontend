@@ -8,12 +8,12 @@ export interface IOrders {
     receipt?:      Receipt;
     status:        string | boolean;
     invoiceType?:  string;
-    bill?:         Bill; // Estructura del módulo Bill 
+    bill?:         Bill;
     date?: number;
 }
 
 export interface IOrderCheckout {
-    address?: string | undefined;
+    address?: OrderAddress;
     userId: string | undefined;
     account?: string;
     products: {
@@ -25,7 +25,7 @@ export interface IOrderCheckout {
 }
 
 export interface Receipt {
-    id: string | undefined; // Cambiado para permitir `undefined`
+    id: string | undefined;
     image: string;
     status: string;
   }
@@ -40,8 +40,8 @@ export interface OrderAddress  {
     address?: string;
     street?: string;
     number?: string;
-    city?: string;
-    state?: string;
+    locality?: string;
+    province?: string;
     country?: string;
     postalCode?: string;
     phone?: string;
@@ -87,7 +87,6 @@ export interface IAccountPayment {
     amount: number;
 }
 
-// Agregamos el módulo Bill
 export interface Bill {
     id: string;  
     type: string;

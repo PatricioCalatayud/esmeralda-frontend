@@ -30,8 +30,6 @@ export default function DashboardLayout({
   const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
-    console.log(authLoading);
-    console.log(session);
     if (!authLoading) {
       if (!session) {
         Swal.fire(

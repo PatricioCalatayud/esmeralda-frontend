@@ -41,7 +41,6 @@ const Contacto: React.FC = () => {
 
     try {
       const res = await CreateTestimony(review, token);
-      console.log(res);
       if (res && ( res.status === 200 || res.status === 201)) {
 
       Swal.fire({

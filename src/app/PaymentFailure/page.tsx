@@ -15,8 +15,6 @@ const PaymentFailure: React.FC = () => {
     setSearchParams(params);
     const id = params.get('orderId');
 
-    console.log(id)
-    console.log(process.env.NEXT_PUBLIC_API_URL)
     if (id) {
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/order/${id}`)
         .then((response) => response.json())
@@ -81,7 +79,7 @@ const PaymentFailure: React.FC = () => {
     <div className="payment__container mx-auto bg-white p-20 rounded-lg flex flex-col items-center justify-evenly shadow-lg">
       <h3 className="payment__container-heading text-4xl font-semibold text-center mb-5 text-red-500">¡Pago Fallido!</h3>
       <img 
-        className="payment__container-image w-24 mb-5" 
+        className="payment__container-image w-24 h-24 mb-5" 
         src="cross.png" 
         alt="Pago Fallido"
       />

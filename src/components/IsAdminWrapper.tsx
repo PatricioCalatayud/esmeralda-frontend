@@ -12,10 +12,6 @@ const IsAdminWrapper = ({ children }: { children: React.ReactNode }) => {
   const isAdminPage = pathname.startsWith("/dashboardAdmin");
   const isUpdateProductPage = pathname.startsWith("/productList/"); // Assuming this is your correct route pattern
 
-  useEffect(() => {
-    console.log("Ruta actual:", pathname);
-  }, [pathname]);
-
   return (
     <>
       {/* Mostrar Navbar, Chatbot y Footer solo si no es /productAdd, /dashboardAdmin ni /productList/{id} */}

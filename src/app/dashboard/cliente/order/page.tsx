@@ -43,7 +43,6 @@ const Dashboard = () => {
           const calculatedTotalPages = Math.ceil((data.totalOrders || data.data.length) / ORDERS_PER_PAGE)
           setTotalPages(calculatedTotalPages)
         }
-        console.log(data)
       } catch (error) {
         console.error("Error fetching orders:", error)
       } finally {
@@ -112,7 +111,6 @@ const Dashboard = () => {
   }, [orders, apiURL])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleSearchChange", e.target.value)
     setCurrentPage(1) // Reset to first page when searching
   }
 
@@ -138,8 +136,6 @@ const Dashboard = () => {
     return order.trackingNumber ? <span>{order.trackingNumber}</span> : "--"
   }
 
-  console.log("orders", orders?.map((order) => order.status))
-  console.log("orders", orders)
   return (
     <>
       <DashboardComponent

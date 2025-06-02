@@ -46,7 +46,6 @@ export default function DashboardLayout({
   useEffect(() => {
     if (!authLoading) {
       if (!session) {
-        console.log("Session no exists:");
         redirect("/login");
       }
     }

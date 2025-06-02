@@ -54,7 +54,7 @@ const DashboardProfile = ({ session }: { session?: ISession }) => {
   );
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  console.log(province);
+
   // Función para editar la dirección
   const handleEditAddress = async () => {
     if (!token) {
@@ -85,8 +85,6 @@ const DashboardProfile = ({ session }: { session?: ISession }) => {
         return;
       }
       const response = await putUser({id: session?.id, address: updatedAddress}, token)
-
-      console.log(response)
 
       if (response && (response.status === 200 || response.status === 201)) {
         Swal.fire({
@@ -119,8 +117,6 @@ const DashboardProfile = ({ session }: { session?: ISession }) => {
       });
     }
   };
-
-  console.log(session);
 
   return (
     <section className="p-1 sm:p-1 antialiased h-screen dark:bg-gray-700">
@@ -228,7 +224,6 @@ const DashboardProfile = ({ session }: { session?: ISession }) => {
                       value={province}
                       onChange={(e) => {
                         setProvince(e.target.value);
-                        console.log(e.target.value);
                       }}
                     >
                       {Object.entries(provinceMapping).map(([key, value]) => (
