@@ -121,11 +121,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           Swal.fire({
             icon: "warning",
             title: "Ups!",
-            text: "Necesitas registrarte para iniciar sesión con Google.",
-            confirmButtonText: "Registrarse",
+            text: "Correo no encontrado, por favor registrate para continuar con Google.",
+            confirmButtonText: "Aceptar",
             confirmButtonColor: "#00897b",
           });
-          router.push("/register");
         }
       }
       setAuthLoading(false);
