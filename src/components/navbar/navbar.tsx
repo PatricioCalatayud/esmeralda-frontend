@@ -27,6 +27,7 @@ import {
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
   const [nav, setNav] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -368,7 +369,11 @@ const Navbar = () => {
                   <Image
                     width={500}
                     height={500}
-                    src={product.imgUrl}
+                    src={
+                      product.imgUrl
+                        ? `${apiURL}/product/${product.imgUrl}`
+                        : "https://img.freepik.com/vector-gratis/diseno-plano-letrero-foto_23-2149259323.jpg?t=st=1734307534~exp=1734311134~hmac=8c21d768817e50b94bcd0f6cf08244791407788d4ef69069b3de7f911f4a1053&w=740"
+                    }
                     alt={product.description}
                     className="w-12 h-12 object-cover mr-2"
                   />
