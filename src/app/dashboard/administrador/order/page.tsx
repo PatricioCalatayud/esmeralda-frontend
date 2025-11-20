@@ -14,6 +14,7 @@ import { useAuthContext } from "@/context/auth.context"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDownload, faX, faEye, faTimes, faSave, faSearch } from "@fortawesome/free-solid-svg-icons"
 import { Tooltip } from "flowbite-react"
+import { formatPrice } from "@/utils/formatPrice"
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL
 const ORDERS_PER_PAGE = 7
@@ -679,7 +680,7 @@ const OrderList = () => {
                   <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     {order.id}
                   </th>
-                  <td className="px-4 py-3 text-center">$ {order.orderDetail.totalPrice}</td>
+                  <td className="px-4 py-3 text-center">{formatPrice(order.orderDetail.totalPrice)}</td>
                   <td className="px-4 py-3 text-center">
                     {order.create && format(new Date(order.create), "dd'-'MM'-'yyyy", { locale: es })}
                     <br />

@@ -26,6 +26,7 @@ import {
 import { Spinner } from "@material-tailwind/react";
 import DashboardComponent from "@/components/DashboardComponent/DashboardComponent";
 import { validateSubproduct } from "@/utils/subproductsUpdateValidation";
+import { formatPrice } from "@/utils/formatPrice";
 
 const ProductList = () => {
   const { token } = useAuthContext();
@@ -589,7 +590,7 @@ const ProductList = () => {
                   key={index}
                   className="h-10 flex items-center  justify-center w-32"
                 >
-                  $ {subproduct.price}
+                  {formatPrice(subproduct.price)}
                 </p>
               ) : (
                 <div className="flex justify-center items-center gap-2 w-32" key={index}> $ <input

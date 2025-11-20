@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Metricas = () => {
   const { token } = useAuthContext();
@@ -282,7 +283,7 @@ const Metricas = () => {
                         {sales?.totalSales}
                       </th>
                       <th className="text-teal-800 py-4">
-                        {sales?.totalRevenue}
+                        {formatPrice(sales?.totalRevenue)}
                       </th>
                     </tr>
                   </tbody>

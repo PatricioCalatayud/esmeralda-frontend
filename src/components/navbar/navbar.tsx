@@ -55,6 +55,7 @@ const Navbar = () => {
 
   const handleNavLinkClick = () => {
     setNav(false);
+    setSearchTerm(""); // Limpiar búsqueda al cerrar sidebar
   };
 
   const handleSignOut = async () => {
@@ -78,7 +79,12 @@ const Navbar = () => {
         <div className="flex items-center text-gray-900 mb-4 md:mb-0 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center">
             <AiOutlineMenu
-              onClick={() => setNav(!nav)}
+              onClick={() => {
+                if (nav) {
+                  setSearchTerm(""); // Limpiar búsqueda si se está cerrando
+                }
+                setNav(!nav);
+              }}
               size={30}
               className="mr-2 cursor-pointer lg:hidden"
             />
@@ -94,25 +100,12 @@ const Navbar = () => {
               </div>
             </Link>
           </div>
-          <div className="flex items-center w-full md:w-auto justify-between space-x-2 md:hidden">
-            <div className="relative flex items-center w-full md:w-auto justify-between md:justify-start space-x-2">
-              <input
-                className="bg-gray-200 rounded-full pl-10 pr-4 py-1 focus:outline-none w-full md:w-64"
-                type="text"
-                placeholder="Buscar productos..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <AiOutlineSearch
-                style={{ width: "20px", height: "20px" }}
-                className="absolute left-2 text-gray-600"
-              />
-            </div>
+          <div className="flex items-center w-full md:w-auto justify-end space-x-2 md:hidden">
             <button
               onClick={() => router.push("/cart")}
               className="text-teal-700 flex items-center p-2 rounded-full relative"
             >
-              <FontAwesomeIcon icon={faCartShopping} size="xl" />
+              <FontAwesomeIcon icon={faCartShopping} size="lg" />
               {cartItemCount > 0 && (
                 <span className="bg-red-500 rounded-full w-6 h-6 flex items-center justify-center text-white absolute -top-1 -right-1">
                   {cartItemCount}
@@ -387,32 +380,54 @@ const Navbar = () => {
       {nav && (
         <div
           className="bg-black/80 fixed w-full h-screen z-20 top-0 left-0"
-          onClick={() => setNav(false)}
+          onClick={() => {
+            setNav(false);
+            setSearchTerm("");
+          }}
         ></div>
       )}
 
       <div
         className={
           nav
-            ? "fixed top-0 left-0 w-[300px] h-screen bg-white z-20 duration-300"
-            : "fixed top-0 left-[-100%] w-[300px] h-screen bg-white z-20 duration-300"
+            ? "fixed top-0 left-0 w-[300px] h-screen bg-teal-700 z-20 duration-300"
+            : "fixed top-0 left-[-100%] w-[300px] h-screen bg-teal-700 z-20 duration-300"
         }
       >
         <AiOutlineClose
-          onClick={() => setNav(!nav)}
+          onClick={() => {
+            setNav(!nav);
+            setSearchTerm("");
+          }}
           size={30}
-          className="absolute right-4 top-4 cursor-pointer dark:text-black"
+          className="absolute right-4 top-4 cursor-pointer text-white"
         />
-        <h2 className="text-2xl p-4 dark:text-black">
+        <h2 className="text-2xl p-4 text-white">
           La <span className="font-bold">Esmeralda Cafe</span>
         </h2>
+        <div className="px-4 pb-4">
+          <div className="relative flex items-center w-full">
+            <input
+              className="bg-white rounded-full pl-10 pr-4 py-2 focus:outline-none w-full focus:ring-2 focus:ring-teal-300"
+              type="text"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="absolute left-3 text-gray-600"
+              style={{ width: "16px", height: "16px" }}
+            />
+          </div>
+        </div>
         <nav>
-          <ul className="flex flex-col p-4 text-gray-800">
+          <ul className="flex flex-col p-4 text-white">
             <li className="text-xl py-4 flex">
               <Link
                 href="/"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/" ? "text-orange-400 font-bold" : ""
+                className={`hover:text-teal-200 gap-4 flex items-center ${
+                  pathname === "/" ? "text-teal-200 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
@@ -424,9 +439,9 @@ const Navbar = () => {
               <li className="text-xl py-4 flex">
                 <Link
                   href="/dashboard/cliente/order"
-                  className={`hover:text-orange-400 gap-4 flex items-center ${
+                  className={`hover:text-teal-200 gap-4 flex items-center ${
                     pathname === "/dashboard/cliente/order"
-                      ? "text-orange-400 font-bold"
+                      ? "text-teal-200 font-bold"
                       : ""
                   }`}
                   onClick={handleNavLinkClick}
@@ -440,9 +455,9 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/categories"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
+                className={`hover:text-teal-200 gap-4 flex items-center ${
                   pathname === "/categories"
-                    ? "text-orange-400 font-bold"
+                    ? "text-teal-200 font-bold"
                     : ""
                 }`}
                 onClick={handleNavLinkClick}
@@ -454,8 +469,8 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/cart"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/cart" ? "text-orange-400 font-bold" : ""
+                className={`hover:text-teal-200 gap-4 flex items-center ${
+                  pathname === "/cart" ? "text-teal-200 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
@@ -467,9 +482,9 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/sobrenosotros"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
+                className={`hover:text-teal-200 gap-4 flex items-center ${
                   pathname === "/sobrenosotros"
-                    ? "text-orange-400 font-bold"
+                    ? "text-teal-200 font-bold"
                     : ""
                 }`}
                 onClick={handleNavLinkClick}
@@ -482,8 +497,8 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/politica"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/politica" ? "text-orange-400 font-bold" : ""
+                className={`hover:text-teal-200 gap-4 flex items-center ${
+                  pathname === "/politica" ? "text-teal-200 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
@@ -494,8 +509,8 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/mvv"
-                className={`hover:text-orange-400 gap-4 flex ${
-                  pathname === "/mvv" ? "text-orange-400 font-bold" : ""
+                className={`hover:text-teal-200 gap-4 flex ${
+                  pathname === "/mvv" ? "text-teal-200 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >
@@ -507,8 +522,8 @@ const Navbar = () => {
             <li className="text-xl py-4 flex">
               <Link
                 href="/faq"
-                className={`hover:text-orange-400 gap-4 flex items-center ${
-                  pathname === "/faq" ? "text-orange-400 font-bold" : ""
+                className={`hover:text-teal-200 gap-4 flex items-center ${
+                  pathname === "/faq" ? "text-teal-200 font-bold" : ""
                 }`}
                 onClick={handleNavLinkClick}
               >

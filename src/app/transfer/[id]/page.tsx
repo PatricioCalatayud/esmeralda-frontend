@@ -15,6 +15,7 @@ import { ILogin, ILoginErrorProps } from "@/interfaces/ILogin";
 import { validateLoginForm } from "@/utils/loginFormValidation";
 const theme = createTheme();
 import Link from "next/link";
+import { formatPrice } from "@/utils/formatPrice";
 
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -531,7 +532,7 @@ const Transfer = ({ params }: { params: { id: string } }) => {
                 Comprobante de transferencia
               </span>
               <span className="block mb-2 text-sm font-semibold text-red-800 dark:text-white">
-                Monto a transferir: $ {totalPrice}
+                Monto a transferir: {formatPrice(totalPrice)}
               </span>
               <div className="flex justify-center items-center w-full ">
                 <label

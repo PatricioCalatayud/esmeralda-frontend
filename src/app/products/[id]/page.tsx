@@ -13,6 +13,7 @@ import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useCartContext } from "@/context/cart.context";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface SelectedCartItem {
   stock: number;
@@ -349,16 +350,14 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
               <div className="flex gap-4 flex-col">
                 <div>
                   <p className="text-lg font-semibold text-gray-600 animate-fade-in-up line-through">
-                    ${selectedPrice}
+                    {formatPrice(selectedPrice)}
                   </p>
                   <p className="text-teal-400 text-sm font-bold">
                     {selectedDiscount} % de descuento
                   </p>
                 </div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  $
-                  {Number(selectedPrice) -
-                    (Number(selectedPrice) * selectedDiscount) / 100}{" "}
+                  {formatPrice(Number(selectedPrice) - (Number(selectedPrice) * selectedDiscount) / 100)}{" "}
                   (+IVA)
                 </p>
               </div>
@@ -366,7 +365,7 @@ const ProductDetail: React.FC<{ params: { id: string } }> = ({ params }) => {
               <div className="flex gap-4 flex-col">
                 <div className="h-12"></div>
                 <p className="text-2xl font-semibold text-teal-600 mb-4 animate-fade-in-up">
-                  ${selectedPrice} (+IVA)
+                  {formatPrice(selectedPrice)} (+IVA)
                 </p>
               </div>
             )}

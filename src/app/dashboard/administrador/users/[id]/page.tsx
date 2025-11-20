@@ -5,6 +5,7 @@ import { useAuthContext } from "@/context/auth.context";
 import { getUser, putUserLimit } from "@/helpers/Autenticacion.helper";
 import { getOrders, putAccountPayment, putOrder } from "@/helpers/Order.helper";
 import { IOrders } from "@/interfaces/IOrders";
+import { formatPrice } from "@/utils/formatPrice";
 
 import { use, useEffect, useState } from "react";
 import Swal from "sweetalert2";
@@ -453,7 +454,7 @@ const UsersId = ({ params }: { params: { id: string } }) => {
               </div>
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-              $ {order.orderDetail?.totalPrice}
+              {formatPrice(order.orderDetail?.totalPrice)}
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
               {order.orderDetail?.deliveryDate &&
@@ -602,10 +603,10 @@ const UsersId = ({ params }: { params: { id: string } }) => {
                 <hr className="border-gray-400 w-full" />
                 <h1>
                   Balance Total:{" "}
-                  <b className="text-red-500"> $ {user?.account?.balance} </b>{" "}
+                  <b className="text-red-500"> {formatPrice(user?.account?.balance)} </b>{" "}
                   / Limite:{" "}
                   <b className="text-teal-500">
-                    $ {user?.account?.creditLimit}{" "}
+                    {formatPrice(user?.account?.creditLimit)}{" "}
                   </b>
                 </h1>
               </div>

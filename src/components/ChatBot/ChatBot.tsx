@@ -9,6 +9,7 @@ import { useProductContext } from "@/context/product.context"
 import type { IProductList } from "@/interfaces/IProductList"
 import { postOrder } from "@/helpers/Order.helper"
 import Swal from "sweetalert2"
+import { formatPrice } from "@/utils/formatPrice"
 
 interface IAddress {
   street: string
@@ -475,7 +476,7 @@ const ChatBotEsmeralda = () => {
                 Direccion: {address.street} {address.number}, {address.locality}, {address.province}
               </p>
               <p>Tipo de factura: {invoiceType}</p>
-              <p>Precio total con iva: $ {totalPrice}</p>
+              <p>Precio total con iva: {formatPrice(totalPrice)}</p>
             </div>
           ),
           options: ["Crear Orden", "Volver al inicio", "Quiero cambiar mi compra"],
@@ -551,7 +552,7 @@ const ChatBotEsmeralda = () => {
                 await params.injectMessage("Aquí puedes hablar con una persona.")
                 return "step2"
               case "quierohablarconunapersona":
-                await params.injectMessage("Puedes, comunicarte por WhatsApp.")
+                await params.injectMessage("Puedes comunicarte por WhatsApp.")
                 return "stepWtp"
               case "sabermasdelaesmeralda":
                 await params.injectMessage("Aquí puedes ver mas sobre la esmeralda.")
@@ -710,7 +711,7 @@ const ChatBotEsmeralda = () => {
                 await params.injectMessage("Aquí puedes hablar con una persona.")
                 break
               case "quierohablarconunapersona":
-                await params.injectMessage("Puedes, comunicarte por WhatsApp.")
+                await params.injectMessage("Puedes comunicarte por WhatsApp.")
                 return "stepWtp"
               case "sabermasdelaesmeralda":
                 await params.injectMessage("Aquí puedes ver mas sobre la esmeralda.")

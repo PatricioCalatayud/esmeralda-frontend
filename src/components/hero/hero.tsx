@@ -3,9 +3,9 @@ import Image from "next/image";
 const Hero = () => {
   return (
     <div className="max-w-[1640px] mx-auto p-4">
-      <div className="max-h-[500px] relative">
+      <div className="max-h-[500px] relative rounded-xl">
         {/* Superposición visual para aumentar el contraste del texto */}
-        <div className="absolute w-full h-full text-gray-200 max-h-[500px] bg-black/60 flex flex-col justify-center">
+        <div className="absolute w-full h-full text-gray-200 max-h-[500px] bg-black/60 flex flex-col justify-center rounded-xl">
           <h1 className="px-8 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold ">
           Descubrí los <span className="text-teal-800">Mejores</span>
           </h1>
@@ -14,7 +14,7 @@ const Hero = () => {
           </h2>
         </div>
         <Image priority={true} width={500} height={500}
-          className="w-full max-h-[500px] object-cover"
+          className="w-full max-h-[500px] object-cover rounded-xl"
           src="https://images.pexels.com/photos/867466/pexels-photo-867466.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
           alt="imagen destacada"
         />
