@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,15 +29,15 @@ const Footer: React.FC = () => {
   useEffect(() => {
     function updateSize() {
       if (window.innerWidth < 640) {
-        setFooterHeight("800px");
+        setFooterHeight("auto");
         setFlexDirection("column");
         setBackgroundStyle({ backgroundColor: "white" });
       } else if (window.innerWidth < 1024) {
-        setFooterHeight("700px");
+        setFooterHeight("auto");
         setFlexDirection("column");
         setBackgroundStyle({ backgroundColor: "white" });
       } else {
-        setFooterHeight("600px");
+        setFooterHeight("auto");
         setFlexDirection("row");
         setBackgroundStyle({
           backgroundImage: 'url("/buenline.jpg")',
@@ -62,7 +62,7 @@ const Footer: React.FC = () => {
     <footer
       style={{
         position: "relative",
-        height: footerHeight,
+        minHeight: footerHeight,
         display: "flex",
         alignItems: "flex-start",
         width: "100%",
@@ -92,73 +92,73 @@ const Footer: React.FC = () => {
           zIndex: -1,
         }}
       />
-      <Container className="h-full py-24">
+      <Container className="h-full py-12 md:py-16 lg:py-24">
         <div className="flex flex-col justify-between h-full">
-          <div className="flex justify-between w-full">
-            <FooterList className="w-1/4 flex flex-col items-center text-center gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4 w-full">
+            <FooterList className="flex flex-col items-center text-center gap-3">
               <h3 className="text-xl font-bold mb-3 text-teal-600">Productos</h3>
               {categories?.map((category) => (
                 <Link key={category.id} href={`/categories/${category.id}`}>
-                  <div>{category.name}</div>
+                  <div className="hover:text-teal-600 transition-colors">{category.name}</div>
                 </Link>
               ))}
             </FooterList>
-            <FooterList className="w-1/4 flex flex-col items-center text-center gap-3">
+            <FooterList className="flex flex-col items-center text-center gap-3">
               <h3 className="text-xl font-bold mb-3 text-teal-600">
                 Servicio al Cliente
               </h3>
               <Link href="/contact">
-                <div>Contáctanos</div>
+                <div className="hover:text-teal-600 transition-colors">Contáctanos</div>
               </Link>
               <Link href="/politica">
-                <div>Política de Entrega</div>
+                <div className="hover:text-teal-600 transition-colors">Política de Entrega</div>
               </Link>
               <Link href="/devoluciones">
-                <div>Devoluciones y Cambios</div>
+                <div className="hover:text-teal-600 transition-colors">Devoluciones y Cambios</div>
               </Link>
               <Link href="/faq">
-                <div>Preguntas Frecuentes</div>
+                <div className="hover:text-teal-600 transition-colors">Preguntas Frecuentes</div>
               </Link>
             </FooterList>
-            <div className="w-1/4 flex flex-col items-center text-center gap-3">
+            <div className="flex flex-col items-center text-center gap-3 px-4 lg:px-2">
               <h3 className="text-xl font-bold mb-3 text-teal-600">
                 Sobre Nosotros
               </h3>
-              <p className="mb-2">
+              <p className="mb-2 text-sm md:text-base">
                 ¡Bienvenido a Café La Esmeralda, tu destino para los mejores cafés
                 en grano y accesorios! Nos enfocamos en granos seleccionados y
                 productos de alta calidad para ofrecerte una experiencia de café
                 única. Disfruta de nuestra variedad de productos y ofertas hoy.
               </p>
             </div>
-            <FooterList className="w-1/4 flex flex-col items-center text-center gap-3">
+            <FooterList className="flex flex-col items-center text-center gap-3">
               <h3 className="text-xl font-bold mb-3 text-teal-600">
                 Síguenos
               </h3>
-              <div className="flex gap-2">
-                <Link href={"https://www.facebook.com/cafelaesmeralda10"} target="_blank">
-                  <MdFacebook size={24} />
+              <div className="flex gap-4 justify-center">
+                <Link href={"https://www.facebook.com/cafelaesmeralda10"} target="_blank" className="hover:text-teal-600 transition-colors">
+                  <MdFacebook size={28} />
                 </Link>
-                <Link href={"https://www.instagram.com/cafelaesmeralda/"} target="_blank">
-                  <AiFillInstagram size={24} />
+                <Link href={"https://www.instagram.com/cafelaesmeralda/"} target="_blank" className="hover:text-teal-600 transition-colors">
+                  <AiFillInstagram size={28} />
                 </Link>
-                <Link href={"https://wa.me/541150107956"} target="_blank">
-                  <MdWhatsapp size={24} />
+                <Link href={"https://wa.me/541150107956"} target="_blank" className="hover:text-teal-600 transition-colors">
+                  <MdWhatsapp size={28} />
                 </Link>
                 <Link
-
                   href={
                     "https://listado.mercadolibre.com.ar/_CustId_510408628?item_id=MLA1670664876&category_id=MLA409413&seller_id=510408628&client=recoview-selleritems&recos_listing=true"
                   }
                   target="_blank"
+                  className="hover:opacity-80 transition-opacity"
                 >
                   <MercadoPagoIcon />
                 </Link>
               </div>
             </FooterList>
           </div>
-          <div className="w-full text-center border-t pt-4">
-            <p>
+          <div className="w-full text-center border-t pt-4 mt-8">
+            <p className="text-sm md:text-base">
               &copy;{new Date().getFullYear()} Café La Esmeralda. Todos los
               derechos reservados
             </p>

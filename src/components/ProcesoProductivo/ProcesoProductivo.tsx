@@ -3,6 +3,7 @@ import { FaSeedling, FaLeaf, FaTruck, FaCoffee } from 'react-icons/fa';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMugHot } from '@fortawesome/free-solid-svg-icons';
+import Image from 'next/image';
 
 const ProcesoProductivo: React.FC = () => {
   return (
@@ -21,10 +22,7 @@ const ProcesoProductivo: React.FC = () => {
         </div>
         <div className="flex flex-wrap">
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 sm:border-l-2  max-sm:border-t-2 border-gray-200 border-opacity-60">
-            <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/cultivo.mp4" type="video/mp4" />
-              Tu navegador no soporta la etiqueta de video.
-            </video>
+            <Image src="/cultivo.webp" alt="Cultivo" width={100} height={100} className='w-full h-40 object-cover mb-4 rounded' />
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
               <FaSeedling className="mr-2" /> Cultivo
             </h2>
@@ -33,10 +31,7 @@ const ProcesoProductivo: React.FC = () => {
             </p>
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 sm:border-l-2 max-sm:border-t-2 border-gray-200 border-opacity-60  ">
-            <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/cosecha.mp4" type="video/mp4" />
-              Tu navegador no soporta la etiqueta de video.
-            </video>
+            <Image src="/cosecha.webp" alt="Cosecha" width={100} height={100} className='w-full h-40 object-cover mb-4 rounded' />
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
               <FaLeaf className="mr-2" /> Cosecha
             </h2>
@@ -45,10 +40,7 @@ const ProcesoProductivo: React.FC = () => {
             </p>
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 sm:border-l-2 max-sm:border-t-2 border-gray-200 border-opacity-60 ">
-            <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/preparacion.mp4" type="video/mp4" />
-              Tu navegador no soporta la etiqueta de video.
-            </video>
+            <Image src="/preparacion.webp" alt="Preparacion" width={100} height={100} className='w-full h-40 object-cover mb-4 rounded' />
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
               <FaTruck className="mr-2" /> Procesamiento y Transporte
             </h2>
@@ -57,10 +49,7 @@ const ProcesoProductivo: React.FC = () => {
             </p>
           </div>
           <div className="xl:w-1/4 lg:w-1/2 md:w-full px-8 py-6 sm:border-l-2 lg:border-x-2 max-sm:border-y-2  border-gray-200 border-opacity-60 ">
-            <video className="w-full h-40 object-cover mb-4 rounded" autoPlay loop muted>
-              <source src="/TomaCafe.mp4" type="video/mp4" />
-              Tu navegador no soporta la etiqueta de video.
-            </video>
+            <Image src="/TomaCafe.webp" alt="TomaCafe" width={100} height={100} className='w-full h-40 object-cover mb-4 rounded' />
             <h2 className="text-lg sm:text-xl text-gray-900 font-medium title-font mb-2 flex items-center">
               <FaCoffee className="mr-2" /> Preparación
             </h2>

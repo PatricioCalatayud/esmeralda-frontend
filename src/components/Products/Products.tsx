@@ -6,6 +6,7 @@ import { IProductList } from "@/interfaces/IProductList";
 import Image from "next/image";
 import { useProductContext } from "@/context/product.context";
 import { Spinner } from "@material-tailwind/react";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Products = () => {
   const [products, setProducts] = useState<IProductList[] | undefined>([]);
@@ -110,14 +111,14 @@ const Products = () => {
                       {product.description}
                     </h3>
                     <p className="text-lg text-gray-800">
-                      Desde $
-                      {
+                      Desde{" "}
+                      {formatPrice(
                         product.subproducts?.reduce((lowest, current) => {
                           return current.price < lowest.price
                             ? current
                             : lowest;
                         }).price
-                      }
+                      )}
                     </p>
                     <div className="flex items-center gap-1"></div>
 

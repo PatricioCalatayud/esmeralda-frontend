@@ -9,6 +9,7 @@ import { useAuthContext } from "@/context/auth.context";
 import { Spinner } from "@material-tailwind/react";
 import { IOrders } from "@/interfaces/IOrders";
 import { getOrder } from "@/helpers/Order.helper";
+import { formatPrice } from "@/utils/formatPrice";
 
 const Checkout = ({ params }: { params: { id: string } }) => {
   const [order, setOrder] = useState<IOrders | null>(null);
@@ -203,29 +204,20 @@ const Checkout = ({ params }: { params: { id: string } }) => {
                           <li className="flex flex-wrap gap-4">
                             Producto{" "}
                             <span className="ml-auto">
-                              ${Number(item.subproduct?.price || 0)}
+                              {formatPrice(Number(item.subproduct?.price || 0))}
                             </span>
                           </li>
                           <li className="flex flex-wrap gap-4">
                             Subtotal
                             <span className="ml-auto font-bold">
-                              $
-                              {(
-                                Number(item.subproduct?.price || 0) *
-                                Number(item.quantity)
-                              ).toFixed(2)}
+                              {formatPrice(Number(item.subproduct?.price || 0) * Number(item.quantity))}
                             </span>
                           </li>
                           <li className="flex flex-wrap gap-4">
                             Descuento
                             {item.subproduct?.discount > 0 && (
                               <span className="ml-auto">
-                                -$
-                                {(
-                                  Number(item.subproduct?.price || 0) *
-                                  Number(item.quantity) *
-                                  (item.subproduct?.discount / 100)
-                                ).toFixed(2)}
+                                -{formatPrice(Number(item.subproduct?.price || 0) * Number(item.quantity) * (item.subproduct?.discount / 100))}
                               </span>
                             )}
                           </li>
@@ -240,34 +232,34 @@ const Checkout = ({ params }: { params: { id: string } }) => {
               <div className="flex justify-between">
                 <h4 className="text-base text-white font-semibold">Envío:</h4>
                 <h4 className="text-base text-white font-semibold">
-                  ${shippingCost.toFixed(2)}
+                  {formatPrice(shippingCost)}
                 </h4>
               </div>
               <hr />
               <div className="flex justify-between">
                 <h4 className="text-md text-white font-semibold">Subtotal:</h4>
                 <h4 className="text-md text-white font-semibold">
-                  ${subtotal.toFixed(2)}
+                  {formatPrice(subtotal)}
                 </h4>
               </div>
               <div className="flex justify-between">
                 <h4 className="text-md text-white font-semibold">Descuento:</h4>
                 <h4 className="text-md text-white font-semibold">
-                  -${descuento.toFixed(2)}
+                  -{formatPrice(descuento)}
                 </h4>
               </div>
               <hr />
               <div className="flex justify-between">
                 <h4 className="text-md text-white font-semibold">IVA (21%):</h4>
                 <h4 className="text-md text-white font-semibold">
-                  ${iva.toFixed(2)}
+                  {formatPrice(iva)}
                 </h4>
               </div>
               <hr />
               <div className="flex justify-between">
                 <h4 className="text-lg text-white font-bold">Total:</h4>
                 <h4 className="text-lg text-white font-bold">
-                  ${total.toFixed(2)}
+                  {formatPrice(total)}
                 </h4>
               </div>
             </div>

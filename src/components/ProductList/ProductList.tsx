@@ -11,6 +11,7 @@ import { useCategoryContext } from "@/context/categories.context";
 import categorySpanish from "@/utils/categorySpanish";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBolt } from "@fortawesome/free-solid-svg-icons";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface ProductsClientPageProps {
   selectedCategory: string | null;
@@ -365,7 +366,7 @@ const ProductList: React.FC<ProductsClientPageProps> = ({
                   {/* Contenedor para el precio */}
                   <div className="flex-shrink-0 p-4 flex items-center justify-between w-full">
                     <p className="text-lg font-medium">Desde:</p>
-                    <p className="text-lg font-bold">${lowestPrice.price} (+IVA)</p>
+                    <p className="text-lg font-bold">{formatPrice(lowestPrice.price)} (+IVA)</p>
                   </div>
                 </div>
                 );

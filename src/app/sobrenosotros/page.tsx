@@ -55,7 +55,7 @@ const SobreNosotros: React.FC = () => {
             Nuestra misión es ofrecer un café de la más alta calidad, respetando y valorizando cada etapa de su producción. Continuamos elevando los estándares y compartiendo nuestra pasión con cada sorbo, brindando una experiencia inigualable a nuestros clientes.
           </p>
           <div className="flex justify-center">
-            <Link href="https://api.whatsapp.com/send?phone=541158803709" target="_blank" className="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-teal-200 rounded text-lg">Contáctanos</Link>
+            <Link href="https://api.whatsapp.com/send?phone=5491150107956" target="_blank" className="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-teal-200 rounded text-lg">Contáctanos</Link>
           </div>
         </div>
       </div>

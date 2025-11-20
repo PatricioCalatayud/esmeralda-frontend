@@ -13,6 +13,7 @@ import { Modal } from "flowbite-react"
 import { useCartContext } from "@/context/cart.context"
 import { getUser } from "@/helpers/Autenticacion.helper"
 import type { IAccountProps } from "@/interfaces/IUser"
+import { formatPrice } from "@/utils/formatPrice"
 
 const Cart = () => {
   const router = useRouter()
@@ -368,19 +369,16 @@ const Cart = () => {
                         {item.discount && Number(item.discount) > 0 ? (
                           <div>
                             <h4 className="text-sm text-gray-500 line-through">
-                              ${(Number(item.price) * (item.quantity || 1)).toFixed(2)}
+                              {formatPrice(Number(item.price) * (item.quantity || 1))}
                             </h4>
                             <h4 className="text-sm text-teal-600 font-bold">% {Number(item.discount)} de descuento</h4>
                             <h4 className="text-lg font-bold text-gray-800">
-                              $
-                              {(Number(item.price) * (item.quantity || 1) * (1 - Number(item.discount) / 100)).toFixed(
-                                2,
-                              )}
+                              {formatPrice(Number(item.price) * (item.quantity || 1) * (1 - Number(item.discount) / 100))}
                             </h4>
                           </div>
                         ) : (
                           <h4 className="text-lg font-bold text-gray-800">
-                            ${(Number(item.price) * (item.quantity || 1)).toFixed(2)}
+                            {formatPrice(Number(item.price) * (item.quantity || 1))}
                           </h4>
                         )}
                       </div>
@@ -398,18 +396,18 @@ const Cart = () => {
           <div className="flex flex-col gap-2 p-4 w-full">
             <ul className=" mt-8 space-y-4 w-full">
               <li className="flex flex-wrap gap-4 text-base w-full">
-                Subtotal <span className="ml-auto font-medium text-lg">${subtotal.toFixed(2)}</span>
+                Subtotal <span className="ml-auto font-medium text-lg">{formatPrice(subtotal)}</span>
               </li>
               {descuento > 0 && (
                 <li className="flex flex-wrap gap-4 text-lg font-medium">
-                  Descuento <span className="ml-auto font-bold">-${descuento.toFixed(2)}</span>
+                  Descuento <span className="ml-auto font-bold">-{formatPrice(descuento)}</span>
                 </li>
               )}
               <li className="flex flex-wrap gap-4 text-base w-full">
-                IVA (21%) <span className="ml-auto font-medium text-lg">${iva.toFixed(2)}</span>
+                IVA (21%) <span className="ml-auto font-medium text-lg">{formatPrice(iva)}</span>
               </li>
               <li className="flex flex-wrap gap-4 text-lg font-bold">
-                Total <span className="ml-auto">${total.toFixed(2)}</span>
+                Total <span className="ml-auto">{formatPrice(total)}</span>
               </li>
             </ul>
           </div>
@@ -651,7 +649,7 @@ const Cart = () => {
                             : ""
                       }
                     >
-                      <p>Agregar a cuenta corriente: $ {total}</p>
+                      <p>Agregar a cuenta corriente: {formatPrice(total)}</p>
                       {account && (
                         <p>
                           <b
@@ -659,9 +657,9 @@ const Cart = () => {
                               account.balance + total > account.creditLimit ? "text-red-500" : "text-white"
                             }`}
                           >
-                            $ {account.balance + total}
+                            {formatPrice(account.balance + total)}
                           </b>{" "}
-                          / $ {account?.creditLimit}
+                          / {formatPrice(account?.creditLimit)}
                         </p>
                       )}
                     </button>

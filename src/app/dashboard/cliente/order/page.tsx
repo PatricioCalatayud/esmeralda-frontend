@@ -14,6 +14,7 @@ import DashboardComponent from "@/components/DashboardComponent/DashboardCompone
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMoneyCheck, faTruck, faMagnifyingGlassPlus } from "@fortawesome/free-solid-svg-icons"
+import { formatPrice } from "@/utils/formatPrice"
 
 const ORDERS_PER_PAGE = 7
 
@@ -239,7 +240,7 @@ const Dashboard = () => {
               )}
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              $ {order.orderDetail.totalPrice}
+              {formatPrice(order.orderDetail.totalPrice)}
             </td>
             <td className={`px-4 py-3 font-medium ${order.status ? "text-teal-500" : "text-red-500"} whitespace-nowrap`}>
               {order.status ? "Orden exitosa" : "Pendiente"}
