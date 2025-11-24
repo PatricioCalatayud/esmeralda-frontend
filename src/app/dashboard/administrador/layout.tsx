@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/auth.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
@@ -41,15 +41,15 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const { session, authLoading } = useAuthContext();
+  const router = useRouter();
 
   //! Obtener token de usuario-Session
   useEffect(() => {
-    if (!authLoading) {
-      if (!session) {
-        redirect("/login");
-      }
+    if (!authLoading && !session) {
+      // Solo redirigir sin mostrar error (el usuario ya cerró sesión o nunca inició)
+      router.push("/");
     }
-  }, [authLoading, session]);
+  }, [authLoading, session, router]);
 
   return (
     <>

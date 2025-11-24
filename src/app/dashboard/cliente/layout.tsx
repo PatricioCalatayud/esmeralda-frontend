@@ -30,17 +30,11 @@ export default function DashboardLayout({
   const router = useRouter();
   //! Obtener token de usuario-Session
   useEffect(() => {
-    if (!authLoading) {
-      if (!session) {
-        Swal.fire(
-          "¡Error!",
-          "Sesión de usuario no encontrada. Por favor, inicia sesión.",
-          "error"
-        );
-        router.push("/login");
-      }
+    if (!authLoading && !session) {
+      // Solo redirigir sin mostrar error (el usuario ya cerró sesión o nunca inició)
+      router.push("/");
     }
-  }, [authLoading, session]);
+  }, [authLoading, session, router]);
 
   return (
     <>
