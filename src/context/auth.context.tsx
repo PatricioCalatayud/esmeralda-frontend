@@ -45,111 +45,177 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [authLoading, setAuthLoading] = useState(true);
   const { setCartItemCount } = useCartContext();
   const router = useRouter();
-  //! Obtener token de usuario-Session
-  useEffect(() => {
-    const userSession = localStorage.getItem("userSession");
-    if (userSession) {
-      const parsedSession = JSON.parse(userSession);
-      const token = parsedSession.accessToken;
-      setToken(token);
-      try {
-        //decodifico el token
-        const decodedToken: any = jwtDecode(token);
-        // si hay token decodificado
-        if (decodedToken) {
-          setUserId(decodedToken.sub);
-          localStorage.setItem("idUser", decodedToken.sub);
-          // seteo la sesion con el token decodificado
-          setSession({
-            id: decodedToken.sub,
-            name: decodedToken.name,
-            email: decodedToken.email,
-            image: undefined,
-            role: decodedToken.roles[0],
-            phone: decodedToken.phone,
-            address: decodedToken.address,
-          });
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-      setAuthLoading(false);
-    }
-    
-  }, []);
 
+  // Helper: Validar si un token JWT está expirado
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const decoded: any = jwtDecode(token);
+      if (!decoded.exp) return false; // Si no tiene exp, asumimos que es válido
+      const currentTime = Date.now() / 1000;
+      return decoded.exp < currentTime;
+    } catch {
+      return true; // Si no se puede decodificar, considerarlo expirado
+    }
+  };
+
+  // Helper: Validar estructura de localStorage
+  const validateLocalStorage = (data: any): boolean => {
+    return (
+      data &&
+      typeof data === "object" &&
+      typeof data.accessToken === "string" &&
+      data.accessToken.length > 0
+    );
+  };
+
+  // Helper: Limpiar sesión corrupta
+  const clearCorruptedSession = () => {
+    localStorage.removeItem("userSession");
+    localStorage.removeItem("idUser");
+    setSession(undefined);
+    setToken(undefined);
+    setUserId(undefined);
+    setUserGoogle(false);
+  };
+
+  //! Inicialización de autenticación
   useEffect(() => {
-    const someFunction = async () => {
-      const sessionGoogle = await getSessionGoogle();
-      
-      if (sessionGoogle && sessionGoogle.user) {
-        const user = { email: sessionGoogle.user.email as string };
-        const reponseLogin = await LoginUser(user);
-  
-        if (reponseLogin && (reponseLogin.status === 200 || reponseLogin.status === 201)) {
-          const token = reponseLogin.data.accessToken;
-          const decodedToken: any = jwtDecode(token);
-  
-          setToken(token);
-          setUserId(decodedToken.sub);
-          
-          setSession({
-            id: decodedToken.sub,
-            name: decodedToken.name,
-            email: decodedToken.email,
-            image: sessionGoogle.user?.image ?? "",
-            role: decodedToken.roles[0],
-            phone: decodedToken.phone,
-            address: decodedToken.address,
-          });
-          
-          localStorage.setItem("userSession", JSON.stringify({
-            accessToken: token,
-            user: {
+    const initializeAuth = async () => {
+      try {
+        // Paso 1: Intentar cargar sesión desde localStorage
+        const userSessionStr = localStorage.getItem("userSession");
+
+        if (userSessionStr) {
+          try {
+            const parsedSession = JSON.parse(userSessionStr);
+
+            // Validar estructura
+            if (!validateLocalStorage(parsedSession)) {
+              console.warn("localStorage corrupto, limpiando...");
+              clearCorruptedSession();
+              setAuthLoading(false);
+              return;
+            }
+
+            const storedToken = parsedSession.accessToken;
+
+            // Validar expiración del token
+            if (isTokenExpired(storedToken)) {
+              console.warn("Token expirado, limpiando sesión...");
+              clearCorruptedSession();
+              setAuthLoading(false);
+              return;
+            }
+
+            // Token válido, restaurar sesión
+            const decodedToken: any = jwtDecode(storedToken);
+
+            setToken(storedToken);
+            setUserId(decodedToken.sub);
+            localStorage.setItem("idUser", decodedToken.sub);
+
+            // Restaurar flag de usuario Google si existe
+            const isGoogleUser = parsedSession.isGoogleUser === true;
+            setUserGoogle(isGoogleUser);
+
+            setSession({
               id: decodedToken.sub,
               name: decodedToken.name,
               email: decodedToken.email,
-              image: sessionGoogle.user?.image ?? "",
+              image: parsedSession.user?.image,
               role: decodedToken.roles[0],
               phone: decodedToken.phone,
               address: decodedToken.address,
-            }
-          }));
-          
-          setUserGoogle(true);
-        } else {
-          Swal.fire({
-            icon: "warning",
-            title: "Ups!",
-            text: "Correo no encontrado, por favor registrate para continuar con Google.",
-            confirmButtonText: "Aceptar",
-            confirmButtonColor: "#00897b",
-          });
+            });
+
+            setAuthLoading(false);
+            return; // Sesión restaurada exitosamente
+          } catch (error) {
+            console.error("Error procesando localStorage:", error);
+            clearCorruptedSession();
+          }
         }
+
+        // Paso 2: Si no hay localStorage válido, intentar login con Google
+        const sessionGoogle = await getSessionGoogle();
+
+        if (sessionGoogle && sessionGoogle.user) {
+          const user = { email: sessionGoogle.user.email as string };
+
+          try {
+            const responseLogin = await LoginUser(user);
+
+            if (responseLogin && (responseLogin.status === 200 || responseLogin.status === 201)) {
+              const token = responseLogin.data.accessToken;
+              const decodedToken: any = jwtDecode(token);
+
+              setToken(token);
+              setUserId(decodedToken.sub);
+              setUserGoogle(true);
+
+              const sessionData = {
+                id: decodedToken.sub,
+                name: decodedToken.name,
+                email: decodedToken.email,
+                image: sessionGoogle.user?.image ?? "",
+                role: decodedToken.roles[0],
+                phone: decodedToken.phone,
+                address: decodedToken.address,
+              };
+
+              setSession(sessionData);
+
+              // Guardar en localStorage con flag de Google
+              localStorage.setItem("userSession", JSON.stringify({
+                accessToken: token,
+                isGoogleUser: true,
+                user: sessionData
+              }));
+
+              localStorage.setItem("idUser", decodedToken.sub);
+            } else {
+              // Solo mostrar error si realmente intentó login y falló (no por errores de red)
+              Swal.fire({
+                icon: "warning",
+                title: "Ups!",
+                text: "Correo no encontrado, por favor registrate para continuar con Google.",
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: "#00897b",
+              });
+            }
+          } catch (error) {
+            console.error("Error en login de Google:", error);
+            // No mostrar error al usuario si es un fallo de red
+          }
+        }
+      } catch (error) {
+        console.error("Error en inicialización de auth:", error);
+      } finally {
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     };
-  
-    someFunction();
+
+    initializeAuth();
   }, []);
 
 
   //! Cerrar sesión
   const handleSignOut = () => {
+    // Cerrar sesión de Google si es usuario de Google
     if (userGoogle === true) {
       signOutWithGoogle();
-      setSession(undefined);
-      setUserId(undefined);
-      setToken(undefined);
-      localStorage.removeItem("userSession");
-    } else {
-      localStorage.removeItem("userSession");
-      localStorage.removeItem("cart");
-      setCartItemCount(0);
-      setSession(undefined);
-      setUserId(undefined);
-      setToken(undefined);
     }
+
+    // Limpiar todo el estado y localStorage
+    localStorage.removeItem("userSession");
+    localStorage.removeItem("idUser");
+    localStorage.removeItem("cart");
+    setCartItemCount(0);
+    setSession(undefined);
+    setUserId(undefined);
+    setToken(undefined);
+    setUserGoogle(false);
+
     router.push("/");
   };
 
