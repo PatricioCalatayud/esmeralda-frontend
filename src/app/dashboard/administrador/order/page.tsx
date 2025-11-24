@@ -314,10 +314,14 @@ const OrderList = () => {
 
   //! Renderizar columna de "Estado" (Comprobante)
   const renderStatusColumn = (order: IOrders) => {
+    const isRejected = order.receipt?.status === "Rechazado"
+    const status = isRejected ? "Pendiente de pago" : order.orderDetail.transactions.status
+    const isPending = status === "Pendiente de pago"
+    
     return (
       <div className="flex justify-center items-center gap-4">
-        <div className={`${order.status ? "text-teal-500" : "text-red-500"}`}>
-          {order.status ? "Exito" : "Pendiente"}
+        <div className={`${isPending ? "text-red-500" : "text-teal-500"}`}>
+          {status}
         </div>
       </div>
     )
@@ -370,9 +374,19 @@ const OrderList = () => {
             <>
               <input
                 type="file"
-                className="w-full text-xs"
+                id={`file-input-${order.id}`}
+                className="hidden"
                 onChange={(e) => handleUploadFile(e, order.id, order.user.email ?? "", bill.id)}
               />
+              <Tooltip content="Subir factura">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById(`file-input-${order.id}`)?.click()}
+                  className="py-1 px-2 flex items-center text-sm text-teal-600 border-teal-600 border rounded-lg hover:bg-teal-600 hover:text-white transition-colors"
+                >
+                  📄 Subir
+                </button>
+              </Tooltip>
             </>
           )}
         </div>
