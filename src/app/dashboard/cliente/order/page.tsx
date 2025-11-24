@@ -242,15 +242,15 @@ const Dashboard = () => {
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               {formatPrice(order.orderDetail.totalPrice)}
             </td>
-            <td className={`px-4 py-3 font-medium ${order.status ? "text-teal-500" : "text-red-500"} whitespace-nowrap`}>
-              {order.status ? "Orden exitosa" : "Pendiente"}
+            <td className={`px-4 py-3 font-medium ${order.orderDetail.transactions.status !== "Pendiente de pago" ? "text-teal-500" : "text-red-500"} whitespace-nowrap`}>
+              {order.orderDetail.transactions.status}
             </td>
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
               {renderTrackingIdColumn(order)}
             </td>
 
             <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-              {order.status && (
+              {order.orderDetail.transactions.status !== "Pendiente de pago" && (
                 <Link
                   type="button"
                   data-drawer-target="drawer-update-product"
