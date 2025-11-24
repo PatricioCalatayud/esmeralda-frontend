@@ -105,8 +105,11 @@ const Login = () => {
           }, 1500);
         }
         if (decodedToken.email_verified === true || decodedToken.roles[0] === "Administrador") {
-          localStorage.setItem("userSession", JSON.stringify(responseData));
-  
+          localStorage.setItem("userSession", JSON.stringify({
+            ...responseData,
+            isGoogleUser: false
+          }));
+
           Swal.fire({
             icon: "success",
             title: "¡Bienvenido a La Esmeralda !",

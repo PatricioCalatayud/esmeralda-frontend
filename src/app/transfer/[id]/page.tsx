@@ -236,7 +236,10 @@ const Transfer = ({ params }: { params: { id: string } }) => {
       }
 
       if (responseData) {
-        localStorage.setItem("userSession", JSON.stringify(responseData));
+        localStorage.setItem("userSession", JSON.stringify({
+          ...responseData,
+          isGoogleUser: false
+        }));
 
         Swal.fire({
           icon: "success",
